@@ -8,9 +8,9 @@ commander
 
 console.log('Server run(ning) at port', commander.port);
 
-const server = dgram.createSocket('udp4', {
-  type:"udp4",
-  reuseAddr:true
+const server = dgram.createSocket({
+  type: 'udp4',
+  reuseAddr: true
 });
 let jsonString = '';
 
