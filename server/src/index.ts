@@ -20,8 +20,9 @@ server.on('message', function (message, remote) {
     jsonString = message.toString();
 	
 	const action = JSON.parse(jsonString);
-	console.log(action);
+  console.log(action);
+  console.log('ASDASD');
 
 });
 
-server.bind(commander.port, '127.0.0.1');
+server.bind(commander.port);
