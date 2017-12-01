@@ -28,6 +28,14 @@ set(SRC
   ${SRCDIR}/Randomizer.cpp
   ${INCDIR}/PostEffect.hpp
   ${SRCDIR}/PostEffect.cpp
+  
+  # Entities
+  ${INCDIR}/Entities/Particle.hpp
+  ${SRCDIR}/Entities/Particle.cpp
+  
+  # Scenes
+  ${INCDIR}/Scenes/LevelScene.hpp
+  ${SRCDIR}/Scenes/LevelScene.cpp
 
   ${SRCDIR}/main.cpp
 )
@@ -45,6 +53,7 @@ if (MSVC)
     # SFML libs
     debug ${BINARY_DIR}/lib/${CMAKE_CFG_INTDIR}/sfml-audio-s-d.lib
     debug ${BINARY_DIR}/lib/${CMAKE_CFG_INTDIR}/sfml-graphics-s-d.lib
+    debug ${BINARY_DIR}/lib/${CMAKE_CFG_INTDIR}/sfml-network-s-d.lib
     debug ${BINARY_DIR}/lib/${CMAKE_CFG_INTDIR}/sfml-main-d.lib
     debug ${BINARY_DIR}/lib/${CMAKE_CFG_INTDIR}/sfml-system-s-d.lib
     debug ${BINARY_DIR}/lib/${CMAKE_CFG_INTDIR}/sfml-window-s-d.lib
@@ -53,6 +62,7 @@ if (MSVC)
     # SFML libs
     optimized ${BINARY_DIR}/lib/${CMAKE_CFG_INTDIR}/sfml-audio-s.lib
     optimized ${BINARY_DIR}/lib/${CMAKE_CFG_INTDIR}/sfml-graphics-s.lib
+    optimized ${BINARY_DIR}/lib/${CMAKE_CFG_INTDIR}/sfml-network-s.lib
     optimized ${BINARY_DIR}/lib/${CMAKE_CFG_INTDIR}/sfml-main.lib
     optimized ${BINARY_DIR}/lib/${CMAKE_CFG_INTDIR}/sfml-system-s.lib
     optimized ${BINARY_DIR}/lib/${CMAKE_CFG_INTDIR}/sfml-window-s.lib

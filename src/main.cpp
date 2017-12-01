@@ -1,12 +1,12 @@
 #include <iostream>
 #include <Jam/Instance.hpp>
-#include <Jam/Scenes/GameScene.hpp>
+#include <Jam/Scenes/LevelScene.hpp>
 #include <rapidjson/document.h>
 
 int main() {
   jam::Instance instance;
 
-  instance.currentScene = std::make_unique<jam::GameScene>(instance);
+  instance.currentScene = std::make_unique<jam::LevelScene>(instance);
 
   while (instance.window.isOpen()) {
     instance();

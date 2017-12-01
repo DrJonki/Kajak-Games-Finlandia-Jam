@@ -32,8 +32,7 @@ namespace jam
       resourceManager(),
       postProcessor(*this),
       m_clock(),
-      m_quad(),
-      tripping()
+      m_quad()
   {
     window.setVerticalSyncEnabled(true);
     window.setKeyRepeatEnabled(false);
@@ -60,7 +59,6 @@ namespace jam
         delta * config.float_("SPEED_MULT") // Global game speed multiplier
       );
 
-    tripping.update(delta);
     postProcessor.update(delta),
     postProcessor.render(delta);
 

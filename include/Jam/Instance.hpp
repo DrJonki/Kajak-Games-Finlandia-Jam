@@ -8,7 +8,6 @@
 #include <Jam/ResourceManager.hpp>
 #include <Jam/ConfigManager.hpp>
 #include <Jam/PostProcessor.hpp>
-#include <Jam/TrippingState.hpp>
 #include <set>
 
 namespace jam
@@ -37,7 +36,6 @@ namespace jam
     std::unique_ptr<Scene> currentScene;
     ResourceManager resourceManager;
     PostProcessor postProcessor;
-    TrippingState tripping;
 
   public:
 
