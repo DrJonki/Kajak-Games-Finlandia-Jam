@@ -1,0 +1,31 @@
+{
+  "name": "suomi100-server",
+  "version": "0.0.1",
+  "description": "",
+  "main": "lib/index.js",
+  "scripts": {
+    "start": "cross-env NODE_ENV=development nodemon --watch lib ./lib/index.js",
+    "production": "cross-env NODE_ENV=production node ./lib/index.js",
+    "build": "tsc",
+    "watch": "tsc -w"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DrJonki/Kajak-Games-Finlandia-Jam.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/DrJonki/Kajak-Games-Finlandia-Jam/issues"
+  },
+  "homepage": "https://github.com/DrJonki/Kajak-Games-Finlandia-Jam#readme",
+  "devDependencies": {
+    "@types/node": "^8.0.53",
+    "nodemon": "^1.12.1",
+    "typescript": "^2.6.2"
+  },
+  "dependencies": {
+    "cross-env": "^5.1.1",
+    "lodash": "^4.17.4"
+  }
+}

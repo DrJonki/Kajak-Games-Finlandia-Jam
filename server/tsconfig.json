@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    "outDir": "lib",
+
+    "target": "es6",
+    "module": "commonjs",
+    "lib": [
+      "es6",
+      "es7",
+      "esnext"
+    ],
+
+    "types": [
+      "node"
+    ],
+
+    "noFallthroughCasesInSwitch": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+
+    "sourceMap": true,
+    "noEmitOnError": true,
+    "removeComments": true,
+    "pretty": true,
+    "moduleResolution": "node",
+
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": [
+    "./src/*"
+  ]
+}
