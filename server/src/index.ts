@@ -24,3 +24,8 @@ server.on('message', (message, remote) => {
 });
 
 server.bind(commander.port);
+
+process.on('beforeExit', () => {
+  server.close();
+  console.log('Closing...');
+});
