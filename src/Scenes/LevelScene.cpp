@@ -15,13 +15,14 @@ namespace jam
 
     const std::string str("{ \"data\": \"asdf\" }");
 
-    //sf::Packet packet;
-    //packet.clear();
-    //packet << "{ \"data\": \"asdf\" }";
-    //packet << 0;
-    //std::cout << (char*)packet.getData() << std::endl;
-
     sock.send(str.c_str(), str.length(), "127.0.0.1", 9002);
+
+    std::vector<char> buf(65000);
+    size_t received = 0;
+    unsigned short port = 0;
+    sock.receive(&buf[0], buf.size(), received, sf::IpAddress("127.0.0.1"), port);
+
+    std::cout << "received: " << std::string(&buf[0], received) << std::endl;
   }
 
   void LevelScene::update(const float dt)

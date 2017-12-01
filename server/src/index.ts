@@ -7,10 +7,7 @@ commander
   .option('-p, --port <n>', '', parseInt)
   .parse(process.argv);
 
-console.log('Server run(ning) at port', commander.port);
-
 const server = dgram.createSocket('udp4');
-let jsonString = '';
 
 server.on('error', (err) => {
   console.log(`server error:\n${err.message}`);
@@ -26,16 +23,19 @@ server.on('message', function (message, remote) {
       console.log(obj);
     } catch (err) {
       console.error(err);
+      return;
     }
+
+    server.send("reply", remote.port, remote.address);
 
     switch(obj.package) {
         case 'connection':
-            if(obj.connection = 'connect') {
+            if(obj.connection === 'connect') {
                 g.players[obj.name] = new Player(obj.name, remote.address, remote.port)
-                console.log(obj.name + ' connected!');
-            } else if(obj.connection = 'disconnect') {
+                console.log(obj.name, 'connected!');
+            } else if(obj.connection === 'disconnect') {
               delete g.players[obj.name]
-              console.log(obj.name + ' disconnected!');
+              console.log(obj.name, 'disconnected!');
             }
             console.log(g.players);
             break;
@@ -44,7 +44,7 @@ server.on('message', function (message, remote) {
 
 server.on('listening', () => {
   const address = server.address();
-  console.log('UDP Server listening on ' + address.address + ":" + address.port);
+  console.log('UDP Server listening on', `${address.address}:${address.port}`);
 });
 
 server.bind(commander.port);
