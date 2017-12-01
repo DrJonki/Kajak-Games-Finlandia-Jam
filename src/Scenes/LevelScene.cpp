@@ -1,5 +1,6 @@
 #include <Jam/Scenes/LevelScene.hpp>
 #include <SFML/Network.hpp>
+#include <iostream>
 
 namespace jam
 {
@@ -12,10 +13,15 @@ namespace jam
     sf::UdpSocket sock;
     sock.bind(sf::Socket::AnyPort);
 
-    sf::Packet packet;
-    packet << "{ \"data\": \"asdf\" }";
+    const std::string str("{ \"data\": \"asdf\" }");
 
-    sock.send(packet, "127.0.0.1", 9002);
+    //sf::Packet packet;
+    //packet.clear();
+    //packet << "{ \"data\": \"asdf\" }";
+    //packet << 0;
+    //std::cout << (char*)packet.getData() << std::endl;
+
+    sock.send(str.c_str(), str.length(), "127.0.0.1", 9002);
   }
 
   void LevelScene::update(const float dt)
