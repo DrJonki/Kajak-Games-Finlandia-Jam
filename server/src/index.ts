@@ -25,7 +25,7 @@ server.on('message', (message, remote) => {
 
 server.bind(commander.port);
 
-process.on('SIGINT', () => {
+process.on('SIGTERM', () => {
   server.close();
   console.log('Closing...');
 });
