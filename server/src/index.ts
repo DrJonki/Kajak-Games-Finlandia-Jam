@@ -1,6 +1,7 @@
 import * as commander from 'commander';
 import * as dgram from 'dgram';
 import Player from './player';
+import * as net from 'net';
 
 commander
   .option('-p, --port <n>', '', parseInt)
@@ -25,7 +26,20 @@ server.on('message', (message, remote) => {
 
 server.bind(commander.port);
 
+const nets = net.createServer((socket) => {
+  socket.end('goodbye\n');
+}).on('error', (err) => {
+  // handle errors here
+  throw err;
+});
+
+// grab an arbitrary unused port.
+nets.listen(9000, () => {
+  console.log('opened server on');
+});
+
 process.on('SIGTERM', () => {
   server.close();
+  nets.close();
   console.log('Closing...');
 });
