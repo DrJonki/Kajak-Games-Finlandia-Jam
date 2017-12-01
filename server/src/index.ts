@@ -8,24 +8,19 @@ commander
 
 console.log('Server run(ning) at port', commander.port);
 
-const server = dgram.createSocket({
-  type: 'udp4',
-  reuseAddr: true
-});
+const server = dgram.createSocket('udp4');
 let jsonString = '';
 
-server.on('listening', function () {
-    const address = server.address();
-    console.log('UDP Server listening on ' + address.address + ":" + address.port);
+server.on('listening', () => {
+  const address = server.address();
+  console.log('UDP Server listening on ' + address.address + ":" + address.port);
 });
 
-server.on('message', function (message, remote) {
-    jsonString = message.toString();
+server.on('message', (message, remote) => {
+  jsonString = message.toString();
 	
 	const action = JSON.parse(jsonString);
-  console.log(action);
-  console.log('ASDASD');
-
+  console.log(message.toString());
 });
 
 server.bind(commander.port);
