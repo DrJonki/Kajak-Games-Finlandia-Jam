@@ -1,6 +1,7 @@
-import * as commander from 'commander';
-import * as dgram from 'dgram';
-import Player from './player';
+import * as commander from 'commander'
+import * as dgram from 'dgram'
+import Player from './player'
+import g from './global'
 
 commander
   .option('-p, --port <n>', '', parseInt)
@@ -17,11 +18,21 @@ server.on('listening', function () {
 });
 
 server.on('message', function (message, remote) {
-    jsonString = message.toString();
-	
-	const action = JSON.parse(jsonString);
-  console.log(action);
-  console.log('ASDASD');
+    const obj = JSON.parse(message.toString());
+    console.log(obj);
+
+    switch(obj.package) {
+        case 'connection':
+            if(obj.connection = 'connect') {
+                g.players[obj.name] = new Player(obj.name, remote.address, remote.port)
+                console.log(obj.name + ' connected!');
+            } else if(obj.connection = 'disconnect') {
+              delete g.players[obj.name]
+              console.log(obj.name + ' disconnected!');
+            }
+            console.log(g.players);
+            break;
+    }
 
 });
 
