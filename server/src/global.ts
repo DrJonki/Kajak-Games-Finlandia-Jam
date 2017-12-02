@@ -3,7 +3,7 @@ const g = {
 	tickCount: -1,
 	players: {},
 	server: dgram.createSocket('udp4'),
-	actionBuffer: {},
+	actionBuffer: [],
 	maxSpeed: 100,
 
 	sendAll(obj){

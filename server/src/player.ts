@@ -1,9 +1,19 @@
 import g from './global'
+import Vec from './vec'
 export default class Player {
     id
     name
     ip
     port
+    side
+    hp = 100
+    ammo = 50
+    kills = 0
+    deaths = 0
+    position = new Vec(0,0)
+    speed = new Vec(0,0)
+    acceleration = new Vec(0,0)
+
     constructor(name, ip, port) {
         this.id = ip+':'+port
         this.name = name

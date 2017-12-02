@@ -13,6 +13,9 @@ export default class Action {
         g.actionBuffer[myId] = this
     }
 }
+
+
+
 console.log('Loaded action');
 
 /*

@@ -1,7 +1,8 @@
 import * as commander from 'commander'
 import Player from './player'
+import Move from './move'
 import g from './global'
-import Tick from './tick'
+//import Tick from './tick'
 
 commander
   .option('-p, --port <n>', '', parseInt)
@@ -28,24 +29,36 @@ g.server.on('message', function (message, remote) {
 
     switch(obj.package) {
         case 'connection':
-            if(obj.connection === 'connect') {
-                new Player(obj.name, remote.address, remote.port)
-                console.log(remote.address, 'connected!');
+            if(obj.data.connection === 'connect') {
+                const player = new Player(obj.data.name, remote.address, remote.port)
+                console.log(remote.address, 'connected!')
                 g.sendAll({asd:'LOL'})
-                new Tick()
 
-            } else if(obj.connection === 'disconnect') {
-              delete g.players[obj.ip]
+            } else if(obj.data.connection === 'disconnect') {
+              delete g.players[remote.address+':'+remote.port]
               console.log(remote.address, 'disconnected!');
             }
             console.log(g.players);
             break;
+        case 'Move':
+            console.log('making the move')
+            const move = new Move(
+                remote.address+':'+remote.port,
+                obj.data.position
+            )
+            break
     }
 });
 
+
 g.server.on('listening', () => {
-  const address = g.server.address();
-  console.log('UDP Server listening on', `${address.address}:${address.port}`);
+    const address = g.server.address();
+    console.log('UDP Server listening on', `${address.address}:${address.port}`);
+    setTimeout(() => {
+        for(let i=0, j=g.actionBuffer.length; i<j; i++) {
+            console.log(g.actionBuffer[i]);
+        }
+    }, 10);
 });
 
 g.server.bind(commander.port);
