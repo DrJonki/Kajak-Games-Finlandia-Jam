@@ -6,41 +6,41 @@ namespace jam
 {
   InterpolatesTransform::InterpolatesTransform(Instance& ins)
     : m_instance(ins),
-      m_prevPos(0, 0),
-      m_nextPos(0, 0),
-      m_prevAngle(0.f),
-      m_nextAngle(0.f),
+      m_prevPos(0.f),
+      m_nextPos(0.f),
+      //m_prevDirection(0, 0),
+      //m_nextDirection(0, 0),
       m_currentDelta(0.f)
   {}
 
   InterpolatesTransform::~InterpolatesTransform()
   {}
 
-  void InterpolatesTransform::updatePosition(const sf::Vector2f& pos, const bool force /*= false*/)
+  void InterpolatesTransform::updatePosition(const glm::vec2& pos, const bool force /*= false*/)
   {
     m_prevPos = force ? pos : getCurrentPos();
     m_nextPos = pos;
+
+    m_currentDelta = 0.f;
   }
 
-  void InterpolatesTransform::updateAngle(const float angle, const bool force /*= false*/)
+  //void InterpolatesTransform::updateDirection(const glm::vec2& dir, const bool force /*= false*/)
+  //{
+  //  m_prevDirection = force ? dir : getCurrentDirection();
+  //  m_nextDirection = dir;
+
+  //  m_currentDelta = 0.f;
+  //}
+
+  glm::vec2 InterpolatesTransform::getCurrentPos() const
   {
-    m_prevAngle = force ? angle : getCurrentAngle();
-    m_nextAngle = angle;
+    return glm::mix(m_prevPos, m_nextPos, m_currentDelta);
   }
 
-  sf::Vector2f InterpolatesTransform::getCurrentPos() const
+  /*glm::vec2 InterpolatesTransform::getCurrentDirection() const
   {
-    const auto prev = glm::vec2(m_prevPos.x, m_prevPos.y);
-    const auto next = glm::vec2(m_nextPos.x, m_nextPos.y);
-    const auto result = glm::mix(prev, next, m_currentDelta);
-
-    return sf::Vector2f(result.x, result.y);
-  }
-
-  float InterpolatesTransform::getCurrentAngle() const
-  {
-    return glm::mix(m_prevAngle, m_nextAngle, m_currentDelta);
-  }
+    return glm::mix(m_prevDirection, m_nextDirection, m_currentDelta);
+  }*/
 
   void InterpolatesTransform::update(const float delta)
   {

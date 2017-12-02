@@ -2,14 +2,19 @@
 
 #include <Jam/Scene.hpp>
 #include <vector>
+#include <SFML/Graphics/View.hpp>
 
 namespace jam
 {
-  class LevelScene : public Scene
+  class Player;
+
+  class LevelScene final : public Scene
   {
   public:
 
     LevelScene(Instance& ins);
+
+    ~LevelScene() override;
 
     void update(const float dt) override;
 
@@ -19,5 +24,10 @@ namespace jam
     Layer& m_propLayer;
     Layer& m_characterLayer;
     std::vector<Layer*> m_uiLayers;
+
+    // Entities
+    Player& m_player;
+
+    sf::View m_gameView;
   };
 }

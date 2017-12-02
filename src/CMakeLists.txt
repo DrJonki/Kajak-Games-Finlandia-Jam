@@ -35,6 +35,8 @@ set(SRC
   ${SRCDIR}/Entities/InterpolatesTransform.cpp
   ${INCDIR}/Entities/ListensMessages.hpp
   ${SRCDIR}/Entities/ListensMessages.cpp
+  ${INCDIR}/Entities/Obstacle.hpp
+  ${SRCDIR}/Entities/Obstacle.cpp
   ${INCDIR}/Entities/Particle.hpp
   ${SRCDIR}/Entities/Particle.cpp
   ${INCDIR}/Entities/Player.hpp

@@ -52,8 +52,8 @@ namespace jam
   private:
 
     Instance& m_instance;
-    std::multimap<uint32_t, std::unique_ptr<Layer>> m_layers;
     std::multimap<std::string, ListensMessages*> m_listeners;
+    std::multimap<uint32_t, std::unique_ptr<Layer>> m_layers;
     sf::View m_view;
   };
 }

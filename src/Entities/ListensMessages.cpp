@@ -1,4 +1,5 @@
 #include <Jam/Entities/ListensMessages.hpp>
+#include <Jam/Instance.hpp>
 #include <Jam/Scene.hpp>
 
 namespace jam
@@ -21,4 +22,19 @@ namespace jam
 
   void ListensMessages::socketMessage(const char* message, const rapidjson::Value& data)
   {}
+
+  bool ListensMessages::sendMessage(const char* message, rapidjson::Value& data)
+  {
+    return m_scene.getInstance().sendMessage(message, data);
+  }
+
+  void ListensMessages::listen(const char* message)
+  {
+    m_listening.insert(message);
+  }
+
+  void ListensMessages::stopListening(const char* message)
+  {
+    m_listening.erase(std::string(message));
+  }
 }

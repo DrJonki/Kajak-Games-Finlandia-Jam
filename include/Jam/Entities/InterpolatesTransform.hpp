@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SFML/System/Vector2.hpp>
+#include <glm/vec2.hpp>
 
 namespace jam
 {
@@ -14,13 +15,13 @@ namespace jam
 
     virtual ~InterpolatesTransform() = 0;
 
-    void updatePosition(const sf::Vector2f& pos, const bool force = false);
+    void updatePosition(const glm::vec2& pos, const bool force = false);
 
-    void updateAngle(const float angle, const bool force = false);
+    // void updateDirection(const glm::vec2& dir, const bool force = false);
 
-    sf::Vector2f getCurrentPos() const;
+    glm::vec2 getCurrentPos() const;
 
-    float getCurrentAngle() const;
+    glm::vec2 getCurrentDirection() const;
 
     void update(const float delta);
 
@@ -28,11 +29,11 @@ namespace jam
 
     Instance& m_instance;
 
-    sf::Vector2f m_prevPos;
-    sf::Vector2f m_nextPos;
+    glm::vec2 m_prevPos;
+    glm::vec2 m_nextPos;
 
-    float m_prevAngle;
-    float m_nextAngle;
+    /*glm::vec2 m_prevDirection;
+    glm::vec2 m_nextDirection;*/
 
     float m_currentDelta;
   };
