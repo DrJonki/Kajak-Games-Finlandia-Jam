@@ -1,55 +1,57 @@
 import * as commander from 'commander'
-import * as dgram from 'dgram'
 import Player from './player'
 import g from './global'
+import Tick from './tick'
 
 commander
   .option('-p, --port <n>', '', parseInt)
   .parse(process.argv);
 
-const server = dgram.createSocket('udp4');
-
-server.on('error', (err) => {
+g.server.on('error', (err) => {
   console.log(`server error:\n${err.message}`);
-  server.close();
+  g.server.close();
 });
 
-server.on('message', function (message, remote) {
-    console.log(message.toString());
+g.server.on('message', function (message, remote) {
+    // console.log(message.toString());
 
     let obj;
     try {
       obj = JSON.parse(message.toString());
-      console.log(obj);
+      // console.log(obj);
     } catch (err) {
       console.error(err);
       return;
     }
 
-    server.send("reply", remote.port, remote.address);
+    // g.server.send("reply", remote.port, remote.address);
 
     switch(obj.package) {
         case 'connection':
             if(obj.connection === 'connect') {
-                g.players[obj.name] = new Player(obj.name, remote.address, remote.port)
-                console.log(obj.name, 'connected!');
+                new Player(obj.name, remote.address, remote.port)
+                console.log(remote.address, 'connected!');
+                g.sendAll({asd:'LOL'})
+                new Tick()
+
             } else if(obj.connection === 'disconnect') {
-              delete g.players[obj.name]
-              console.log(obj.name, 'disconnected!');
+              delete g.players[obj.ip]
+              console.log(remote.address, 'disconnected!');
             }
             console.log(g.players);
             break;
     }
 });
 
-server.on('listening', () => {
-  const address = server.address();
+g.server.on('listening', () => {
+  const address = g.server.address();
   console.log('UDP Server listening on', `${address.address}:${address.port}`);
 });
 
-server.bind(commander.port);
+g.server.bind(commander.port);
 
 process.on('SIGTERM', () => {
-  server.close();
-  console.log('Closing...');
+    g.server.close();
+    console.log('Closing...');
 });
+
