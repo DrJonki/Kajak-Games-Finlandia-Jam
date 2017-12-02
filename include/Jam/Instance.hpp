@@ -4,6 +4,8 @@
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/System/Clock.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
+#include <SFML/Network/UdpSocket.hpp>
+#include <rapidjson/document.h>
 #include <memory>
 #include <Jam/ResourceManager.hpp>
 #include <Jam/ConfigManager.hpp>
@@ -27,6 +29,8 @@ namespace jam
 
     void operator ()();
 
+    bool sendMessage(const char* message, rapidjson::Value& data);
+
   public:
 
     // Globals
@@ -36,6 +40,7 @@ namespace jam
     std::unique_ptr<Scene> currentScene;
     ResourceManager resourceManager;
     PostProcessor postProcessor;
+    sf::UdpSocket socket;
 
   public:
 

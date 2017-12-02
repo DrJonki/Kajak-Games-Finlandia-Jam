@@ -1,5 +1,9 @@
 #include <Jam/Scenes/LevelScene.hpp>
-#include <SFML/Network.hpp>
+#include <Jam/Entities/Player.hpp>
+#include <Jam/Layer.hpp>
+#include <Jam/Instance.hpp>
+#include <Jam/Entities/Obstacle.hpp>
+#include <SFML/Graphics/View.hpp>
 #include <iostream>
 
 namespace jam
@@ -8,26 +12,28 @@ namespace jam
     : Scene(ins),
       m_backgroundLayer(addLayer(10)),
       m_propLayer(addLayer(20)),
-      m_characterLayer(addLayer(30))
+      m_characterLayer(addLayer(30)),
+      m_uiLayers(),
+      m_gameView(sf::Vector2f(), sf::Vector2f(ins.config.float_("VIEW_X"), ins.config.float_("VIEW_Y"))),
+      m_player(m_characterLayer.insert<Player>("player_self", ins, *this, true))
   {
-    sf::UdpSocket sock;
-    sock.bind(sf::Socket::AnyPort);
+    m_backgroundLayer.setSharedView(&m_gameView);
+    m_propLayer.setSharedView(&m_gameView);
+    m_characterLayer.setSharedView(&m_gameView);
 
-    const std::string str("{ \"data\": \"asdf\" }");
+    m_propLayer.insert<Obstacle>("");
+  }
 
-    sock.send(str.c_str(), str.length(), "127.0.0.1", 9002);
-
-    std::vector<char> buf(65000);
-    size_t received = 0;
-    unsigned short port = 0;
-    sock.receive(&buf[0], buf.size(), received, sf::IpAddress("127.0.0.1"), port);
-
-    std::cout << "received: " << std::string(&buf[0], received) << std::endl;
+  LevelScene::~LevelScene()
+  {
+    
   }
 
   void LevelScene::update(const float dt)
   {
-    
+    Scene::update(dt);
+
+    m_gameView.setCenter(m_player.getPosition());
   }
 
 }
