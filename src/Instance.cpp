@@ -3,6 +3,8 @@
 #include <Jam/PostProcessor.hpp>
 #include <SFML/Window/Event.hpp>
 #include <rapidjson/document.h>
+#include <rapidjson/stringbuffer.h>
+#include <rapidjson/writer.h>
 #include <iostream>
 #include <string>
 
@@ -31,6 +33,7 @@ namespace jam
       currentScene(),
       resourceManager(),
       postProcessor(*this),
+      socket(),
       m_clock(),
       m_quad()
   {
@@ -43,6 +46,12 @@ namespace jam
       false
     #endif
     );
+
+    if (socket.bind(sf::Socket::AnyPort) != sf::Socket::Status::Done) {
+      assert(false);
+    }
+
+    socket.setBlocking(false);
   }
 
   Instance::~Instance()
@@ -54,10 +63,25 @@ namespace jam
   {
     const auto delta = m_clock.restart().asSeconds();
 
-    if (currentScene)
+    if (currentScene) {
+      static std::vector<char> buffer(sf::UdpSocket::MaxDatagramSize);
+      sf::IpAddress addr;
+      unsigned short port = 0;
+      std::size_t received = 0;
+
+      while (socket.receive(&buffer[0], buffer.size(), received, addr, port) == sf::UdpSocket::Done) {
+        rapidjson::Document doc;
+        doc.ParseInsitu<rapidjson::kParseStopWhenDoneFlag>(buffer.data());
+
+        if (!doc.HasParseError() && doc.HasMember("package") && doc.HasMember("data")) {
+          currentScene->socketEvent(doc["package"].GetString(), doc["data"]);
+        }
+      }
+
       currentScene->update(
         delta * config.float_("SPEED_MULT") // Global game speed multiplier
       );
+    }
 
     postProcessor.update(delta),
     postProcessor.render(delta);
@@ -99,6 +123,25 @@ namespace jam
       }
       }
     }
+  }
+
+  bool Instance::sendMessage(const char* message, rapidjson::Value& data)
+  {
+    using namespace rapidjson;
+
+    static const sf::IpAddress address = sf::IpAddress(config.string("SERVER_ADDRESS"));
+    static const unsigned short port = config.integer("SERVER_PORT");
+
+    Document doc;
+    doc.SetObject();
+    doc.AddMember(StringRef("package"), StringRef(message), doc.GetAllocator());
+    doc.AddMember(StringRef("data"), data, doc.GetAllocator());
+
+    StringBuffer buffer;
+    Writer<StringBuffer> writer(buffer);
+    doc.Accept(writer);
+
+    return socket.send(buffer.GetString(), buffer.GetSize(), address, port) == sf::UdpSocket::Done;
   }
 }
 

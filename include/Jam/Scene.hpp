@@ -3,6 +3,7 @@
 #include <memory>
 #include <map>
 #include <SFML/Graphics/View.hpp>
+#include <rapidjson/document.h>
 
 namespace sf
 {
@@ -14,6 +15,7 @@ namespace jam
 {
   class Layer;
   class Instance;
+  class ListensMessages;
 
   class Scene
   {
@@ -39,12 +41,19 @@ namespace jam
 
     const sf::View& getView() const;
 
+    void addListener(const std::string& message, ListensMessages& entity);
+
+    void removeListener(const std::string& message, ListensMessages& entity);
+
     virtual void textEvent(const uint32_t code);
+
+    virtual void socketEvent(const char* event, const rapidjson::Value& data);
 
   private:
 
     Instance& m_instance;
     std::multimap<uint32_t, std::unique_ptr<Layer>> m_layers;
+    std::multimap<std::string, ListensMessages*> m_listeners;
     sf::View m_view;
   };
 }

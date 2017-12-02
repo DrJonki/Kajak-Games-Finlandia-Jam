@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <Jam/Entity.hpp>
 #include <SFML/Graphics/View.hpp>
+#include <Jam/Entities/ListensMessages.hpp>
 
 namespace sf
 {
@@ -22,14 +23,7 @@ namespace jam
     ~Layer();
 
     template<typename T, typename ... Args>
-    T& insert(const std::string& name, Args&&... args) {
-      static_assert(std::is_base_of<Entity, T>::value, "Not an entity");
-      auto uniq = std::make_unique<T>(args...);
-      auto& ref = *uniq;
-      m_entities.emplace(name, std::move(uniq));
-
-      return ref;
-    }
+    T& insert(const std::string& name, Args&&... args);
 
     Entity* get(const std::string& name) const;
 
@@ -60,5 +54,7 @@ namespace jam
     sf::View m_view;
     bool m_active;
   };
+
+  #include <Jam/Layer.inl>
 }
 
