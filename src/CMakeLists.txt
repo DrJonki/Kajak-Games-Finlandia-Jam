@@ -17,6 +17,7 @@ set(SRC
   ${INCDIR}/ParticleEmitter.hpp
   ${SRCDIR}/ParticleEmitter.cpp
   ${INCDIR}/Layer.hpp
+  ${INCDIR}/Layer.inl
   ${SRCDIR}/Layer.cpp
   ${INCDIR}/Scene.hpp
   ${SRCDIR}/Scene.cpp
@@ -30,8 +31,14 @@ set(SRC
   ${SRCDIR}/PostEffect.cpp
   
   # Entities
+  ${INCDIR}/Entities/InterpolatesTransform.hpp
+  ${SRCDIR}/Entities/InterpolatesTransform.cpp
+  ${INCDIR}/Entities/ListensMessages.hpp
+  ${SRCDIR}/Entities/ListensMessages.cpp
   ${INCDIR}/Entities/Particle.hpp
   ${SRCDIR}/Entities/Particle.cpp
+  ${INCDIR}/Entities/Player.hpp
+  ${SRCDIR}/Entities/Player.cpp
   
   # Scenes
   ${INCDIR}/Scenes/LevelScene.hpp

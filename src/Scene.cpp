@@ -1,12 +1,14 @@
 #include <Jam/Scene.hpp>
 #include <Jam/Layer.hpp>
+#include <cassert>
 
 namespace jam
 {
   Scene::Scene(Instance& ins)
     : m_instance(ins),
       m_layers()
-  {}
+  {
+  }
 
   Scene::~Scene()
   {}
@@ -34,7 +36,6 @@ namespace jam
     }
   }
 
-
   void Scene::postDraw(sf::RenderTarget& target)
   {}
 
@@ -59,6 +60,32 @@ namespace jam
     return m_view;
   }
 
+  void Scene::addListener(const std::string& message, ListensMessages& entity)
+  {
+    m_listeners.emplace(std::make_pair(message, &entity));
+  }
+
+  void Scene::removeListener(const std::string& message, ListensMessages& entity)
+  {
+    auto range = m_listeners.equal_range(message);
+
+    for (auto itr = range.first; itr != range.second; ++itr) {
+      if (itr->second == &entity) {
+        m_listeners.erase(itr);
+        break;
+      }
+    }
+  }
+
   void Scene::textEvent(const uint32_t code)
   {}
+
+  void Scene::socketEvent(const char* event, const rapidjson::Value& data)
+  {
+    auto range = m_listeners.equal_range(event);
+
+    for (auto itr = range.first; itr != range.second; ++itr) {
+      itr->second->socketMessage(event, data);
+    }
+  }
 }
