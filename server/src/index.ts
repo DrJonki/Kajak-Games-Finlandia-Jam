@@ -45,11 +45,28 @@ g.server.on('message', function (message, remote) {
                         side: g.players[remote.address+':'+remote.port].side
                     }
                 })
+
+                for(let key in g.players) {
+                    g.sendAllExcept({
+                        package: 'join', 
+                        data:{ id: g.players[key].ip + ':' + g.players[key].port
+                        }
+                    }, remote.address+':'+remote.port)
+                }
+
             break
         case 'disconnect': 
                 delete g.players[remote.address+':'+remote.port]
                 console.log(remote.address, 'disconnected!');
                 console.log(g.players);
+
+                for(let key in g.players) {
+                    g.sendAllExcept({
+                        package: 'leave', 
+                        data:{ id: g.players[key].ip + ':' + g.players[key].port
+                        }
+                    }, remote.address+':'+remote.port)
+                }
             break;
         case 'updateMovement':
             console.log('making the move')

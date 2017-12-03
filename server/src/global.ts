@@ -12,7 +12,16 @@ const g = {
 		for(let key in g.players) {
 			g.players[key].send(json)
 		}
-	}
+	},
+
+	sendAllExcept(obj, exceptionID){
+		const json = JSON.stringify(obj)
+		for(let key in g.players) {
+			if(exceptionID !== g.players[key].id) {
+				g.players[key].send(json)
+			}
+		}
+	},
 }
 export default g
 console.log('Loaded global');
