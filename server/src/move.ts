@@ -19,7 +19,9 @@ export default class Move {
             if(this.validate()) {
                 console.log(this.playerID)
                 g.players[this.playerID].position = this.position
-                //g.sendAllExcept()
+                //g.sendAllExcept(
+                //    ,his.playerID
+                //)
                 // console.log(g.players[this.playerID].position)
             } else {
                 this.sendPlayerBackToPreviousPosition()
