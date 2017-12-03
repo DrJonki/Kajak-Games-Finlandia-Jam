@@ -25,7 +25,7 @@ namespace jam
     if (m_controllable) {
       using sf::Keyboard;
 
-      const float speed = 5.f;
+      const float speed = 250.f;
       glm::vec2 currentPos = getCurrentPos();
       glm::vec2 targetDirection(0.f);
 

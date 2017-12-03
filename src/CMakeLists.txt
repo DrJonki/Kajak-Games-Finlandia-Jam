@@ -45,6 +45,8 @@ set(SRC
   # Scenes
   ${INCDIR}/Scenes/LevelScene.hpp
   ${SRCDIR}/Scenes/LevelScene.cpp
+  ${INCDIR}/Scenes/TitleScene.hpp
+  ${SRCDIR}/Scenes/TitleScene.cpp
 
   ${SRCDIR}/main.cpp
 )
@@ -81,7 +83,6 @@ if (MSVC)
     # SFML dependencies
     ${SOURCE_DIR}/extlibs/libs-msvc-universal/x86/flac.lib
     ${SOURCE_DIR}/extlibs/libs-msvc-universal/x86/freetype.lib
-    ${SOURCE_DIR}/extlibs/libs-msvc-universal/x86/jpeg.lib
     ${SOURCE_DIR}/extlibs/libs-msvc-universal/x86/ogg.lib
     ${SOURCE_DIR}/extlibs/libs-msvc-universal/x86/openal32.lib
     ${SOURCE_DIR}/extlibs/libs-msvc-universal/x86/vorbis.lib
