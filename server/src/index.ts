@@ -38,7 +38,6 @@ g.server.on('message', function (message, remote) {
         case 'connect':
                 const player = new Player(obj.data.name, remote.address, remote.port)
                 console.log(remote.address, 'connected!')
-                //g.sendAll({asd:'LOL'})
                 g.players[remote.address+':'+remote.port].send({
                     package: 'connected',
                     data:{
@@ -63,7 +62,7 @@ g.server.on('message', function (message, remote) {
                             {
                                 package: 'join', 
                                 data:{ 
-                                    id: g.players[key].ip + ':' + g.players[key].port,
+                                    id: key,
                                     side: g.players[key].side
                                 }
                             }
