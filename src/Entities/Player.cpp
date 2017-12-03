@@ -6,18 +6,28 @@
 
 namespace jam
 {
-  Player::Player(Instance& ins, Scene& scene, const bool controllable)
+  Player::Player(Instance& ins, Scene& scene, const bool controllable, const Faction faction)
     : Entity(),
       ListensMessages(scene, {"updateMovement"}),
       InterpolatesTransform(ins),
       sf::CircleShape(10.f),
-      m_controllable(controllable)
+      m_controllable(controllable),
+      m_faction(faction)
   {
     if (controllable) {
       listen("forcePosition");
     }
 
-    setFillColor(sf::Color::Blue);
+    setOutlineThickness(1.f);
+
+    if (faction == Faction::Simo) {
+      setFillColor(sf::Color::Blue);
+      setOutlineColor(sf::Color::White);
+    }
+    else if (faction == Faction::Russian) {
+      setFillColor(sf::Color::Red);
+      setOutlineColor(sf::Color(255, 168, 0));
+    }
   }
 
   void Player::update(const float dt)
@@ -70,14 +80,20 @@ namespace jam
 
   void Player::socketMessage(const char* message, const rapidjson::Value& data)
   {
+    if (strcmp(message, "forcePosition") == 0) {
+      updatePosition(glm::vec2(
+        static_cast<float>(rapidjson::GetValueByPointer(data, "/position/0")->GetDouble()),
+        static_cast<float>(rapidjson::GetValueByPointer(data, "/position/1")->GetDouble())
+      ), true);
+    }
+
     if (m_controllable) return;
 
-    if (strcmp(message, "updateMovement") == 0) {
+    if (strcmp(message, "updateMovement") == 0 && strcmp(getID().c_str(), data["id"].GetString()) == 0) {
       updatePosition(glm::vec2(
         static_cast<float>(rapidjson::GetValueByPointer(data, "/position/0")->GetDouble()),
         static_cast<float>(rapidjson::GetValueByPointer(data, "/position/1")->GetDouble())
       ));
     }
   }
-
 }
