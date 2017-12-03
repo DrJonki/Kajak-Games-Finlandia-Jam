@@ -4,6 +4,10 @@
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <glm/vec2.hpp>
 
+namespace {
+  const float ns_radius = 10.f;
+}
+
 namespace jam
 {
   Player::Player(Instance& ins, Scene& scene, const bool controllable, const Faction faction)
@@ -18,6 +22,9 @@ namespace jam
     if (controllable) {
       listen("forcePosition");
     }
+
+    setRadius(ns_radius);
+    setOrigin(ns_radius / 2, ns_radius / 2);
 
     setOutlineThickness(1.f);
 
