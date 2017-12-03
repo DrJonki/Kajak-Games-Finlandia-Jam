@@ -28,7 +28,7 @@ export default class Player {
     die(killer){
         this.hp = 0
         ++this.deaths
-        this.send({package:'dead', data:{
+        g.sendAll({package:'dead', data:{
             id: this.id,
             message: killer.name + ' made you his bitch'}})
         this.respawn(3000);
