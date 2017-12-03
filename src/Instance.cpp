@@ -41,7 +41,7 @@ namespace jam
     window.setKeyRepeatEnabled(false);
     window.setMouseCursorVisible(
     #ifdef _DEBUG
-      true
+      false
     #else
       false
     #endif
