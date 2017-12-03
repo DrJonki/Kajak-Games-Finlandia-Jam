@@ -151,8 +151,9 @@ namespace jam
 
     else if (m_findingGame && strcmp(event, "connected") == 0) {
       const auto faction = static_cast<Player::Faction>(data["side"].GetUint());
+      const auto id = data["id"].GetString();
 
-      getInstance().currentScene = std::make_unique<LevelScene>(getInstance(), faction);
+      getInstance().currentScene = std::make_unique<LevelScene>(getInstance(), faction, id);
     }
   }
 

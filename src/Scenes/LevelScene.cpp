@@ -11,7 +11,7 @@
 
 namespace jam
 {
-  LevelScene::LevelScene(Instance& ins, const Player::Faction faction)
+  LevelScene::LevelScene(Instance& ins, const Player::Faction faction, const std::string& playerID)
     : Scene(ins),
       m_background(sf::Vector2f(ins.config.float_("VIEW_X") * 3, ins.config.float_("VIEW_Y") * 3)),
       m_backgroundLayer(addLayer(10)),
@@ -22,7 +22,7 @@ namespace jam
       m_crossHair(sf::Vector2f(20, 20)),
       m_gameView(sf::Vector2f(), sf::Vector2f(ins.config.float_("VIEW_X"), ins.config.float_("VIEW_Y"))),
       m_uiView(sf::Vector2f(0.5f, 0.5f), sf::Vector2f(1.f, 1.f)),
-      m_player(m_characterLayer.insert<Player>("player_self", ins, *this, true, faction)),
+      m_player(m_characterLayer.insert<Player>(playerID, ins, *this, true, faction)),
       m_music()
   {
     m_music.setLoop(true);

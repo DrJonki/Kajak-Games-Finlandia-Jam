@@ -22,7 +22,7 @@ namespace jam
 
   public:
 
-    LevelScene(Instance& ins, const Player::Faction faction);
+    LevelScene(Instance& ins, const Player::Faction faction, const std::string& playerID);
 
     ~LevelScene() override;
 

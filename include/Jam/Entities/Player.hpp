@@ -34,6 +34,7 @@ namespace jam
 
   private:
 
+    Instance& m_instance;
     const Faction m_faction;
     const bool m_controllable;
     bool m_dead;

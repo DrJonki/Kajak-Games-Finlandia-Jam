@@ -1,11 +1,12 @@
 #include <Jam/Entities/Player.hpp>
 #include <SFML/Window/Keyboard.hpp>
 #include <rapidjson/pointer.h>
+#include <Jam/Instance.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <glm/vec2.hpp>
 
 namespace {
-  const float ns_radius = 10.f;
+  const float ns_radius = 20.f;
 }
 
 namespace jam
@@ -15,6 +16,7 @@ namespace jam
       ListensMessages(scene, {"updateMovement", "dead", "respawn"}),
       InterpolatesTransform(ins),
       sf::CircleShape(10.f),
+      m_instance(ins),
       m_controllable(controllable),
       m_faction(faction), 
       m_dead(false)
@@ -29,12 +31,14 @@ namespace jam
     setOutlineThickness(1.f);
 
     if (faction == Faction::Simo) {
-      setFillColor(sf::Color::Blue);
-      setOutlineColor(sf::Color::White);
+      // setFillColor(sf::Color::Blue);
+      setOutlineColor(sf::Color::Blue);
+      setTexture(&ins.resourceManager.GetTexture("white.jpg"));
     }
     else if (faction == Faction::Russian) {
-      setFillColor(sf::Color::Red);
+      //setFillColor(sf::Color::Red);
       setOutlineColor(sf::Color(255, 168, 0));
+      setTexture(&ins.resourceManager.GetTexture("cheeki.png"));
     }
   }
 
@@ -54,7 +58,7 @@ namespace jam
       using sf::Keyboard;
 
       bool input = false;
-      const float baseSpeed = 250.f;
+      const float baseSpeed = 750.f * m_instance.config.float_("INTERPOLATION_TICK_LENGTH");
       const float speed = m_faction == Faction::Simo ? baseSpeed : baseSpeed / 4;
       glm::vec2 currentPos = getCurrentPos();
       glm::vec2 targetDirection(0.f);
@@ -89,6 +93,8 @@ namespace jam
         sendMessage("updateMovement", doc);
       }
     }
+
+    setActive(!isDead());
 
     InterpolatesTransform::update(dt);
 
