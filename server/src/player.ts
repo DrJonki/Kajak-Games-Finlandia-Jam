@@ -31,6 +31,17 @@ export default class Player {
         this.hp = 0
         ++this.deaths
         this.send({package:'Die', data:{message: killer.name + ' made you his bitch'}})
+        this.respawn(3000);
+    }
+    respawn(time) {
+        setTimeout(()=>
+        {
+            this.hp = 100;
+            this.position.x = Math.random()*1024
+            this.position.y =  Math.random()*600
+            this.send({package:'Respawn', data:{position: [this.position.x, this.position.y]}})
+        }
+        ,time)
     }
 }
 console.log('Loaded player');
