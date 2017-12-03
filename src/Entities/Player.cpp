@@ -79,7 +79,7 @@ namespace jam
       const auto nextPos = currentPos + targetDirection;
       updatePosition(nextPos);
 
-      if (input) {
+      //if (input) {
         const auto pos = getCurrentPos();
         rapidjson::Document doc;
         rapidjson::Value positionVector;
@@ -91,10 +91,8 @@ namespace jam
         doc.AddMember("position", positionVector, doc.GetAllocator());
 
         sendMessage("updateMovement", doc);
-      }
+      //}
     }
-
-    setActive(!isDead());
 
     InterpolatesTransform::update(dt);
 
@@ -104,9 +102,7 @@ namespace jam
 
   void Player::draw(sf::RenderTarget& target)
   {
-    if (!isDead()) {
-      target.draw(*this);
-    }
+    target.draw(*this);
   }
 
   void Player::socketMessage(const char* message, const rapidjson::Value& data)
@@ -124,10 +120,12 @@ namespace jam
 
     else if (strcmp(message, "dead") == 0 && strcmp(data["id"].GetString(), getID().c_str()) == 0) {
       m_dead = true;
+      setActive(false);
     }
 
     else if (strcmp(message, "respawn") == 0 && strcmp(data["id"].GetString(), getID().c_str()) == 0) {
       posUpdate(true);
+      setActive(true);
       m_dead = false;
     }
 
