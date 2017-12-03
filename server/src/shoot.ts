@@ -27,7 +27,7 @@ export default class Shoot {
         console.log(this.crosshairPosition)
         console.log(g.players[id].position.distanceToVector(this.crosshairPosition))
         console.log('-----------------------------')
-        return g.players[id].position.distanceToVector(this.crosshairPosition) < 10 ? true : false
+        return g.players[id].position.distanceToVector(this.crosshairPosition) < 20 ? true : false
     }
 }
 

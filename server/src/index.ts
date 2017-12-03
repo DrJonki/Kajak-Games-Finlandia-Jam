@@ -42,6 +42,7 @@ g.server.on('message', function (message, remote) {
                     package: 'connected',
                     data:{
                         message:'GLHF',
+                        id: remote.address+':'+remote.port,
                         side: g.players[remote.address+':'+remote.port].side
                     }
                 })
