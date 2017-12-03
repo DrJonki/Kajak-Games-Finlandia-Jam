@@ -32,6 +32,11 @@ namespace jam
     m_propLayer.insert<Obstacle>("");
   }
 
+  LevelScene::~LevelScene()
+  {
+    getInstance().sendMessage("disconnect");
+  }
+
   void LevelScene::update(const float dt)
   {
     Scene::update(dt);
@@ -49,7 +54,6 @@ namespace jam
   void LevelScene::textEvent(const uint32_t code)
   {
     if (code == 0x1B) {
-      getInstance().sendMessage("disconnect");
       getInstance().currentScene = std::make_unique<TitleScene>(getInstance());
     }
   }

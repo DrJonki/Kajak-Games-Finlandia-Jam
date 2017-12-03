@@ -15,6 +15,8 @@ namespace jam
 
     LevelScene(Instance& ins, const Player::Faction faction);
 
+    ~LevelScene() override;
+
     void update(const float dt) override;
 
     void draw(sf::RenderTarget& target) override;
