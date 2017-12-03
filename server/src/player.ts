@@ -26,5 +26,10 @@ export default class Player {
         g.server.send(json, this.port, this.ip);
         console.log('sent' + json + this.ip + ':' + this.port)
     }
+    die(killer){
+        this.hp = 0
+        ++this.deaths
+        this.send({package:'Die', data:{message: killer.name + ' made you his bitch'}})
+    }
 }
 console.log('Loaded player');

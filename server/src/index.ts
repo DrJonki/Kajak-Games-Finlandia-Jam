@@ -53,7 +53,7 @@ g.server.on('message', function (message, remote) {
             )
             break
         case 'boomHeadshot':
-            
+            new Shoot(remote.address+':'+remote.port, obj.data.playerPosition, obj.data.croshairPosition)
             break
     }
 });
