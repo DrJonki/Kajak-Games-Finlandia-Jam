@@ -4,6 +4,7 @@ import Move from './move'
 import Shoot from './shoot'
 import g from './global'
 import { Server } from 'https';
+import {has} from 'lodash'
 //import Tick from './tick'
 
 commander
@@ -70,18 +71,20 @@ g.server.on('message', function (message, remote) {
                 }
 
             break
-        case 'disconnect': 
-                console.log(remote.address, 'disconnected!');
-                console.log(g.players);
-                g.sendAllExcept(
-                    {
-                    package: 'leave', 
-                    data:{ 
-                        id: remote.address + ':' + remote.port,
-                        side: g.players[remote.address+':'+remote.port].side
-                    }
-                }, remote.address+':'+remote.port)
-                delete g.players[remote.address+':'+remote.port]
+        case 'disconnect':
+                if(has(g.players, remote.address+':'+remote.port)){
+                    console.log(remote.address, 'disconnected!');
+                    console.log(g.players);
+                    g.sendAllExcept(
+                        {
+                        package: 'leave', 
+                        data:{ 
+                            id: remote.address + ':' + remote.port,
+                            side: g.players[remote.address+':'+remote.port].side
+                        }
+                    }, remote.address+':'+remote.port)
+                    delete g.players[remote.address+':'+remote.port]
+                }
 
             break;
         case 'updateMovement':
