@@ -95,7 +95,7 @@ g.server.on('message', function (message, remote) {
             )
             break
         case 'shoot':
-            new Shoot(remote.address+':'+remote.port, obj.data.croshairPosition)
+            new Shoot(remote.address+':'+remote.port, obj.data.crosshairPosition)
             break
     }
 });
