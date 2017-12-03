@@ -1,26 +1,27 @@
 #pragma once
 
 #include <Jam/Scene.hpp>
+#include <Jam/Entities/Player.hpp>
 #include <vector>
 #include <SFML/Graphics/View.hpp>
+#include <SFML/Audio/Music.hpp>
+#include <unordered_map>
 
 namespace jam
 {
-  class Player;
-
   class LevelScene final : public Scene
   {
   public:
 
-    LevelScene(Instance& ins);
-
-    ~LevelScene() override;
+    LevelScene(Instance& ins, const Player::Faction faction);
 
     void update(const float dt) override;
 
     void draw(sf::RenderTarget& target) override;
 
     void textEvent(const uint32_t code) override;
+
+    void socketEvent(const char* message, const rapidjson::Value& data) override;
 
   private:
 
@@ -34,5 +35,7 @@ namespace jam
 
     sf::View m_gameView;
     sf::View m_uiView;
+
+    sf::Music m_music;
   };
 }

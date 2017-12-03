@@ -11,7 +11,14 @@ namespace jam
   {
   public:
 
-    Player(Instance& ins, Scene& scene, const bool controllable);
+    enum class Faction {
+      Simo,
+      Russian,
+    };
+
+  public:
+
+    Player(Instance& ins, Scene& scene, const bool controllable, const Faction faction);
 
   private:
 
@@ -23,6 +30,7 @@ namespace jam
 
   private:
 
+    const Faction m_faction;
     const bool m_controllable;
   };
 }

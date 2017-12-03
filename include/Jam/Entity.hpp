@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 namespace sf
 {
   class RenderTarget;
@@ -25,6 +27,10 @@ namespace jam
 
     bool isActive() const;
 
+    void setID(const std::string& id);
+
+    const std::string& getID() const;
+
   private:
 
     void baseUpdate(const float dt);
@@ -35,6 +41,7 @@ namespace jam
 
     virtual void draw(sf::RenderTarget& target);
 
+    std::string m_id;
     bool m_active;
     bool m_deleted;
   };

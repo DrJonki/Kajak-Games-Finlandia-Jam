@@ -54,4 +54,14 @@ namespace jam
   {
     return m_active;
   }
+
+  void Entity::setID(const std::string & id)
+  {
+    m_id = id;
+  }
+
+  const std::string& Entity::getID() const
+  {
+    return  m_id;
+  }
 }

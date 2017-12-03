@@ -5,6 +5,7 @@
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/System/Clock.hpp>
+#include <SFML/Audio/Music.hpp>
 
 namespace jam
 {
@@ -38,5 +39,8 @@ namespace jam
     sf::Text m_instructionText[2];
 
     bool m_findingGame;
+    sf::Text m_connectingText;
+
+    sf::Music m_music;
   };
 }

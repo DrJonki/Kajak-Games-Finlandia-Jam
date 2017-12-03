@@ -7,7 +7,7 @@ namespace jam
     : Entity(),
       sf::RectangleShape(sf::Vector2f(20, 20))
   {
-    setFillColor(sf::Color::Red);
+    setFillColor(sf::Color::Black);
   }
 
   void Obstacle::draw(sf::RenderTarget& target)

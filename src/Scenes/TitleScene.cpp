@@ -18,8 +18,15 @@ namespace jam
       m_titleText(),
       m_connectionText(),
       m_instructionText(),
-      m_findingGame(false)
+      m_connectingText(),
+      m_findingGame(false),
+      m_music()
   {
+    m_music.setLoop(true);
+    m_music.setRelativeToListener(true);
+    m_music.openFromFile("assets/Audio/finlandia.ogg");
+    m_music.play();
+
     m_background.setTexture(&ins.resourceManager.GetTexture("titlebg.jpg"));
 
     m_titleText[0].setFont(ins.resourceManager.GetFont("AmazDooMLeft.ttf"));
@@ -54,6 +61,17 @@ namespace jam
     m_connectionText.setPosition(0.9f, 0.09f);
     m_connectionText.setScale(0.001f, 0.001f);
     m_connectionText.setFillColor(sf::Color::Black);
+
+    m_connectingText.setFont(font);
+    m_connectingText.setString("Connecting...");
+    m_connectingText.setCharacterSize(128);
+    m_connectingText.setFillColor(sf::Color::Black);
+    m_connectingText.setOutlineColor(sf::Color::White);
+    m_connectingText.setOutlineThickness(2.f);
+    const auto bounds = m_connectingText.getLocalBounds();
+    m_connectingText.setOrigin(bounds.width / 2, bounds.height / 2);
+    m_connectingText.setScale(0.0005f, 0.0005f);
+    m_connectingText.setPosition(0.5f, 0.5f);
 
     for (int i = 0; i < 2; ++i) {
       auto& t = m_instructionText[i];
@@ -109,6 +127,10 @@ namespace jam
     for (int i = 0; i < 2; ++i) {
       target.draw(m_instructionText[i]);
     }
+
+    if (m_findingGame) {
+      target.draw(m_connectingText);
+    }
   }
 
   void TitleScene::socketEvent(const char * event, const rapidjson::Value & data)
@@ -122,14 +144,22 @@ namespace jam
 
       setConnectionString(std::to_string(m_pingClock.getElapsedTime().asMilliseconds()) + "ms");
     }
+
+    else if (m_findingGame && strcmp(event, "connected") == 0) {
+      const auto faction = static_cast<Player::Faction>(data["side"].GetUint());
+
+      getInstance().currentScene = std::make_unique<LevelScene>(getInstance(), faction);
+    }
   }
 
   void TitleScene::textEvent(const uint32_t code)
   {
     if (!m_findingGame && code == 0xD) {
-      getInstance().currentScene = std::make_unique<LevelScene>(getInstance());
+      getInstance().sendMessage("connect");
+      m_findingGame = true;
     }
     else if (code == 0x1B) {
+      getInstance().sendMessage("disconnect");
       getInstance().window.close();
     }
   }

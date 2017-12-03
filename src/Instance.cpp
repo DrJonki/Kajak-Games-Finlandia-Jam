@@ -73,8 +73,11 @@ namespace jam
         rapidjson::Document doc;
         doc.ParseInsitu<rapidjson::kParseStopWhenDoneFlag>(buffer.data());
 
-        if (!doc.HasParseError() && doc.HasMember("package") && doc.HasMember("data")) {
-          currentScene->socketEvent(doc["package"].GetString(), doc["data"]);
+        if (!doc.HasParseError() && doc.HasMember("package")) {
+          rapidjson::Value dummyData;
+          dummyData.SetObject();
+
+          currentScene->socketEvent(doc["package"].GetString(), doc.HasMember("data") ? doc["data"] : dummyData);
         }
       }
 
