@@ -45,6 +45,8 @@ set(SRC
   # Scenes
   ${INCDIR}/Scenes/LevelScene.hpp
   ${SRCDIR}/Scenes/LevelScene.cpp
+  ${INCDIR}/Scenes/TitleScene.hpp
+  ${SRCDIR}/Scenes/TitleScene.cpp
 
   ${SRCDIR}/main.cpp
 )

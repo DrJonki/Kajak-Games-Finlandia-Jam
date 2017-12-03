@@ -8,13 +8,13 @@ export default class Tick {
     action
     position
 
-    movePlayers(){
-        for(let key in g.players) {
-            if(this.validateMovement([key])) {
+    // movePlayers(){
+    //     for(let key in g.players) {
+    //         if(this.validateMovement([key])) {
 
-            }
-        }
-    }
+    //         }
+    //     }
+    // }
 
     updateStatus(){
 
@@ -28,17 +28,17 @@ export default class Tick {
 
     }
 
-    validateMovement(playerId) {
-        if(g.tickCount > 1) {
-            newPos = g.actionBuffer.pos
-            if(newPos.distanceToVector())
-        }
-    }
+    // validateMovement(playerId) {
+    //     if(g.tickCount > 1) {
+    //         newPos = g.actionBuffer.pos
+    //         if(newPos.distanceToVector())
+    //     }
+    // }
 
-    constructor() {
-        this.pos = this.movePlayers()
-        this.status = this.updateStatus()
-    }
+    // constructor() {
+    //     this.pos = this.movePlayers()
+    //     this.status = this.updateStatus()
+    // }
 }
 console.log('Loaded tick');
 

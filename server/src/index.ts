@@ -2,6 +2,7 @@ import * as commander from 'commander'
 import Player from './player'
 import Move from './move'
 import g from './global'
+import { Server } from 'https';
 //import Tick from './tick'
 
 commander
@@ -28,6 +29,11 @@ g.server.on('message', function (message, remote) {
     // g.server.send("reply", remote.port, remote.address);
 
     switch(obj.package) {
+        case 'ping': {
+            g.server.send(JSON.stringify({ package: 'pong', data: {} }), remote.port, remote.address);
+            break;
+        }
+
         case 'connection':
             if(obj.data.connection === 'connect') {
                 const player = new Player(obj.data.name, remote.address, remote.port)
