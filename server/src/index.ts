@@ -27,12 +27,11 @@ g.server.on('message', function (message, remote) {
     }
 
     // g.server.send("reply", remote.port, remote.address);
-
+    console.log(obj)
     switch(obj.package) {
-        case 'ping': {
+        case 'ping':
             g.server.send(JSON.stringify({ package: 'pong', data: {} }), remote.port, remote.address);
             break;
-        }
 
         case 'connection':
             if(obj.data.connection === 'connect') {
@@ -40,18 +39,25 @@ g.server.on('message', function (message, remote) {
                 console.log(remote.address, 'connected!')
                 g.sendAll({asd:'LOL'})
 
+                const json = JSON.stringify({package: 'connected', data:{message:'GLHF'}})
+                g.players[remote.address+':'+remote.port].send(json)
+            
+
             } else if(obj.data.connection === 'disconnect') {
               delete g.players[remote.address+':'+remote.port]
               console.log(remote.address, 'disconnected!');
             }
             console.log(g.players);
             break;
-        case 'Move':
+        case 'updateMovement':
             console.log('making the move')
             const move = new Move(
                 remote.address+':'+remote.port,
                 obj.data.position
             )
+            break
+        case 'boomHeadshot':
+            
             break
     }
 });
