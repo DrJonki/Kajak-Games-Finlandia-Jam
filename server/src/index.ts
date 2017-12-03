@@ -38,7 +38,13 @@ g.server.on('message', function (message, remote) {
                 const player = new Player(obj.data.name, remote.address, remote.port)
                 console.log(remote.address, 'connected!')
                 //g.sendAll({asd:'LOL'})
-                g.players[remote.address+':'+remote.port].send({package: 'connected', data:{message:'GLHF'}})
+                g.players[remote.address+':'+remote.port].send({
+                    package: 'connected',
+                    data:{
+                        message:'GLHF',
+                        side: g.players[remote.address+':'+remote.port].side
+                    }
+                })
             break
         case 'disconnect': 
                 delete g.players[remote.address+':'+remote.port]
