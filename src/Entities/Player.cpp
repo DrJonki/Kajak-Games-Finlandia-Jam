@@ -8,11 +8,12 @@ namespace jam
 {
   Player::Player(Instance& ins, Scene& scene, const bool controllable, const Faction faction)
     : Entity(),
-      ListensMessages(scene, {"updateMovement"}),
+      ListensMessages(scene, {"updateMovement", "dead", "respawn"}),
       InterpolatesTransform(ins),
       sf::CircleShape(10.f),
       m_controllable(controllable),
-      m_faction(faction)
+      m_faction(faction), 
+      m_dead(false)
   {
     if (controllable) {
       listen("forcePosition");
@@ -30,13 +31,24 @@ namespace jam
     }
   }
 
+  bool Player::isDead() const
+  {
+    return m_dead;
+  }
+
+  std::string Player::killedBy() const
+  {
+    return std::string();
+  }
+
   void Player::update(const float dt)
   {
-    if (m_controllable) {
+    if (m_controllable && !isDead()) {
       using sf::Keyboard;
 
       bool input = false;
-      const float speed = 250.f;
+      const float baseSpeed = 250.f;
+      const float speed = m_faction == Faction::Simo ? baseSpeed : baseSpeed / 4;
       glm::vec2 currentPos = getCurrentPos();
       glm::vec2 targetDirection(0.f);
 
@@ -78,27 +90,37 @@ namespace jam
 
   void Player::draw(sf::RenderTarget& target)
   {
-    target.draw(*this);
+    if (!isDead()) {
+      target.draw(*this);
+    }
   }
 
   void Player::socketMessage(const char* message, const rapidjson::Value& data)
   {
-    if (strcmp(message, "forcePosition") == 0) {
+    auto posUpdate = [this, &data](const bool force = false) {
       updatePosition(glm::vec2(
         static_cast<float>(rapidjson::GetValueByPointer(data, "/position/0")->GetDouble()),
         static_cast<float>(rapidjson::GetValueByPointer(data, "/position/1")->GetDouble())
-      ), true);
+      ), force);
+    };
+
+    if (strcmp(message, "forcePosition") == 0) {
+      posUpdate(true);
+    }
+
+    if (strcmp(message, "dead") == 0) {
+      m_dead = true;
+    }
+
+    if (strcmp(message, "respawn") == 0) {
+      posUpdate();
+      m_dead = false;
     }
 
     if (m_controllable) return;
 
-    if (strcmp(message, "updateMovement") == 0) {
-      if (strcmp(getID().c_str(), data["id"].GetString()) == 0) {
-        updatePosition(glm::vec2(
-          static_cast<float>(rapidjson::GetValueByPointer(data, "/position/0")->GetDouble()),
-          static_cast<float>(rapidjson::GetValueByPointer(data, "/position/1")->GetDouble())
-        ));
-      }
+    if (strcmp(message, "updateMovement") == 0 && strcmp(getID().c_str(), data["id"].GetString()) == 0) {
+      posUpdate();
     }
   }
 }

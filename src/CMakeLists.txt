@@ -41,6 +41,8 @@ set(SRC
   ${SRCDIR}/Entities/Particle.cpp
   ${INCDIR}/Entities/Player.hpp
   ${SRCDIR}/Entities/Player.cpp
+  ${INCDIR}/Entities/Text.hpp
+  ${SRCDIR}/Entities/Text.cpp
   
   # Scenes
   ${INCDIR}/Scenes/LevelScene.hpp

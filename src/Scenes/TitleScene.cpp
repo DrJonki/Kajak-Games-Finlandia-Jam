@@ -82,7 +82,7 @@ namespace jam
       t.setOutlineColor(sf::Color::White);
       t.setOutlineThickness(2.f);
     }
-    m_instructionText[0].setString("ENTER - Start game");
+    m_instructionText[0].setString("ENTER - Start  game");
     m_instructionText[0].setPosition(0.025f, 0.9f);
     m_instructionText[1].setString("ESC - Quit");
     m_instructionText[1].setOrigin(m_instructionText[1].getLocalBounds().width, 0);

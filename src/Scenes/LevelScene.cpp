@@ -5,6 +5,7 @@
 #include <Jam/Entities/Obstacle.hpp>
 #include <SFML/Graphics/View.hpp>
 #include <Jam/Scenes/TitleScene.hpp>
+#include <Jam/Entities/Text.hpp>
 #include <SFML/Window/Mouse.hpp>
 #include <iostream>
 
@@ -16,6 +17,7 @@ namespace jam
       m_propLayer(addLayer(20)),
       m_characterLayer(addLayer(30)),
       m_uiLayers(),
+      m_uiState(UIState::None),
       m_crossHair(sf::Vector2f(20, 20)),
       m_gameView(sf::Vector2f(), sf::Vector2f(ins.config.float_("VIEW_X"), ins.config.float_("VIEW_Y"))),
       m_uiView(sf::Vector2f(0.5f, 0.5f), sf::Vector2f(1.f, 1.f)),
@@ -35,6 +37,40 @@ namespace jam
     m_crossHair.setOrigin(m_crossHair.getSize() * 0.5f);
 
     m_propLayer.insert<Obstacle>("");
+
+    for (int i = 0; i < static_cast<int>(UIState::Last); ++i) {
+      m_uiLayers.push_back(&addLayer(40 + i));
+      m_uiLayers.back()->setSharedView(&m_uiView);
+    }
+
+    const auto& font = ins.resourceManager.GetFont("BEBAS.ttf");
+
+    auto& deathUiLayer = m_uiLayers[static_cast<int>(UIState::Dead)];
+    {
+      auto& deathText = deathUiLayer->insert<Text>("deathText");
+      deathText.setFont(font);
+      deathText.setCharacterSize(128);
+      deathText.setOutlineThickness(5.f);
+      deathText.setOutlineColor(sf::Color::White);
+      deathText.setFillColor(sf::Color::Black);
+      deathText.setString("DEAD");
+      const auto bounds = deathText.getLocalBounds();
+      deathText.setOrigin(bounds.width / 2, bounds.height / 2);
+      deathText.setScale(0.0005f, 0.0005f);
+      deathText.setPosition(0.5f, 0.45f);
+    } {
+      auto& deathText = deathUiLayer->insert<Text>("deathText2");
+      deathText.setFont(font);
+      deathText.setCharacterSize(128);
+      deathText.setOutlineThickness(5.f);
+      deathText.setOutlineColor(sf::Color::White);
+      deathText.setFillColor(sf::Color::Black);
+      deathText.setString("Waiting  for  respawn");
+      const auto bounds = deathText.getLocalBounds();
+      deathText.setOrigin(bounds.width / 2, bounds.height / 2);
+      deathText.setScale(0.00025f, 0.00025f);
+      deathText.setPosition(0.5f, 0.55f);
+    }
   }
 
   LevelScene::~LevelScene()
@@ -46,7 +82,15 @@ namespace jam
   {
     Scene::update(dt);
 
+    if (m_player.isDead()) {
+      m_uiState = UIState::Dead;
+    }
+
     m_gameView.setCenter(m_player.getPosition());
+
+    for (int i = 0; i < static_cast<int>(UIState::Last); ++i) {
+      m_uiLayers[i]->setActive(i == static_cast<int>(m_uiState));
+    }
 
     const auto mouseWorld = getInstance().window.mapPixelToCoords(sf::Mouse::getPosition(getInstance().window), m_gameView);
     m_crossHair.setPosition(mouseWorld);
@@ -58,7 +102,8 @@ namespace jam
 
     Scene::draw(target);
 
-    target.draw(m_crossHair);
+    if (!m_player.isDead())
+      target.draw(m_crossHair);
   }
 
   void LevelScene::textEvent(const uint32_t code)

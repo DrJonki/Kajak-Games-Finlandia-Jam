@@ -12,6 +12,14 @@ namespace jam
 {
   class LevelScene final : public Scene
   {
+  private:
+
+    enum class UIState {
+      None,
+      Dead,
+      Last
+    };
+
   public:
 
     LevelScene(Instance& ins, const Player::Faction faction);
@@ -34,6 +42,7 @@ namespace jam
     Layer& m_propLayer;
     Layer& m_characterLayer;
     std::vector<Layer*> m_uiLayers;
+    UIState m_uiState;
 
     // Entities
     Player& m_player;

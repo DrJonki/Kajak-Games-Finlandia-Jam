@@ -20,6 +20,10 @@ namespace jam
 
     Player(Instance& ins, Scene& scene, const bool controllable, const Faction faction);
 
+    bool isDead() const;
+
+    std::string killedBy() const;
+
   private:
 
     void update(const float dt) override;
@@ -32,5 +36,6 @@ namespace jam
 
     const Faction m_faction;
     const bool m_controllable;
+    bool m_dead;
   };
 }
