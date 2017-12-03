@@ -20,6 +20,7 @@ export default class Shoot {
         return true
     }
     detectHitWithPlayer(id){
+        console.log('detecting hit with '+ id)
         return g.players[id].position.distanceToVector(this.croshairPosition) < 10 ? true : false
     }
 }
