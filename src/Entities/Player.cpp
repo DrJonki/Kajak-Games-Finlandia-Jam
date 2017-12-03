@@ -92,11 +92,13 @@ namespace jam
 
     if (m_controllable) return;
 
-    if (strcmp(message, "updateMovement") == 0 && strcmp(getID().c_str(), data["id"].GetString()) == 0) {
-      updatePosition(glm::vec2(
-        static_cast<float>(rapidjson::GetValueByPointer(data, "/position/0")->GetDouble()),
-        static_cast<float>(rapidjson::GetValueByPointer(data, "/position/1")->GetDouble())
-      ));
+    if (strcmp(message, "updateMovement") == 0) {
+      if (strcmp(getID().c_str(), data["id"].GetString()) == 0) {
+        updatePosition(glm::vec2(
+          static_cast<float>(rapidjson::GetValueByPointer(data, "/position/0")->GetDouble()),
+          static_cast<float>(rapidjson::GetValueByPointer(data, "/position/1")->GetDouble())
+        ));
+      }
     }
   }
 }

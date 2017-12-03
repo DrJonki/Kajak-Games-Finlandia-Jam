@@ -87,6 +87,8 @@ namespace jam
 
   void LevelScene::socketEvent(const char * message, const rapidjson::Value & data)
   {
+    Scene::socketEvent(message, data);
+
     if (strcmp(message, "join") == 0) {
       m_characterLayer.insert<Player>(data["id"].GetString(), getInstance(), *this, false, static_cast<Player::Faction>(data["side"].GetUint()));
     }
