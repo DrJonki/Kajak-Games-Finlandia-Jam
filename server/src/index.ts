@@ -4,6 +4,7 @@ import Move from './move'
 import Shoot from './shoot'
 import g from './global'
 import { Server } from 'https';
+import {has} from 'lodash'
 //import Tick from './tick'
 
 commander
@@ -55,19 +56,35 @@ g.server.on('message', function (message, remote) {
                     }
                 }, remote.address+':'+remote.port)
 
-            break
-        case 'disconnect': 
-                delete g.players[remote.address+':'+remote.port]
-                console.log(remote.address, 'disconnected!');
-                console.log(g.players);
-                g.sendAllExcept(
-                    {
-                    package: 'leave', 
-                    data:{ 
-                        id: g.players[remote.address+':'+remote.port].ip + ':' + g.players[remote.address+':'+remote.port].port,
-                        side: g.players[remote.address+':'+remote.port].side
+                for(let key in g.players) {
+                    if(key !== remote.address+':'+remote.port) {
+                        g.players[remote.address+':'+remote.port].send(
+                            {
+                                package: 'join', 
+                                data:{ 
+                                    id: g.players[key].ip + ':' + g.players[key].port,
+                                    side: g.players[key].side
+                                }
+                            }
+                        )
                     }
-                }, remote.address+':'+remote.port)
+                }
+
+            break
+        case 'disconnect':
+                if(has(g.players, remote.address+':'+remote.port)){
+                    console.log(remote.address, 'disconnected!');
+                    console.log(g.players);
+                    g.sendAllExcept(
+                        {
+                        package: 'leave', 
+                        data:{ 
+                            id: remote.address + ':' + remote.port,
+                            side: g.players[remote.address+':'+remote.port].side
+                        }
+                    }, remote.address+':'+remote.port)
+                    delete g.players[remote.address+':'+remote.port]
+                }
 
             break;
         case 'updateMovement':
