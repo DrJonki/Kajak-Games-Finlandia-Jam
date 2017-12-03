@@ -32,6 +32,7 @@ namespace jam
     m_characterLayer.setSharedView(&m_gameView);
 
     m_crossHair.setTexture(&ins.resourceManager.GetTexture("crosshair.png"));
+    m_crossHair.setOrigin(m_crossHair.getSize() * 0.5f);
 
     m_propLayer.insert<Obstacle>("");
   }
@@ -46,6 +47,9 @@ namespace jam
     Scene::update(dt);
 
     m_gameView.setCenter(m_player.getPosition());
+
+    const auto mouseWorld = getInstance().window.mapPixelToCoords(sf::Mouse::getPosition(getInstance().window), m_gameView);
+    m_crossHair.setPosition(mouseWorld);
   }
 
   void LevelScene::draw(sf::RenderTarget & target)
@@ -54,9 +58,6 @@ namespace jam
 
     Scene::draw(target);
 
-    target.setView(m_gameView);
-    const auto mouseWorld = target.mapPixelToCoords(sf::Mouse::getPosition());
-    m_crossHair.setPosition(mouseWorld);
     target.draw(m_crossHair);
   }
 
@@ -78,7 +79,7 @@ namespace jam
       point.SetArray();
       point.PushBack(world.x, data.GetAllocator());
       point.PushBack(world.y, data.GetAllocator());
-      data.AddMember("position", point, data.GetAllocator());
+      data.AddMember("crosshairPosition", point, data.GetAllocator());
 
       getInstance().sendMessage("shoot", data);
     }
