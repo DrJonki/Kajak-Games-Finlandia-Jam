@@ -49,7 +49,8 @@ g.server.on('message', function (message, remote) {
                 for(let key in g.players) {
                     g.sendAllExcept({
                         package: 'join', 
-                        data:{ id: g.players[key].ip + ':' + g.players[key].port
+                        data:{ id: g.players[key].ip + ':' + g.players[key].port,
+                        side: g.players[key].side
                         }
                     }, remote.address+':'+remote.port)
                 }
@@ -63,7 +64,8 @@ g.server.on('message', function (message, remote) {
                 for(let key in g.players) {
                     g.sendAllExcept({
                         package: 'leave', 
-                        data:{ id: g.players[key].ip + ':' + g.players[key].port
+                        data:{ id: g.players[key].ip + ':' + g.players[key].port,
+                        side: g.players[key].side
                         }
                     }, remote.address+':'+remote.port)
                 }
