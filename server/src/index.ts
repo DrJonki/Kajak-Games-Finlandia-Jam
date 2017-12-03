@@ -36,7 +36,7 @@ g.server.on('message', function (message, remote) {
         case 'connect':
                 const player = new Player(obj.data.name, remote.address, remote.port)
                 console.log(remote.address, 'connected!')
-                g.sendAll({asd:'LOL'})
+                //g.sendAll({asd:'LOL'})
                 const json = JSON.stringify({package: 'connected', data:{message:'GLHF'}})
                 g.players[remote.address+':'+remote.port].send(json)
             break
