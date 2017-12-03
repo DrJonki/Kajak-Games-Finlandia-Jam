@@ -11,8 +11,6 @@ export default class Player {
     kills = 0
     deaths = 0
     position = new Vec(0,0)
-    speed = new Vec(0,0)
-    acceleration = new Vec(0,0)
 
     constructor(name, ip, port) {
         this.id = ip+':'+port
