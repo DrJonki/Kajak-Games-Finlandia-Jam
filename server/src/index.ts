@@ -55,6 +55,18 @@ g.server.on('message', function (message, remote) {
                     }
                 }, remote.address+':'+remote.port)
 
+                for(let key in g.players) {
+                    g.players[remote.address+':'+remote.port].send(
+                        {
+                            package: 'join', 
+                            data:{ 
+                                id: g.players[key].ip + ':' + g.players[key].port,
+                                side: g.players[key].side
+                            }
+                        }
+                    )
+                }
+
             break
         case 'disconnect': 
                 delete g.players[remote.address+':'+remote.port]
