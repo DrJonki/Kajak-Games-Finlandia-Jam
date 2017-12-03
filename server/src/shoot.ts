@@ -11,7 +11,7 @@ export default class Shoot {
         this.playerID = id
         this.croshairPosition = new Vec(croshairPos[0], croshairPos[1])
         for(let key in g.players) {
-            if(this.detectHitWithPlayer(g.players[key]) && this.detectClearLineOfSight(g.players[key])) {
+            if(this.detectHitWithPlayer(key) && this.detectClearLineOfSight(g.players[key])) {
                 g.players[key].die(g.players[this.playerID])
             }
         }

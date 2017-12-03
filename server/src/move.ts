@@ -16,16 +16,26 @@ export default class Move {
 
     do(){
         if(has(g.players, this.playerID)) {
-            if(this.validate()) {
-                console.log(this.playerID)
-                g.players[this.playerID].position = this.position
-                //g.sendAllExcept(
-                //    ,his.playerID
-                //)
-                // console.log(g.players[this.playerID].position)
-            } else {
-                this.sendPlayerBackToPreviousPosition()
-            }
+            console.log('Cykaaaa!')
+            console.log({
+                package: 'updateMovement',
+                data: {
+                    id: this.playerID,
+                    position: [this.position.x, this.position.y]
+                },
+            })
+            g.players[this.playerID].position = this.position
+            g.sendAllExcept (
+                {
+                    package: 'updateMovement',
+                    data: {
+                        id: this.playerID,
+                        position: [this.position.x, this.position.y]
+                    },
+                },
+                this.playerID
+            )
+            // console.log(g.players[this.playerID].position)
         }
     }
 
