@@ -12,7 +12,7 @@ namespace jam
   TitleScene::TitleScene(Instance& ins)
     : Scene(ins),
       m_pingTimer(ns_pingTime),
-      m_pongTimer(0.f),
+      m_pongTimer(ns_pingTime + 2.f),
       m_view(sf::Vector2f(0.5f, 0.5f), sf::Vector2f(1.f, 1.f)),
       m_background(sf::Vector2f(1.f, 1.f)),
       m_titleText(),
@@ -89,6 +89,11 @@ namespace jam
     m_instructionText[1].setPosition(0.975f, 0.9f);
   }
 
+  TitleScene::~TitleScene()
+  {
+    getInstance().sendMessage("disconnect");
+  }
+
   void TitleScene::update(const float dt)
   {
     Scene::update(dt);
@@ -105,7 +110,7 @@ namespace jam
     }
     else if (m_pongTimer > ns_pingTime + 1.f) {
       m_connectionStatus.setFillColor(sf::Color::Yellow);
-      setConnectionString("Waiting...");
+      setConnectionString("Reconnecting...");
     }
   }
 
@@ -124,7 +129,7 @@ namespace jam
     target.draw(m_connectionStatus);
     target.draw(m_connectionText);
 
-    for (int i = 0; i < 2; ++i) {
+    for (int i = 1 - isConnected(); i < 2; ++i) {
       target.draw(m_instructionText[i]);
     }
 
@@ -154,14 +159,18 @@ namespace jam
 
   void TitleScene::textEvent(const uint32_t code)
   {
-    if (!m_findingGame && code == 0xD) {
+    if (!m_findingGame && code == 0xD && isConnected()) {
       getInstance().sendMessage("connect");
       m_findingGame = true;
     }
     else if (code == 0x1B) {
-      getInstance().sendMessage("disconnect");
       getInstance().window.close();
     }
+  }
+
+  bool TitleScene::isConnected() const
+  {
+    return m_pongTimer < ns_pingTime + 1.f;
   }
 
   void TitleScene::setConnectionString(const std::string& string)

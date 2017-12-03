@@ -15,6 +15,8 @@ namespace jam
 
     TitleScene(Instance& ins);
 
+    ~TitleScene() override;
+
     void update(const float dt) override;
 
     void draw(sf::RenderTarget& target) override;
@@ -24,6 +26,8 @@ namespace jam
     void textEvent(const uint32_t code) override;
 
   private:
+
+    bool isConnected() const;
 
     void setConnectionString(const std::string& string);
 
