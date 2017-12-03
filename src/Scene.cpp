@@ -80,6 +80,10 @@ namespace jam
   void Scene::textEvent(const uint32_t code)
   {}
 
+  void Scene::mousePressed(const int mouseKey, const int x, const int y)
+  {
+  }
+
   void Scene::socketEvent(const char* event, const rapidjson::Value& data)
   {
     auto range = m_listeners.equal_range(event);

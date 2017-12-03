@@ -111,8 +111,8 @@ namespace jam
       }
       case sf::Event::KeyReleased:
       {
-        if (event.key.code == sf::Keyboard::Escape)
-          window.close();
+        /*if (event.key.code == sf::Keyboard::Escape)
+          window.close();*/
 
         break;
       }
@@ -121,8 +121,21 @@ namespace jam
         currentScene->textEvent(event.text.unicode);
         break;
       }
+      case sf::Event::MouseButtonPressed: 
+      {
+        currentScene->mousePressed(event.mouseButton.button, event.mouseButton.x, event.mouseButton.y);
+        break;
+      }
       }
     }
+  }
+
+  bool Instance::sendMessage(const char * message)
+  {
+    rapidjson::Value val;
+    val.SetObject();
+
+    return sendMessage(message, val);
   }
 
   bool Instance::sendMessage(const char* message, rapidjson::Value& data)

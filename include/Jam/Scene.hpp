@@ -47,6 +47,8 @@ namespace jam
 
     virtual void textEvent(const uint32_t code);
 
+    virtual void mousePressed(const int mouseKey, const int x, const int y);
+
     virtual void socketEvent(const char* event, const rapidjson::Value& data);
 
   private:

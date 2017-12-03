@@ -29,6 +29,8 @@ namespace jam
 
     void operator ()();
 
+    bool sendMessage(const char* message);
+
     bool sendMessage(const char* message, rapidjson::Value& data);
 
   public:

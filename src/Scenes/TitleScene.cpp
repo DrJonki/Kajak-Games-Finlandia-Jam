@@ -1,13 +1,24 @@
 #include <Jam/Scenes/TitleScene.hpp>
 #include <Jam/Instance.hpp>
+#include <Jam/Scenes/LevelScene.hpp>
+
+namespace
+{
+  const float ns_pingTime = 1.f;
+}
 
 namespace jam
 {
   TitleScene::TitleScene(Instance& ins)
     : Scene(ins),
+      m_pingTimer(ns_pingTime),
+      m_pongTimer(0.f),
       m_view(sf::Vector2f(0.5f, 0.5f), sf::Vector2f(1.f, 1.f)),
       m_background(sf::Vector2f(1.f, 1.f)),
-      m_titleText()
+      m_titleText(),
+      m_connectionText(),
+      m_instructionText(),
+      m_findingGame(false)
   {
     m_background.setTexture(&ins.resourceManager.GetTexture("titlebg.jpg"));
 
@@ -32,12 +43,52 @@ namespace jam
     m_titleText[2].setPosition(0.06f, 0.3f);
     m_titleText[2].setScale(0.0005f, 0.0005f);
 
+    m_connectionStatus.setFillColor(sf::Color::Red);
+    m_connectionStatus.setRadius(0.03f);
+    m_connectionStatus.setScale(0.6f, 1.f);
+    m_connectionStatus.setPosition(0.925f, 0.05f);
 
+    const auto& font = ins.resourceManager.GetFont("BEBAS.ttf");
+    m_connectionText.setFont(font);
+    m_connectionText.setString("...");
+    m_connectionText.setPosition(0.9f, 0.09f);
+    m_connectionText.setScale(0.001f, 0.001f);
+    m_connectionText.setFillColor(sf::Color::Black);
+
+    for (int i = 0; i < 2; ++i) {
+      auto& t = m_instructionText[i];
+      const float scale = 0.0015f;
+      t.setScale(scale, scale);
+      t.setFont(font);
+      t.setFillColor(sf::Color::Black);
+      t.setOutlineColor(sf::Color::White);
+      t.setOutlineThickness(2.f);
+    }
+    m_instructionText[0].setString("ENTER - Start game");
+    m_instructionText[0].setPosition(0.025f, 0.9f);
+    m_instructionText[1].setString("ESC - Quit");
+    m_instructionText[1].setOrigin(m_instructionText[1].getLocalBounds().width, 0);
+    m_instructionText[1].setPosition(0.975f, 0.9f);
   }
 
   void TitleScene::update(const float dt)
   {
     Scene::update(dt);
+
+    if ((m_pingTimer += dt) > ns_pingTime) {
+      getInstance().sendMessage("ping");
+      m_pingClock.restart();
+      m_pingTimer = ns_pingTime - 2.f;
+    }
+
+    if ((m_pongTimer += dt) > ns_pingTime + 2.f) {
+      m_connectionStatus.setFillColor(sf::Color::Red);
+      setConnectionString("No connection!");
+    }
+    else if (m_pongTimer > ns_pingTime + 1.f) {
+      m_connectionStatus.setFillColor(sf::Color::Yellow);
+      setConnectionString("Waiting...");
+    }
   }
 
   void TitleScene::draw(sf::RenderTarget & target)
@@ -51,5 +102,42 @@ namespace jam
     for (int i = 0; i < sizeof(m_titleText) / sizeof(m_titleText[0]); ++i) {
       target.draw(m_titleText[i]);
     }
+
+    target.draw(m_connectionStatus);
+    target.draw(m_connectionText);
+
+    for (int i = 0; i < 2; ++i) {
+      target.draw(m_instructionText[i]);
+    }
+  }
+
+  void TitleScene::socketEvent(const char * event, const rapidjson::Value & data)
+  {
+    Scene::socketEvent(event, data);
+
+    if (strcmp(event, "pong") == 0) {
+      m_connectionStatus.setFillColor(sf::Color::Green);
+      m_pongTimer = 0.f;
+      m_pingTimer = 0.f;
+
+      setConnectionString(std::to_string(m_pingClock.getElapsedTime().asMilliseconds()) + "ms");
+    }
+  }
+
+  void TitleScene::textEvent(const uint32_t code)
+  {
+    if (!m_findingGame && code == 0xD) {
+      getInstance().currentScene = std::make_unique<LevelScene>(getInstance());
+    }
+    else if (code == 0x1B) {
+      getInstance().window.close();
+    }
+  }
+
+  void TitleScene::setConnectionString(const std::string& string)
+  {
+    m_connectionText.setString(string);
+    const auto bounds = m_connectionText.getLocalBounds();
+    m_connectionText.setOrigin(bounds.width, bounds.height);
   }
 }
