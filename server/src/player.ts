@@ -1,11 +1,12 @@
 import g from './global'
 import Vec from './vec'
+import {size} from 'lodash'
 export default class Player {
     id
     name
     ip
     port
-    side = g.simoIsInDaHouse
+    side = size(g.players) === 0 ? 0 : 1
     hp = 100
     ammo = 50
     kills = 0
@@ -39,7 +40,7 @@ export default class Player {
             this.hp = 100;
             this.position.x = Math.random()*1024
             this.position.y =  Math.random()*600
-            this.send({package:'respawn', data:{
+            g.sendAll({package:'respawn', data:{
                 id: this.id,
                 position: [this.position.x, this.position.y]}})
         }
