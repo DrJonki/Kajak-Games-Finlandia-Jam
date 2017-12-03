@@ -38,6 +38,8 @@ namespace jam
 
   private:
 
+    sf::RectangleShape m_background;
+
     Layer& m_backgroundLayer;
     Layer& m_propLayer;
     Layer& m_characterLayer;

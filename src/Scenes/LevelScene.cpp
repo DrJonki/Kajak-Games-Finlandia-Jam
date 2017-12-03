@@ -13,6 +13,7 @@ namespace jam
 {
   LevelScene::LevelScene(Instance& ins, const Player::Faction faction)
     : Scene(ins),
+      m_background(sf::Vector2f(ins.config.float_("VIEW_X") * 3, ins.config.float_("VIEW_Y") * 3)),
       m_backgroundLayer(addLayer(10)),
       m_propLayer(addLayer(20)),
       m_characterLayer(addLayer(30)),
@@ -33,10 +34,18 @@ namespace jam
     m_propLayer.setSharedView(&m_gameView);
     m_characterLayer.setSharedView(&m_gameView);
 
+    auto& bgtex = ins.resourceManager.GetTexture("kentta.png");
+    bgtex.setRepeated(true);
+    m_background.setTexture(&bgtex);
+    m_background.setTextureRect(sf::IntRect(0, 0, ins.config.float_("VIEW_X") * 3, ins.config.float_("VIEW_Y") * 3));
+    const auto bounds = m_background.getLocalBounds();
+    m_background.setOrigin(bounds.width / 2, bounds.height / 2);
+
     m_crossHair.setTexture(&ins.resourceManager.GetTexture("crosshair.png"));
     m_crossHair.setOrigin(m_crossHair.getSize() * 0.5f);
 
-    m_propLayer.insert<Obstacle>("");
+    m_propLayer.insert<Obstacle>("").setPosition(50, 50);
+    m_player.updatePosition(glm::vec2(50, 50), true);
 
     for (int i = 0; i < static_cast<int>(UIState::Last); ++i) {
       m_uiLayers.push_back(&addLayer(40 + i));
@@ -99,6 +108,9 @@ namespace jam
   void LevelScene::draw(sf::RenderTarget & target)
   {
     target.clear(sf::Color(222, 222, 222));
+
+    target.setView(m_gameView);
+    target.draw(m_background);
 
     Scene::draw(target);
 
