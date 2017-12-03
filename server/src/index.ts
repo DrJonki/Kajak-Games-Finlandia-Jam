@@ -38,7 +38,6 @@ g.server.on('message', function (message, remote) {
         case 'connect':
                 const player = new Player(obj.data.name, remote.address, remote.port)
                 console.log(remote.address, 'connected!')
-                //g.sendAll({asd:'LOL'})
                 g.players[remote.address+':'+remote.port].send({
                     package: 'connected',
                     data:{
@@ -51,18 +50,19 @@ g.server.on('message', function (message, remote) {
                     {
                     package: 'join', 
                     data:{ 
-                        id: g.players[remote.address+':'+remote.port].ip + ':' + g.players[remote.address+':'+remote.port].port,
+                        id: remote.address+':'+remote.port,
                         side: g.players[remote.address+':'+remote.port].side
                     }
                 }, remote.address+':'+remote.port)
 
                 for(let key in g.players) {
                     if(key !== remote.address+':'+remote.port) {
+                        console.log(remote.address+':'+remote.port )
                         g.players[remote.address+':'+remote.port].send(
                             {
                                 package: 'join', 
                                 data:{ 
-                                    id: g.players[key].ip + ':' + g.players[key].port,
+                                    id: key,
                                     side: g.players[key].side
                                 }
                             }
@@ -94,8 +94,8 @@ g.server.on('message', function (message, remote) {
                 obj.data.position
             )
             break
-        case 'boomHeadshot':
-            new Shoot(remote.address+':'+remote.port, obj.data.playerPosition, obj.data.croshairPosition)
+        case 'shoot':
+            new Shoot(remote.address+':'+remote.port, obj.data.croshairPosition)
             break
     }
 });

@@ -15,8 +15,11 @@ const g = {
 
 	sendAllExcept(obj, exceptionID){
 		for(let key in g.players) {
-			if(exceptionID !== g.players[key].id) {
+			if(exceptionID !== key) {
 				g.players[key].send(obj)
+				console.log('sent:' )
+				console.log(obj)
+				console.log('to all except' + exceptionID)
 			}
 		}
 	},
