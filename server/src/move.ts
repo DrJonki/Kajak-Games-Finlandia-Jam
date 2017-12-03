@@ -1,7 +1,7 @@
 import g from './global'
 import Vec from './vec'
 import Player from './player'
-import {has} from 'Lodash'
+import {has} from 'lodash'
 
 export default class Move {
     package = 'Move'
