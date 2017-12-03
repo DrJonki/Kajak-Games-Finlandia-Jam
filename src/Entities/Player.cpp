@@ -69,11 +69,12 @@ namespace jam
       updatePosition(nextPos);
 
       if (input) {
+        const auto pos = getCurrentPos();
         rapidjson::Document doc;
         rapidjson::Value positionVector;
         positionVector.SetArray();
-        positionVector.PushBack(nextPos.x, doc.GetAllocator());
-        positionVector.PushBack(nextPos.y, doc.GetAllocator());
+        positionVector.PushBack(pos.x, doc.GetAllocator());
+        positionVector.PushBack(pos.y, doc.GetAllocator());
 
         doc.SetObject();
         doc.AddMember("position", positionVector, doc.GetAllocator());
