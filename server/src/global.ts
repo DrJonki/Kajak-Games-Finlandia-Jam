@@ -21,6 +21,7 @@ const g = {
 				console.log(obj)
 				console.log('to all except' + exceptionID)
 			}
+			console.log('sent to: '+ key)
 		}
 	},
 }
