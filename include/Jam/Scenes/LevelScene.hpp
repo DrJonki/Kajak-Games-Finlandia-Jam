@@ -4,6 +4,7 @@
 #include <Jam/Entities/Player.hpp>
 #include <vector>
 #include <SFML/Graphics/View.hpp>
+#include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Audio/Music.hpp>
 #include <unordered_map>
 
@@ -23,6 +24,8 @@ namespace jam
 
     void textEvent(const uint32_t code) override;
 
+    void mousePressed(const int mouseKey, const int x, const int y) override;
+
     void socketEvent(const char* message, const rapidjson::Value& data) override;
 
   private:
@@ -34,6 +37,9 @@ namespace jam
 
     // Entities
     Player& m_player;
+
+    // Crosshair
+    sf::RectangleShape m_crossHair;
 
     sf::View m_gameView;
     sf::View m_uiView;

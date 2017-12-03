@@ -5,6 +5,7 @@
 #include <Jam/Entities/Obstacle.hpp>
 #include <SFML/Graphics/View.hpp>
 #include <Jam/Scenes/TitleScene.hpp>
+#include <SFML/Window/Mouse.hpp>
 #include <iostream>
 
 namespace jam
@@ -15,6 +16,7 @@ namespace jam
       m_propLayer(addLayer(20)),
       m_characterLayer(addLayer(30)),
       m_uiLayers(),
+      m_crossHair(sf::Vector2f(20, 20)),
       m_gameView(sf::Vector2f(), sf::Vector2f(ins.config.float_("VIEW_X"), ins.config.float_("VIEW_Y"))),
       m_uiView(sf::Vector2f(0.5f, 0.5f), sf::Vector2f(1.f, 1.f)),
       m_player(m_characterLayer.insert<Player>("player_self", ins, *this, true, faction)),
@@ -28,6 +30,8 @@ namespace jam
     m_backgroundLayer.setSharedView(&m_gameView);
     m_propLayer.setSharedView(&m_gameView);
     m_characterLayer.setSharedView(&m_gameView);
+
+    m_crossHair.setTexture(&ins.resourceManager.GetTexture("crosshair.png"));
 
     m_propLayer.insert<Obstacle>("");
   }
@@ -49,12 +53,34 @@ namespace jam
     target.clear(sf::Color(222, 222, 222));
 
     Scene::draw(target);
+
+    target.setView(m_gameView);
+    const auto mouseWorld = target.mapPixelToCoords(sf::Mouse::getPosition());
+    m_crossHair.setPosition(mouseWorld);
+    target.draw(m_crossHair);
   }
 
   void LevelScene::textEvent(const uint32_t code)
   {
     if (code == 0x1B) {
       getInstance().currentScene = std::make_unique<TitleScene>(getInstance());
+    }
+  }
+
+  void LevelScene::mousePressed(const int mouseKey, const int x, const int y)
+  {
+    if (mouseKey == sf::Mouse::Button::Left) {
+      const auto world = getInstance().window.mapPixelToCoords(sf::Vector2i(x, y), m_gameView);
+
+      rapidjson::Document data;
+      data.SetObject();
+      rapidjson::Value point;
+      point.SetArray();
+      point.PushBack(world.x, data.GetAllocator());
+      point.PushBack(world.y, data.GetAllocator());
+      data.AddMember("position", point, data.GetAllocator());
+
+      getInstance().sendMessage("shoot", data);
     }
   }
 

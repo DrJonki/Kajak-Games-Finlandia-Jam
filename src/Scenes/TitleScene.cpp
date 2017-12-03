@@ -91,7 +91,6 @@ namespace jam
 
   TitleScene::~TitleScene()
   {
-    getInstance().sendMessage("disconnect");
   }
 
   void TitleScene::update(const float dt)
@@ -159,11 +158,12 @@ namespace jam
 
   void TitleScene::textEvent(const uint32_t code)
   {
-    if (!m_findingGame && code == 0xD && isConnected()) {
+    if (!m_findingGame && code == 0xD && isConnected()) { // Enter
       getInstance().sendMessage("connect");
       m_findingGame = true;
     }
-    else if (code == 0x1B) {
+    else if (code == 0x1B) { // Escape
+      getInstance().sendMessage("disconnect");
       getInstance().window.close();
     }
   }

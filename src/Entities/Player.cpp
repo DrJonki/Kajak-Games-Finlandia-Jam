@@ -35,36 +35,39 @@ namespace jam
     if (m_controllable) {
       using sf::Keyboard;
 
+      bool input = false;
       const float speed = 250.f;
       glm::vec2 currentPos = getCurrentPos();
       glm::vec2 targetDirection(0.f);
 
       if (sf::Keyboard::isKeyPressed(Keyboard::A)) {
-        targetDirection.x = -speed;
+        targetDirection.x = -speed; input = true;
       }
       if (sf::Keyboard::isKeyPressed(Keyboard::D)) {
-        targetDirection.x = speed;
+        targetDirection.x = speed; input = true;
       }
       if (sf::Keyboard::isKeyPressed(Keyboard::S)) {
-        targetDirection.y = speed;
+        targetDirection.y = speed; input = true;
       }
       if (sf::Keyboard::isKeyPressed(Keyboard::W)) {
-        targetDirection.y = -speed;
+        targetDirection.y = -speed; input = true;
       }
 
       const auto nextPos = currentPos + targetDirection;
       updatePosition(nextPos);
 
-      rapidjson::Document doc;
-      rapidjson::Value positionVector;
-      positionVector.SetArray();
-      positionVector.PushBack(nextPos.x, doc.GetAllocator());
-      positionVector.PushBack(nextPos.y, doc.GetAllocator());
+      if (input) {
+        rapidjson::Document doc;
+        rapidjson::Value positionVector;
+        positionVector.SetArray();
+        positionVector.PushBack(nextPos.x, doc.GetAllocator());
+        positionVector.PushBack(nextPos.y, doc.GetAllocator());
 
-      doc.SetObject();
-      doc.AddMember("position", positionVector, doc.GetAllocator());
+        doc.SetObject();
+        doc.AddMember("position", positionVector, doc.GetAllocator());
 
-      sendMessage("updateMovement", doc);
+        sendMessage("updateMovement", doc);
+      }
     }
 
     InterpolatesTransform::update(dt);
