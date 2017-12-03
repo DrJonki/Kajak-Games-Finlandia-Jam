@@ -5,7 +5,7 @@ export default class Player {
     name
     ip
     port
-    side
+    side = g.simoIsInDaHouse
     hp = 100
     ammo = 50
     kills = 0
@@ -20,11 +20,17 @@ export default class Player {
         this.ip = ip
         this.port = port
         g.players[this.id] = this
+        g.simoIsInDaHouse = 1;
     }
     send(obj) {
         const json = JSON.stringify(obj)
         g.server.send(json, this.port, this.ip);
         console.log('sent' + json + this.ip + ':' + this.port)
+    }
+    die(killer){
+        this.hp = 0
+        ++this.deaths
+        this.send({package:'Die', data:{message: killer.name + ' made you his bitch'}})
     }
 }
 console.log('Loaded player');

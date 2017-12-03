@@ -5,6 +5,7 @@ const g = {
 	server: dgram.createSocket('udp4'),
 	actionBuffer: [],
 	maxSpeed: 100,
+	simoIsInDaHouse: 0,
 
 	sendAll(obj){
 		const json = JSON.stringify(obj)

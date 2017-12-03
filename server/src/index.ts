@@ -1,6 +1,7 @@
 import * as commander from 'commander'
 import Player from './player'
 import Move from './move'
+import Shoot from './shoot'
 import g from './global'
 import { Server } from 'https';
 //import Tick from './tick'
@@ -27,31 +28,38 @@ g.server.on('message', function (message, remote) {
     }
 
     // g.server.send("reply", remote.port, remote.address);
-
+    console.log(obj)
     switch(obj.package) {
-        case 'ping': {
+        case 'ping':
             g.server.send(JSON.stringify({ package: 'pong', data: {} }), remote.port, remote.address);
             break;
-        }
 
-        case 'connection':
-            if(obj.data.connection === 'connect') {
+        case 'connect':
                 const player = new Player(obj.data.name, remote.address, remote.port)
                 console.log(remote.address, 'connected!')
-                g.sendAll({asd:'LOL'})
-
-            } else if(obj.data.connection === 'disconnect') {
-              delete g.players[remote.address+':'+remote.port]
-              console.log(remote.address, 'disconnected!');
-            }
-            console.log(g.players);
+                //g.sendAll({asd:'LOL'})
+                g.players[remote.address+':'+remote.port].send({
+                    package: 'connected',
+                    data:{
+                        message:'GLHF',
+                        side: g.players[remote.address+':'+remote.port].side
+                    }
+                })
+            break
+        case 'disconnect': 
+                delete g.players[remote.address+':'+remote.port]
+                console.log(remote.address, 'disconnected!');
+                console.log(g.players);
             break;
-        case 'Move':
+        case 'updateMovement':
             console.log('making the move')
             const move = new Move(
                 remote.address+':'+remote.port,
                 obj.data.position
             )
+            break
+        case 'boomHeadshot':
+            new Shoot(remote.address+':'+remote.port, obj.data.playerPosition, obj.data.croshairPosition)
             break
     }
 });
