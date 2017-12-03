@@ -71,7 +71,6 @@ g.server.on('message', function (message, remote) {
 
             break
         case 'disconnect': 
-                delete g.players[remote.address+':'+remote.port]
                 console.log(remote.address, 'disconnected!');
                 console.log(g.players);
                 g.sendAllExcept(
@@ -82,6 +81,7 @@ g.server.on('message', function (message, remote) {
                         side: g.players[remote.address+':'+remote.port].side
                     }
                 }, remote.address+':'+remote.port)
+                delete g.players[remote.address+':'+remote.port]
 
             break;
         case 'updateMovement':
