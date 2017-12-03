@@ -19,9 +19,16 @@ export default class Move {
             if(this.validate()) {
                 console.log(this.playerID)
                 g.players[this.playerID].position = this.position
-                //g.sendAllExcept(
-                //    ,his.playerID
-                //)
+                g.sendAllExcept (
+                    {
+                        package: 'positionUpdate',
+                        data: {
+                            id: this.playerID,
+                            position: [this.position[0], this.position[1]]
+                        },
+                    },
+                    this.playerID
+                )
                 // console.log(g.players[this.playerID].position)
             } else {
                 this.sendPlayerBackToPreviousPosition()
