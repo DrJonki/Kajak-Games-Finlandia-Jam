@@ -33,21 +33,17 @@ g.server.on('message', function (message, remote) {
             g.server.send(JSON.stringify({ package: 'pong', data: {} }), remote.port, remote.address);
             break;
 
-        case 'connection':
-            if(obj.data.connection === 'connect') {
+        case 'connect':
                 const player = new Player(obj.data.name, remote.address, remote.port)
                 console.log(remote.address, 'connected!')
                 g.sendAll({asd:'LOL'})
-
                 const json = JSON.stringify({package: 'connected', data:{message:'GLHF'}})
                 g.players[remote.address+':'+remote.port].send(json)
-            
-
-            } else if(obj.data.connection === 'disconnect') {
-              delete g.players[remote.address+':'+remote.port]
-              console.log(remote.address, 'disconnected!');
-            }
-            console.log(g.players);
+            break
+        case 'disconnect': 
+                delete g.players[remote.address+':'+remote.port]
+                console.log(remote.address, 'disconnected!');
+                console.log(g.players);
             break;
         case 'updateMovement':
             console.log('making the move')
