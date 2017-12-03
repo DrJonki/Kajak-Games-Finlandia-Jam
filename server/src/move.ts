@@ -17,7 +17,14 @@ export default class Move {
     do(){
         if(has(g.players, this.playerID)) {
             if(true) {
-                console.log(this.playerID)
+                console.log('Cykaaaa!')
+                console.log({
+                    package: 'updateMovement',
+                    data: {
+                        id: this.playerID,
+                        position: [this.position[0], this.position[1]]
+                    },
+                })
                 g.players[this.playerID].position = this.position
                 g.sendAllExcept (
                     {
