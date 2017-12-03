@@ -1,6 +1,7 @@
 import * as commander from 'commander'
 import Player from './player'
 import Move from './move'
+import Shoot from './shoot'
 import g from './global'
 import { Server } from 'https';
 //import Tick from './tick'
@@ -37,8 +38,7 @@ g.server.on('message', function (message, remote) {
                 const player = new Player(obj.data.name, remote.address, remote.port)
                 console.log(remote.address, 'connected!')
                 //g.sendAll({asd:'LOL'})
-                const json = JSON.stringify({package: 'connected', data:{message:'GLHF'}})
-                g.players[remote.address+':'+remote.port].send(json)
+                g.players[remote.address+':'+remote.port].send({package: 'connected', data:{message:'GLHF'}})
             break
         case 'disconnect': 
                 delete g.players[remote.address+':'+remote.port]
