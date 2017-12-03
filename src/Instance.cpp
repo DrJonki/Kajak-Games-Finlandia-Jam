@@ -100,6 +100,9 @@ namespace jam
       switch (event.type)
       {
       case sf::Event::Closed:
+        if (currentScene) {
+          currentScene.reset();
+        }
         window.close();
         break;
       case sf::Event::Resized:
