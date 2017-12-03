@@ -77,7 +77,7 @@ g.server.on('message', function (message, remote) {
                     {
                     package: 'leave', 
                     data:{ 
-                        id: g.players[remote.address+':'+remote.port].ip + ':' + g.players[remote.address+':'+remote.port].port,
+                        id: remote.address + ':' + remote.port,
                         side: g.players[remote.address+':'+remote.port].side
                     }
                 }, remote.address+':'+remote.port)
