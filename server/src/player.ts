@@ -39,7 +39,7 @@ export default class Player {
             this.hp = 100;
             this.position.x = Math.random()*1024
             this.position.y =  Math.random()*600
-            this.send({package:'Respawn', data:{position: [this.position.x, this.position.y]}})
+            this.send({package:'respawn', data:{position: [this.position.x, this.position.y]}})
         }
         ,time)
     }
