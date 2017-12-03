@@ -21,7 +21,7 @@ export default class Move {
                 package: 'updateMovement',
                 data: {
                     id: this.playerID,
-                    position: [this.position[0], this.position[1]]
+                    position: [this.position.x, this.position.y]
                 },
             })
             g.players[this.playerID].position = this.position
@@ -30,7 +30,7 @@ export default class Move {
                     package: 'updateMovement',
                     data: {
                         id: this.playerID,
-                        position: [this.position[0], this.position[1]]
+                        position: [this.position.x, this.position.y]
                     },
                 },
                 this.playerID
