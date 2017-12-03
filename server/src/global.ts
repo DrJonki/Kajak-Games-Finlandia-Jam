@@ -8,17 +8,15 @@ const g = {
 	simoIsInDaHouse: 0,
 
 	sendAll(obj){
-		const json = JSON.stringify(obj)
 		for(let key in g.players) {
-			g.players[key].send(json)
+			g.players[key].send(obj)
 		}
 	},
 
 	sendAllExcept(obj, exceptionID){
-		const json = JSON.stringify(obj)
 		for(let key in g.players) {
 			if(exceptionID !== g.players[key].id) {
-				g.players[key].send(json)
+				g.players[key].send(obj)
 			}
 		}
 	},
