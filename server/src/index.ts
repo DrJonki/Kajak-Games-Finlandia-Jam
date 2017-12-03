@@ -26,7 +26,7 @@ g.server.on('message', function (message, remote) {
     }
 
     // g.server.send("reply", remote.port, remote.address);
-
+    console.log(obj)
     switch(obj.package) {
         case 'connection':
             if(obj.data.connection === 'connect') {
