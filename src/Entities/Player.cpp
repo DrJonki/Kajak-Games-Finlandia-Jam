@@ -116,11 +116,11 @@ namespace jam
       posUpdate(true);
     }
 
-    else if (strcmp(message, "dead") == 0) {
+    else if (strcmp(message, "dead") == 0 && strcmp(data["id"].GetString(), getID().c_str()) == 0) {
       m_dead = true;
     }
 
-    else if (strcmp(message, "respawn") == 0) {
+    else if (strcmp(message, "respawn") == 0 && strcmp(data["id"].GetString(), getID().c_str()) == 0) {
       posUpdate(true);
       m_dead = false;
     }
