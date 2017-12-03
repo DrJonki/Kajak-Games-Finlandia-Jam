@@ -94,6 +94,9 @@ namespace jam
     if (m_player.isDead()) {
       m_uiState = UIState::Dead;
     }
+    else {
+      m_uiState = UIState::None;
+    }
 
     m_gameView.setCenter(m_player.getPosition());
 
@@ -147,7 +150,8 @@ namespace jam
     Scene::socketEvent(message, data);
 
     if (strcmp(message, "join") == 0) {
-      m_characterLayer.insert<Player>(data["id"].GetString(), getInstance(), *this, false, static_cast<Player::Faction>(data["side"].GetUint()));
+      m_characterLayer.insert<Player>(data["id"].GetString(), getInstance(), *this, false, static_cast<Player::Faction>(data["side"].GetUint())).updatePosition(glm::vec2(50, 50), true);
+
     }
 
     else if (strcmp(message, "leave") == 0) {

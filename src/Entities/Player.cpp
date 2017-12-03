@@ -116,12 +116,12 @@ namespace jam
       posUpdate(true);
     }
 
-    if (strcmp(message, "dead") == 0) {
+    else if (strcmp(message, "dead") == 0) {
       m_dead = true;
     }
 
-    if (strcmp(message, "respawn") == 0) {
-      posUpdate();
+    else if (strcmp(message, "respawn") == 0) {
+      posUpdate(true);
       m_dead = false;
     }
 
