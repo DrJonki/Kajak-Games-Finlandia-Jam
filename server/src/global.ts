@@ -6,7 +6,8 @@ const g = {
 	actionBuffer: [],
 	packageManager: new PackageManager(),
 	maxSpeed: 100,
-	
+	simoIsInDaHouse: 0,
+
 	sendAll(obj){
 		for(let key in g.players) {
 			g.players[key].send(obj)
