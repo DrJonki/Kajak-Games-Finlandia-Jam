@@ -23,6 +23,4 @@ export default class PackageManager {
 
 }
 
-
-
 console.log('Loaded Package');
