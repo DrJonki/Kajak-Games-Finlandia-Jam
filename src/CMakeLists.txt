@@ -54,31 +54,36 @@ set(SRC
 )
 
 add_executable(Jam ${SRC})
-#add_dependencies(Jam SFML GLM JSON CURL)
 add_dependencies(Jam SFML GLM JSON)
-
-#add_definitions(-DSFML_STATIC -DCURL_STATICLIB)
 add_definitions(-DSFML_STATIC)
 
-if (MSVC)
-  ExternalProject_Get_Property(SFML BINARY_DIR)
+set(CMK_SLP ${CMAKE_STATIC_LIBRARY_PREFIX})
+set(CMK_SLS ${CMAKE_STATIC_LIBRARY_SUFFIX})
+
+ExternalProject_Get_Property(SFML BINARY_DIR)
+target_link_libraries(Jam
+  # SFML libs
+  debug ${BINARY_DIR}/lib/${CMAKE_CFG_INTDIR}/${CMK_SLP}sfml-audio-s-d${CMK_SLS}
+  debug ${BINARY_DIR}/lib/${CMAKE_CFG_INTDIR}/${CMK_SLP}sfml-graphics-s-d${CMK_SLS}
+  debug ${BINARY_DIR}/lib/${CMAKE_CFG_INTDIR}/${CMK_SLP}sfml-network-s-d${CMK_SLS}
+  debug ${BINARY_DIR}/lib/${CMAKE_CFG_INTDIR}/${CMK_SLP}sfml-window-s-d${CMK_SLS}
+  debug ${BINARY_DIR}/lib/${CMAKE_CFG_INTDIR}/${CMK_SLP}sfml-system-s-d${CMK_SLS}
+)
+target_link_libraries(Jam
+  # SFML libs
+  optimized ${BINARY_DIR}/lib/${CMAKE_CFG_INTDIR}/${CMK_SLP}sfml-audio-s${CMK_SLS}
+  optimized ${BINARY_DIR}/lib/${CMAKE_CFG_INTDIR}/${CMK_SLP}sfml-graphics-s${CMK_SLS}
+  optimized ${BINARY_DIR}/lib/${CMAKE_CFG_INTDIR}/${CMK_SLP}sfml-network-s${CMK_SLS}
+  optimized ${BINARY_DIR}/lib/${CMAKE_CFG_INTDIR}/${CMK_SLP}sfml-window-s${CMK_SLS}
+  optimized ${BINARY_DIR}/lib/${CMAKE_CFG_INTDIR}/${CMK_SLP}sfml-system-s${CMK_SLS}
+)
+
+if (WIN32)
   target_link_libraries(Jam
-    # SFML libs
-    debug ${BINARY_DIR}/lib/${CMAKE_CFG_INTDIR}/sfml-audio-s-d.lib
-    debug ${BINARY_DIR}/lib/${CMAKE_CFG_INTDIR}/sfml-graphics-s-d.lib
-    debug ${BINARY_DIR}/lib/${CMAKE_CFG_INTDIR}/sfml-network-s-d.lib
-    debug ${BINARY_DIR}/lib/${CMAKE_CFG_INTDIR}/sfml-main-d.lib
-    debug ${BINARY_DIR}/lib/${CMAKE_CFG_INTDIR}/sfml-system-s-d.lib
-    debug ${BINARY_DIR}/lib/${CMAKE_CFG_INTDIR}/sfml-window-s-d.lib
+    debug ${BINARY_DIR}/lib/${CMAKE_CFG_INTDIR}/${CMK_SLP}sfml-main-d${CMK_SLS}
   )
   target_link_libraries(Jam
-    # SFML libs
-    optimized ${BINARY_DIR}/lib/${CMAKE_CFG_INTDIR}/sfml-audio-s.lib
-    optimized ${BINARY_DIR}/lib/${CMAKE_CFG_INTDIR}/sfml-graphics-s.lib
-    optimized ${BINARY_DIR}/lib/${CMAKE_CFG_INTDIR}/sfml-network-s.lib
-    optimized ${BINARY_DIR}/lib/${CMAKE_CFG_INTDIR}/sfml-main.lib
-    optimized ${BINARY_DIR}/lib/${CMAKE_CFG_INTDIR}/sfml-system-s.lib
-    optimized ${BINARY_DIR}/lib/${CMAKE_CFG_INTDIR}/sfml-window-s.lib
+    optimized ${BINARY_DIR}/lib/${CMAKE_CFG_INTDIR}/${CMK_SLP}sfml-main${CMK_SLS}
   )
 
   target_link_libraries(Jam
@@ -90,7 +95,6 @@ if (MSVC)
     ${SOURCE_DIR}/extlibs/libs-msvc-universal/x86/vorbis.lib
     ${SOURCE_DIR}/extlibs/libs-msvc-universal/x86/vorbisenc.lib
     ${SOURCE_DIR}/extlibs/libs-msvc-universal/x86/vorbisfile.lib
-    ${SOURCE_DIR}/extlibs/libs-msvc-universal/x86/flac.lib
 
     opengl32.lib
     winmm.lib
@@ -100,6 +104,29 @@ if (MSVC)
   )
 
   set_target_properties(Jam PROPERTIES LINK_FLAGS_RELEASE "/SUBSYSTEM:WINDOWS")
+elseif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+  if (${CMAKE_BUILD_TYPE} MATCHES "Debug")
+    add_definitions(-D_DEBUG)
+  endif()
+
+  find_package(X11 REQUIRED)
+  find_package(OpenGL REQUIRED)
+  find_package(Freetype REQUIRED)
+  find_package(OpenAL REQUIRED)
+  find_package(Vorbis REQUIRED)
+  find_package(FLAC REQUIRED)
+
+  target_link_libraries(Jam
+    libudev.so
+    libpthread.so
+    libXrandr.so
+    ${X11_LIBRARIES}
+    ${OPENGL_LIBRARIES}
+    ${FREETYPE_LIBRARIES}
+    ${OPENAL_LIBRARY}
+    ${VORBIS_LIBRARIES}
+    ${FLAC_LIBRARY}
+  )
 endif()
 
 add_custom_target(jam_assets ALL DEPENDS asset_copy)
