@@ -5,7 +5,7 @@ export default class PackageManager {
     aply
     packages = {}
     constructor() {
-        g.packageManager = this
+        (g as any).packageManager = this
     }
 
     create(name, method) {

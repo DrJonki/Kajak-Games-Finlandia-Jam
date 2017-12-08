@@ -4,7 +4,7 @@ const g = {
 	players: {},
 	server: dgram.createSocket('udp4'),
 	actionBuffer: [],
-	packageManager: new PackageManager(),
+	packageManager: null,
 	maxSpeed: 100,
 	simoIsInDaHouse: 0,
 
