@@ -1,8 +1,9 @@
+import g from './global'
 import * as commander from 'commander'
+import './packages'
 import Player from './player'
 import Move from './move'
 import Shoot from './shoot'
-import g from './global'
 import { Server } from 'https';
 import {has} from 'lodash'
 //import Tick from './tick'
@@ -28,77 +29,13 @@ g.server.on('message', function (message, remote) {
       return;
     }
 
+    /// testing new package manager
+    g.packageManager.apply(obj, remote)
+    
+    ///////////////////////////////
+
     // g.server.send("reply", remote.port, remote.address);
     console.log(obj)
-    switch(obj.package) {
-        case 'ping':
-            g.server.send(JSON.stringify({ package: 'pong', data: {} }), remote.port, remote.address);
-            break;
-
-        case 'connect':
-                const player = new Player(obj.data.name, remote.address, remote.port)
-                console.log(remote.address, 'connected!')
-                g.players[remote.address+':'+remote.port].send({
-                    package: 'connected',
-                    data:{
-                        message:'GLHF',
-                        id: remote.address+':'+remote.port,
-                        side: g.players[remote.address+':'+remote.port].side
-                    }
-                })
-
-                g.sendAllExcept(
-                    {
-                    package: 'join', 
-                    data:{ 
-                        id: remote.address+':'+remote.port,
-                        side: g.players[remote.address+':'+remote.port].side
-                    }
-                }, remote.address+':'+remote.port)
-
-                for(let key in g.players) {
-                    if(key !== remote.address+':'+remote.port) {
-                        console.log(remote.address+':'+remote.port )
-                        g.players[remote.address+':'+remote.port].send(
-                            {
-                                package: 'join', 
-                                data:{ 
-                                    id: key,
-                                    side: g.players[key].side
-                                }
-                            }
-                        )
-                    }
-                }
-
-            break
-        case 'disconnect':
-                if(has(g.players, remote.address+':'+remote.port)){
-                    console.log(remote.address, 'disconnected!');
-                    console.log(g.players);
-                    g.sendAllExcept(
-                        {
-                        package: 'leave', 
-                        data:{ 
-                            id: remote.address + ':' + remote.port,
-                            side: g.players[remote.address+':'+remote.port].side
-                        }
-                    }, remote.address+':'+remote.port)
-                    delete g.players[remote.address+':'+remote.port]
-                }
-
-            break;
-        case 'updateMovement':
-            console.log('making the move')
-            const move = new Move(
-                remote.address+':'+remote.port,
-                obj.data.position
-            )
-            break
-        case 'shoot':
-            new Shoot(remote.address+':'+remote.port, obj.data.crosshairPosition)
-            break
-    }
 });
 
 
