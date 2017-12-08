@@ -1,11 +1,10 @@
 import g from './global'
 import {includes} from 'lodash'
-export default class PackageManager {
+class PackageManager {
     name
     aply
     packages = {}
     constructor() {
-        (g as any).packageManager = this
     }
 
     create(name, method) {
@@ -23,4 +22,4 @@ export default class PackageManager {
 
 }
 
-console.log('Loaded Package');
+g.packageManager = new PackageManager()

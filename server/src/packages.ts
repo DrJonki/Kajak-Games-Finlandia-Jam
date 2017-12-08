@@ -1,5 +1,5 @@
 import g from './global'
-import PackageManager from './package'
+import './package'
 import Player from './player'
 import Move from './move'
 import Shoot from './shoot'

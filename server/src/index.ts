@@ -4,7 +4,6 @@ import './packages'
 import Player from './player'
 import Move from './move'
 import Shoot from './shoot'
-import PackageManager from './package'
 import { Server } from 'https';
 import {has} from 'lodash'
 //import Tick from './tick'
