@@ -1,11 +1,11 @@
 import g from './global'
 import * as commander from 'commander'
-import './packages'
 import Player from './player'
 import Move from './move'
 import Shoot from './shoot'
 import { Server } from 'https';
 import {has} from 'lodash'
+import Session from './session'
 //import Tick from './tick'
 
 commander

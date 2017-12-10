@@ -14,6 +14,12 @@ const g = {
 		}
 	},
 
+	sendAllInSession(obj, sessionID){
+		for(let key in g.packageManager.sessions[sessionID].players) {
+			g.players[key].send(obj)
+		}
+	},
+
 	sendAllExcept(obj, exceptionID){
 		for(let key in g.players) {
 			if(exceptionID !== key) {
@@ -25,6 +31,7 @@ const g = {
 			console.log('sent to: '+ key)
 		}
 	},
+	
 }
 export default g
 console.log('Loaded global');

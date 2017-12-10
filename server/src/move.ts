@@ -7,9 +7,11 @@ export default class Move {
     package = 'Move'
     playerID
     position
+    session
     time
     constructor(id, pos) {
         this.playerID = id
+        this.session = g.packageManager.getSession(this.playerID)
         this.position = new Vec(pos[0], pos[1])
         this.do()
     }
@@ -24,7 +26,17 @@ export default class Move {
                     position: [this.position.x, this.position.y]
                 },
             })
-            g.players[this.playerID].position = this.position
+            g.packageManager.sessions
+            // finding the correct session and doing the movement
+            for(let key in g.packageManager.sessions) {
+                for (let player in g.packageManager.sessions[key].players) {
+                    if (this.playerID === player) {
+                        g.packageManager.sessions[key].players[player].position = this.position
+                    }
+                }
+            }
+            
+            // players[this.playerID].position = this.position
             g.sendAllExcept (
                 {
                     package: 'updateMovement',
