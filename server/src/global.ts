@@ -1,9 +1,10 @@
 import * as dgram from 'dgram'
+import PackageManager from './package'
 const g = {
-	tickCount: -1,
 	players: {},
 	server: dgram.createSocket('udp4'),
 	actionBuffer: [],
+	packageManager: null,
 	maxSpeed: 100,
 	simoIsInDaHouse: 0,
 

@@ -1,11 +1,14 @@
-cmake_minimum_required(VERSION 3.6.0)
+cmake_minimum_required(VERSION 3.5.0)
 
-set(CMAKE_BUILD_TYPE "Release")
+#set(CMAKE_BUILD_TYPE "Release")
 
 project(ProjectName)
 
 include(ExternalProject)
 
+
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
 
 ExternalProject_Add(GLM
   GIT_REPOSITORY https://github.com/g-truc/glm.git
@@ -31,7 +34,6 @@ ExternalProject_Add(JSON
              -DRAPIDJSON_BUILD_DOC=OFF
              -DRAPIDJSON_BUILD_EXAMPLES=OFF
              -DRAPIDJSON_BUILD_TESTS=OFF
-             -DBUILD_TESTING=OFF
 )
 ExternalProject_Get_Property(JSON SOURCE_DIR)
 include_directories(${SOURCE_DIR}/include)
