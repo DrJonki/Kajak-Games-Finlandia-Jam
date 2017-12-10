@@ -17,7 +17,7 @@ namespace jam
     enum class UIState {
       None,
       Dead,
-      Last
+      Last,
     };
 
   public:

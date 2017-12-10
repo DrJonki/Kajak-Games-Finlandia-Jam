@@ -98,7 +98,7 @@ namespace jam
     Scene::update(dt);
 
     if ((m_pingTimer += dt) > ns_pingTime) {
-      getInstance().sendMessage("ping");
+      getInstance().sendMessage("ping", false);
       m_pingClock.restart();
       m_pingTimer = ns_pingTime - 2.f;
     }
@@ -160,11 +160,11 @@ namespace jam
   void TitleScene::textEvent(const uint32_t code)
   {
     if (!m_findingGame && code == 0xD && isConnected()) { // Enter
-      getInstance().sendMessage("connect");
+      getInstance().sendMessage("connect", true);
       m_findingGame = true;
     }
     else if (code == 0x1B) { // Escape
-      getInstance().sendMessage("disconnect");
+      getInstance().sendMessage("disconnect", true);
       getInstance().window.close();
     }
   }

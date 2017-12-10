@@ -47,11 +47,6 @@ namespace jam
     return m_dead;
   }
 
-  std::string Player::killedBy() const
-  {
-    return std::string();
-  }
-
   void Player::update(const float dt)
   {
     if (m_controllable && !isDead()) {
@@ -79,7 +74,7 @@ namespace jam
       const auto nextPos = currentPos + targetDirection;
       updatePosition(nextPos);
 
-      //if (input) {
+      if (input) {
         const auto pos = getCurrentPos();
         rapidjson::Document doc;
         rapidjson::Value positionVector;
@@ -90,8 +85,8 @@ namespace jam
         doc.SetObject();
         doc.AddMember("position", positionVector, doc.GetAllocator());
 
-        sendMessage("updateMovement", doc);
-      //}
+        sendMessage("updateMovement", doc, false);
+      }
     }
 
     InterpolatesTransform::update(dt);

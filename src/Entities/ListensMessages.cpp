@@ -23,9 +23,9 @@ namespace jam
   void ListensMessages::socketMessage(const char* message, const rapidjson::Value& data)
   {}
 
-  bool ListensMessages::sendMessage(const char* message, rapidjson::Value& data)
+  bool ListensMessages::sendMessage(const char* message, rapidjson::Value& data, const bool tcp)
   {
-    return m_scene.getInstance().sendMessage(message, data);
+    return m_scene.getInstance().sendMessage(message, data, tcp);
   }
 
   void ListensMessages::listen(const char* message)
@@ -35,6 +35,6 @@ namespace jam
 
   void ListensMessages::stopListening(const char* message)
   {
-    m_listening.erase(std::string(message));
+    m_listening.erase(message);
   }
 }

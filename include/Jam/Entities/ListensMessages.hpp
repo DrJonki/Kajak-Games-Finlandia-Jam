@@ -23,7 +23,7 @@ namespace jam
 
   protected:
 
-    bool sendMessage(const char* message, rapidjson::Value& data);
+    bool sendMessage(const char* message, rapidjson::Value& data, const bool tcp);
 
     void listen(const char* message);
 

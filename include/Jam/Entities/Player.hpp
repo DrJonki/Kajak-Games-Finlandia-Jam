@@ -22,8 +22,6 @@ namespace jam
 
     bool isDead() const;
 
-    std::string killedBy() const;
-
   private:
 
     void update(const float dt) override;

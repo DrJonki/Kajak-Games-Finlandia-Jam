@@ -5,7 +5,7 @@
 #include <Jam/Entities/Obstacle.hpp>
 #include <SFML/Graphics/View.hpp>
 #include <Jam/Scenes/TitleScene.hpp>
-#include <Jam/Entities/Text.hpp>
+#include <Jam/Entities/GenericEntity.hpp>
 #include <SFML/Window/Mouse.hpp>
 #include <iostream>
 
@@ -34,13 +34,6 @@ namespace jam
     m_propLayer.setSharedView(&m_gameView);
     m_characterLayer.setSharedView(&m_gameView);
 
-    auto& bgtex = ins.resourceManager.GetTexture("kentta.png");
-    bgtex.setRepeated(true);
-    m_background.setTexture(&bgtex);
-    m_background.setTextureRect(sf::IntRect(0, 0, ins.config.float_("VIEW_X") * 3, ins.config.float_("VIEW_Y") * 3));
-    const auto bounds = m_background.getLocalBounds();
-    m_background.setOrigin(bounds.width / 2, bounds.height / 2);
-
     m_crossHair.setTexture(&ins.resourceManager.GetTexture("crosshair.png"));
     m_crossHair.setOrigin(m_crossHair.getSize() * 0.5f);
 
@@ -56,7 +49,7 @@ namespace jam
 
     auto& deathUiLayer = m_uiLayers[static_cast<int>(UIState::Dead)];
     {
-      auto& deathText = deathUiLayer->insert<Text>("deathText");
+      auto& deathText = deathUiLayer->insert<GenericEntity<sf::Text>>("deathText");
       deathText.setFont(font);
       deathText.setCharacterSize(128);
       deathText.setOutlineThickness(5.f);
@@ -68,7 +61,7 @@ namespace jam
       deathText.setScale(0.0005f, 0.0005f);
       deathText.setPosition(0.5f, 0.45f);
     } {
-      auto& deathText = deathUiLayer->insert<Text>("deathText2");
+      auto& deathText = deathUiLayer->insert<GenericEntity<sf::Text>>("deathText2");
       deathText.setFont(font);
       deathText.setCharacterSize(128);
       deathText.setOutlineThickness(5.f);
@@ -84,7 +77,7 @@ namespace jam
 
   LevelScene::~LevelScene()
   {
-    getInstance().sendMessage("disconnect");
+    getInstance().sendMessage("disconnect", true);
   }
 
   void LevelScene::update(const float dt)
@@ -141,7 +134,7 @@ namespace jam
       point.PushBack(world.y, data.GetAllocator());
       data.AddMember("crosshairPosition", point, data.GetAllocator());
 
-      getInstance().sendMessage("shoot", data);
+      getInstance().sendMessage("shoot", data, false);
     }
   }
 
