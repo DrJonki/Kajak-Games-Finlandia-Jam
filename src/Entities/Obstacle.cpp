@@ -41,6 +41,10 @@ namespace jam
         assert(false);
       }
     }
+
+    auto& d = reinterpret_cast<sf::Transformable&>(*m_drawable);
+    d.setPosition(data["position"][0u].GetFloat(), data["position"][1].GetFloat());
+    d.setRotation(data["angle"].GetFloat());
   }
 
   bool Obstacle::isBroken() const
