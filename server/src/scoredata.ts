@@ -1,7 +1,8 @@
 import g from './global'
-import ScoreData from './scoredata'
+import Vec from './vec'
 
 export default class ScoreData {
+    id
     session
     side = 0
     hp = 100
@@ -10,8 +11,9 @@ export default class ScoreData {
     deaths = 0
     position = new Vec(0,0)
 
-    constructor(session) {
+    constructor(session, id) {
         this.session = session
+        this.id = id
     }
 
     die(killer){

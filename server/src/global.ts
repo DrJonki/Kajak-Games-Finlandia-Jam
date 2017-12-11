@@ -31,7 +31,7 @@ const g = {
 			console.log('sent to: '+ key)
 		}
 	},
-	
+
 }
 export default g
 console.log('Loaded global');
