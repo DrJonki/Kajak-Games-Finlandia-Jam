@@ -7,7 +7,7 @@ import Level from './level'
 
 g.packageManager.create(
     'ping', 
-    (obj, remote) => {
+    (obj, remote, isTcp) => {
         g.server.send(JSON.stringify({ package: 'pong', data: {} }), remote.port, remote.address)
     }
 )
@@ -59,8 +59,29 @@ g.packageManager.create(
                 }
             }
         } else {
-            const level = JSON.stringify(new Level())
+            /*
+            const level = JSON.stringify()
+            const initPack = 
+                {
+                    id: remote.address + ':' + remote.port, // Unique player identifier
+                    faction: int, // 0 - Simo, 1 - Russian
+                    health: int, // Initial health
+                    level: new Level(),
+                    players: [ // Excluding self
+                        {
+                            id: string,
+                            health: int,
+                            faction: int,
+                        },
+                        {
+                            ...	
+                        }
+                    ]
+                }
+            }
+            
             remote.write(level)
+            */
         }
     }
 )
