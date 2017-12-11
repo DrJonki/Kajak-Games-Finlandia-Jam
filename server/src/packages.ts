@@ -76,8 +76,8 @@ g.packageManager.create(
                         }
                     }), value => value.id !== myId)
             }
-            
-            // remote.write(level)
+            const obj = {package: 'connect', data: initPack}
+            remote.write(JSON.stringify(obj))
         }
     }
 )
