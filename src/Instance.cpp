@@ -68,7 +68,7 @@ namespace jam
     const auto delta = m_clock.restart().asSeconds();
 
     if (currentScene) {
-      static std::vector<char> buffer(sf::UdpSocket::MaxDatagramSize);
+      static std::vector<char> buffer(sf::UdpSocket::MaxDatagramSize * 5); // Bigger buffer for TCP messages
       sf::IpAddress addr;
       unsigned short port = 0;
       std::size_t received = 0;
