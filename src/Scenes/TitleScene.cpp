@@ -13,6 +13,7 @@ namespace jam
       m_instructionText(),
       m_connectingText(),
       m_findingGame(false),
+      m_matchmakingTimer(),
       m_music()
   {
     m_music.setLoop(true);
@@ -109,6 +110,10 @@ namespace jam
       setConnectionString(std::to_string(ms) + "ms");
       m_connectionStatus.setFillColor(sf::Color::Green);
     }
+
+    if (m_findingGame && m_matchmakingTimer.getElapsedTime().asSeconds() >= 5.f) {
+      m_findingGame = false;
+    }
   }
 
   void TitleScene::draw(sf::RenderTarget & target)
@@ -148,6 +153,7 @@ namespace jam
   {
     if (!m_findingGame && code == 0xD) { // Enter
       m_findingGame = getInstance().sendMessage("connect", true);
+      m_matchmakingTimer.restart();
     }
     else if (code == 0x1B) { // Escape
       getInstance().sendMessage("disconnect", true);

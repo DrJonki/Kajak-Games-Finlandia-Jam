@@ -39,6 +39,7 @@ namespace jam
     sf::Text m_instructionText[2];
 
     bool m_findingGame;
+    sf::Clock m_matchmakingTimer;
     sf::Text m_connectingText;
 
     sf::Music m_music;
