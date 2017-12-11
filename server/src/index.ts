@@ -32,26 +32,25 @@ g.server.on('message', function (message, remote) {
       console.error(err);
       return;
     }
-    console.log('packMan >>>')
-    console.log(g.packageManager)
     /// testing new package manager
     g.packageManager.apply(obj, remote, false)
     
     ///////////////////////////////
 
     // g.server.send("reply", remote.port, remote.address);
-    console.log(obj)
 });
 
 
 g.server.on('listening', () => {
     const address = g.server.address();
     console.log('UDP Server listening on', `${address.address}:${address.port}`);
+    /*
     setTimeout(() => {
         for(let i=0, j=g.actionBuffer.length; i<j; i++) {
             console.log(g.actionBuffer[i]);
         }
     }, 10);
+    */
 });
 
 g.server.bind(commander.udpPort);

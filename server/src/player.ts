@@ -18,7 +18,7 @@ export default class Player {
     send(obj) {
         const json = JSON.stringify(obj)
         g.server.send(json, this.port, this.ip);
-        console.log('sent' + json + this.ip + ':' + this.port)
+        //console.log('sent' + json + this.ip + ':' + this.port)
     }
 }
 console.log('Loaded player');
