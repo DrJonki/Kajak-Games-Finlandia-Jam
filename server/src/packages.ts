@@ -2,7 +2,7 @@ import g from './global'
 import Player from './player'
 import Move from './move'
 import Shoot from './shoot'
-import {has} from 'lodash'
+import {has, map, filter} from 'lodash'
 import Level from './level'
 
 g.packageManager.create(
@@ -59,29 +59,25 @@ g.packageManager.create(
                 }
             }
         } else {
-            /*
-            const level = JSON.stringify()
-            const initPack = 
-                {
-                    id: remote.address + ':' + remote.port, // Unique player identifier
-                    faction: int, // 0 - Simo, 1 - Russian
-                    health: int, // Initial health
-                    level: new Level(),
-                    players: [ // Excluding self
-                        {
-                            id: string,
-                            health: int,
-                            faction: int,
-                        },
-                        {
-                            ...	
-                        }
-                    ]
-                }
-            }
             
-            remote.write(level)
-            */
+            const ses = g.packageManager.getSession(remote.address + ':' + remote.port);
+            const myId = remote.address + ':' + remote.port;
+            const initPack = {
+                id: myId, // Unique player identifier
+                faction: ses.player[myId].side, // 0 - Simo, 1 - Russian
+                health: ses.player[myId].health, // Initial health
+                level: new Level(),
+                players: filter(
+                    map(ses.players, (value, key) => {
+                        return {
+                            id: key,
+                            health: value.hp,
+                            faction: value.side,
+                        }
+                    }), value => value.id !== myId)
+            }
+            const obj = {package: 'connect', data: initPack}
+            remote.write(JSON.stringify(obj))
         }
     }
 )
