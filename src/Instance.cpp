@@ -41,6 +41,7 @@ namespace jam
       m_clock(),
       m_quad(),
       m_sockets(),
+      m_pingTimer(),
       m_pingClock(),
       m_lastPingTime()
   {
@@ -84,11 +85,11 @@ namespace jam
           static const rapidjson::Value dummyData(rapidjson::kObjectType);
 
           auto pack = doc["package"].GetString();
-          if (strcmp(pack, "ping")) {
+          if (strcmp(pack, "ping") == 0) {
             sendMessage("pong", false);
           }
-          else if (strcmp(pack, "pong")) {
-            m_lastPingTime = m_pingClock.restart();
+          else if (strcmp(pack, "pong") == 0) {
+            m_lastPingTime = m_pingTimer.restart();
           }
 
           currentScene->socketEvent(pack, doc.HasMember("data") ? doc["data"] : dummyData);
@@ -98,9 +99,12 @@ namespace jam
       currentScene->update(delta);
     }
 
-    if (m_pingClock.getElapsedTime().asSeconds() >= ns_pingTime) {
+    static bool firstUpdate = true;
+    if (firstUpdate || m_pingClock.getElapsedTime().asSeconds() >= ns_pingTime) {
+      firstUpdate = false;
       sendMessage("ping", false);
       m_pingClock.restart();
+      m_pingTimer.restart();
     }
 
     postProcessor.update(delta);
@@ -206,9 +210,9 @@ namespace jam
 
     return udpSocket().send(buffer.GetString(), buffer.GetSize(), address, port) == sf::Socket::Done;
   }
-  const sf::Time & Instance::getLastPingTime() const
+
+  sf::Time Instance::getLastPingTime() const
   {
     return m_lastPingTime;
   }
 }
-

@@ -50,10 +50,10 @@ namespace jam
 
     const auto& font = ins.resourceManager.GetFont("BEBAS.ttf");
     m_connectionText.setFont(font);
-    m_connectionText.setString("...");
     m_connectionText.setPosition(0.9f, 0.09f);
     m_connectionText.setScale(0.001f, 0.001f);
     m_connectionText.setFillColor(sf::Color::Black);
+    setConnectionString("Connecting...");
 
     m_connectingText.setFont(font);
     m_connectingText.setString("Connecting...");
@@ -94,6 +94,21 @@ namespace jam
       m_connectionStatus.setFillColor(sf::Color::Red);
       setConnectionString("No connection!");
     }
+
+    {
+      const auto ms = getInstance().getLastPingTime().asMilliseconds();
+      sf::Color color = sf::Color::Red;
+
+      if (ms < 80) {
+        color = sf::Color::Green;
+      }
+      else if (ms < 160) {
+        color = sf::Color::Yellow;
+      }
+
+      setConnectionString(std::to_string(ms) + "ms");
+      m_connectionStatus.setFillColor(sf::Color::Green);
+    }
   }
 
   void TitleScene::draw(sf::RenderTarget & target)
@@ -124,22 +139,7 @@ namespace jam
   {
     Scene::socketEvent(event, data);
 
-    if (strcmp(event, "pong") == 0) {
-      const auto ms = getInstance().getLastPingTime().asMilliseconds();
-      sf::Color color = sf::Color::Red;
-
-      if (ms < 80) {
-        color = sf::Color::Green;
-      }
-      else if (ms < 160) {
-        color = sf::Color::Yellow;
-      }
-
-      setConnectionString(std::to_string(ms) + "ms");
-      m_connectionStatus.setFillColor(sf::Color::Green);
-    }
-
-    else if (m_findingGame && strcmp(event, "connect") == 0) {
+    if (m_findingGame && strcmp(event, "connect") == 0) {
       getInstance().currentScene = std::make_unique<LevelScene>(getInstance(), data);
     }
   }

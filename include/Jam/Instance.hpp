@@ -41,7 +41,7 @@ namespace jam
 
     bool sendMessage(const char* message, rapidjson::Value& data, const bool tcp);
 
-    const sf::Time& getLastPingTime() const;
+    sf::Time getLastPingTime() const;
 
   private:
 
@@ -69,6 +69,7 @@ namespace jam
 
     std::pair<sf::TcpSocket, sf::UdpSocket> m_sockets;
     sf::RectangleShape m_quad;
+    sf::Clock m_pingTimer;
     sf::Clock m_pingClock;
     sf::Time m_lastPingTime;
   };

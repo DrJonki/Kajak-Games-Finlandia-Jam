@@ -17,7 +17,7 @@ namespace jam
 
     void updatePosition(const glm::vec2& pos, const bool force = false);
 
-    // void updateDirection(const glm::vec2& dir, const bool force = false);
+    void updateDirection(const glm::vec2& dir, const bool force = false);
 
     glm::vec2 getCurrentPos() const;
 
@@ -32,8 +32,8 @@ namespace jam
     glm::vec2 m_prevPos;
     glm::vec2 m_nextPos;
 
-    /*glm::vec2 m_prevDirection;
-    glm::vec2 m_nextDirection;*/
+    glm::vec2 m_prevDirection;
+    glm::vec2 m_nextDirection;
 
     float m_currentDelta;
   };
