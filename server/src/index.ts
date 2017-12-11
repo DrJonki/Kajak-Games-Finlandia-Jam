@@ -10,7 +10,8 @@ import Session from './session'
 import './packages'
 
 //import Tick from './tick'
-
+const asdasdSession = new Session()
+console.log(g.packageManager.sessions)
 commander
   .option('--udp-port <n>', '', parseInt)
   .option('--tcp-port <n>', '', parseInt)
