@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.5.0)
 
-#set(CMAKE_BUILD_TYPE "Release")
+if (NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "Release")
+endif()
 
 project(ProjectName)
 
@@ -49,10 +51,26 @@ ExternalProject_Add(SFML
 
   CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
              -DBUILD_SHARED_LIBS=OFF
+             -DCMAKE_INSTALL_PREFIX=
 )
 ExternalProject_Get_Property(SFML SOURCE_DIR)
 include_directories(${SOURCE_DIR}/include)
 
+
+#ExternalProject_Add(THOR
+#  GIT_REPOSITORY https://github.com/Bromeon/Thor.git
+#  GIT_TAG master
+#
+#  UPDATE_COMMAND ""
+#  PATCH_COMMAND ""
+#  INSTALL_COMMAND ""
+#
+#  CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+#             -DTHOR_SHARED_LIBS=OFF
+#)
+#ExternalProject_Get_Property(THOR SOURCE_DIR)
+#include_directories(${SOURCE_DIR}/include)
+#add_dependencies(THOR SFML)
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
 add_subdirectory(src)

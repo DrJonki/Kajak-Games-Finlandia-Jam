@@ -5,15 +5,14 @@
 #include <Jam/Entities/Obstacle.hpp>
 #include <SFML/Graphics/View.hpp>
 #include <Jam/Scenes/TitleScene.hpp>
-#include <Jam/Entities/Text.hpp>
+#include <Jam/Entities/GenericEntity.hpp>
 #include <SFML/Window/Mouse.hpp>
 #include <iostream>
 
 namespace jam
 {
-  LevelScene::LevelScene(Instance& ins, const Player::Faction faction, const std::string& playerID)
+  LevelScene::LevelScene(Instance& ins, const rapidjson::Value& data)
     : Scene(ins),
-      m_background(sf::Vector2f(ins.config.float_("VIEW_X") * 3, ins.config.float_("VIEW_Y") * 3)),
       m_backgroundLayer(addLayer(10)),
       m_propLayer(addLayer(20)),
       m_characterLayer(addLayer(30)),
@@ -22,24 +21,17 @@ namespace jam
       m_crossHair(sf::Vector2f(20, 20)),
       m_gameView(sf::Vector2f(), sf::Vector2f(ins.config.float_("VIEW_X"), ins.config.float_("VIEW_Y"))),
       m_uiView(sf::Vector2f(0.5f, 0.5f), sf::Vector2f(1.f, 1.f)),
-      m_player(m_characterLayer.insert<Player>(playerID, ins, *this, true, faction)),
+      m_player(m_characterLayer.insert<Player>(data["id"].GetString(), ins, *this, true, static_cast<Player::Faction>(data["faction"].GetInt()))),
       m_music()
   {
-    m_music.setLoop(true);
+    /*m_music.setLoop(true);
     m_music.setRelativeToListener(true);
     m_music.openFromFile("assets/Audio/sandstorm.ogg");
-    m_music.play();
+    m_music.play();*/
 
     m_backgroundLayer.setSharedView(&m_gameView);
     m_propLayer.setSharedView(&m_gameView);
     m_characterLayer.setSharedView(&m_gameView);
-
-    auto& bgtex = ins.resourceManager.GetTexture("kentta.png");
-    bgtex.setRepeated(true);
-    m_background.setTexture(&bgtex);
-    m_background.setTextureRect(sf::IntRect(0, 0, ins.config.float_("VIEW_X") * 3, ins.config.float_("VIEW_Y") * 3));
-    const auto bounds = m_background.getLocalBounds();
-    m_background.setOrigin(bounds.width / 2, bounds.height / 2);
 
     m_crossHair.setTexture(&ins.resourceManager.GetTexture("crosshair.png"));
     m_crossHair.setOrigin(m_crossHair.getSize() * 0.5f);
@@ -47,7 +39,7 @@ namespace jam
     m_propLayer.insert<Obstacle>("").setPosition(50, 50);
     m_player.updatePosition(glm::vec2(50, 50), true);
 
-    for (int i = 0; i < static_cast<int>(UIState::Last); ++i) {
+    for (int i = 0; i < 2; ++i) {
       m_uiLayers.push_back(&addLayer(40 + i));
       m_uiLayers.back()->setSharedView(&m_uiView);
     }
@@ -56,7 +48,7 @@ namespace jam
 
     auto& deathUiLayer = m_uiLayers[static_cast<int>(UIState::Dead)];
     {
-      auto& deathText = deathUiLayer->insert<Text>("deathText");
+      auto& deathText = deathUiLayer->insert<GenericEntity<sf::Text>>("deathText");
       deathText.setFont(font);
       deathText.setCharacterSize(128);
       deathText.setOutlineThickness(5.f);
@@ -68,7 +60,7 @@ namespace jam
       deathText.setScale(0.0005f, 0.0005f);
       deathText.setPosition(0.5f, 0.45f);
     } {
-      auto& deathText = deathUiLayer->insert<Text>("deathText2");
+      auto& deathText = deathUiLayer->insert<GenericEntity<sf::Text>>("deathText2");
       deathText.setFont(font);
       deathText.setCharacterSize(128);
       deathText.setOutlineThickness(5.f);
@@ -84,7 +76,7 @@ namespace jam
 
   LevelScene::~LevelScene()
   {
-    getInstance().sendMessage("disconnect");
+    getInstance().sendMessage("disconnect", true);
   }
 
   void LevelScene::update(const float dt)
@@ -92,16 +84,16 @@ namespace jam
     Scene::update(dt);
 
     if (m_player.isDead()) {
-      m_uiState = UIState::Dead;
+      m_uiState |= UIState::Dead;
     }
     else {
-      m_uiState = UIState::None;
+      m_uiState &= ~UIState::Dead;
     }
 
     m_gameView.setCenter(m_player.getPosition());
 
-    for (int i = 0; i < static_cast<int>(UIState::Last); ++i) {
-      m_uiLayers[i]->setActive(i == static_cast<int>(m_uiState));
+    for (std::size_t i = 0; i < m_uiLayers.size(); ++i) {
+      m_uiLayers[i]->setActive(i == static_cast<std::size_t>((m_uiState & 1 << (i + 1)) != 0));
     }
 
     const auto mouseWorld = getInstance().window.mapPixelToCoords(sf::Mouse::getPosition(getInstance().window), m_gameView);
@@ -112,9 +104,6 @@ namespace jam
   {
     target.clear(sf::Color(222, 222, 222));
 
-    target.setView(m_gameView);
-    target.draw(m_background);
-
     Scene::draw(target);
 
     if (!m_player.isDead())
@@ -123,14 +112,14 @@ namespace jam
 
   void LevelScene::textEvent(const uint32_t code)
   {
-    if (code == 0x1B) {
-      getInstance().currentScene = std::make_unique<TitleScene>(getInstance());
+    if (code == 0x1B) { // Escape
+      quit();
     }
   }
 
   void LevelScene::mousePressed(const int mouseKey, const int x, const int y)
   {
-    if (mouseKey == sf::Mouse::Button::Left) {
+    if (mouseKey == sf::Mouse::Button::Left && !m_player.isDead()) {
       const auto world = getInstance().window.mapPixelToCoords(sf::Vector2i(x, y), m_gameView);
 
       rapidjson::Document data;
@@ -141,7 +130,7 @@ namespace jam
       point.PushBack(world.y, data.GetAllocator());
       data.AddMember("crosshairPosition", point, data.GetAllocator());
 
-      getInstance().sendMessage("shoot", data);
+      getInstance().sendMessage("shoot", data, false);
     }
   }
 
@@ -149,13 +138,43 @@ namespace jam
   {
     Scene::socketEvent(message, data);
 
-    if (strcmp(message, "join") == 0) {
-      m_characterLayer.insert<Player>(data["id"].GetString(), getInstance(), *this, false, static_cast<Player::Faction>(data["side"].GetUint())).updatePosition(glm::vec2(50, 50), true);
+    auto findPlayerId = [&data]() -> const char* {
+      return data["id"].GetString();
+    };
 
+    if (strcmp(message, "damage") == 0) {
+      auto player = static_cast<Player*>(m_characterLayer.get(findPlayerId()));
+
+      if (player) {
+        player->offsetHealth(data["amount"].GetInt());
+      }
+    }
+
+    else if (strcmp(message, "respawn") == 0) {
+      auto player = static_cast<Player*>(m_characterLayer.get(findPlayerId()));
+
+      if (player) {
+        player->setHealth(data["health"].GetInt());
+        player->setActive(true);
+      }
+    }
+
+    else if (strcmp(message, "join") == 0) {
+      m_characterLayer.insert<Player>(
+        data["id"].GetString(), getInstance(), *this, false, static_cast<Player::Faction>(data["faction"].GetUint())
+      ).setHealth(0);
     }
 
     else if (strcmp(message, "leave") == 0) {
       m_characterLayer.get(data["id"].GetString())->erase();
     }
+
+    else if (strcmp(message, "kick") == 0) {
+      quit();
+    }
+  }
+  void LevelScene::quit()
+  {
+    getInstance().currentScene = std::make_unique<TitleScene>(getInstance());
   }
 }

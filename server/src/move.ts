@@ -18,7 +18,8 @@ export default class Move {
 
     do(){
         if(has(g.players, this.playerID)) {
-            console.log('Cykaaaa!')
+            //console.log('Cykaaaa!')
+            /*
             console.log({
                 package: 'updateMovement',
                 data: {
@@ -26,6 +27,7 @@ export default class Move {
                     position: [this.position.x, this.position.y]
                 },
             })
+            */
             g.packageManager.sessions
             // finding the correct session and doing the movement
             for(let key in g.packageManager.sessions) {

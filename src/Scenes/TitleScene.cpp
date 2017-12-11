@@ -2,17 +2,10 @@
 #include <Jam/Instance.hpp>
 #include <Jam/Scenes/LevelScene.hpp>
 
-namespace
-{
-  const float ns_pingTime = 1.f;
-}
-
 namespace jam
 {
   TitleScene::TitleScene(Instance& ins)
     : Scene(ins),
-      m_pingTimer(ns_pingTime),
-      m_pongTimer(ns_pingTime + 2.f),
       m_view(sf::Vector2f(0.5f, 0.5f), sf::Vector2f(1.f, 1.f)),
       m_background(sf::Vector2f(1.f, 1.f)),
       m_titleText(),
@@ -97,19 +90,9 @@ namespace jam
   {
     Scene::update(dt);
 
-    if ((m_pingTimer += dt) > ns_pingTime) {
-      getInstance().sendMessage("ping");
-      m_pingClock.restart();
-      m_pingTimer = ns_pingTime - 2.f;
-    }
-
-    if ((m_pongTimer += dt) > ns_pingTime + 2.f) {
+    if (getInstance().getLastPingTime().asSeconds() > 2.f) {
       m_connectionStatus.setFillColor(sf::Color::Red);
       setConnectionString("No connection!");
-    }
-    else if (m_pongTimer > ns_pingTime + 1.f) {
-      m_connectionStatus.setFillColor(sf::Color::Yellow);
-      setConnectionString("Reconnecting...");
     }
   }
 
@@ -128,7 +111,7 @@ namespace jam
     target.draw(m_connectionStatus);
     target.draw(m_connectionText);
 
-    for (int i = 1 - isConnected(); i < 2; ++i) {
+    for (int i = 0; i < 2; ++i) {
       target.draw(m_instructionText[i]);
     }
 
@@ -142,36 +125,34 @@ namespace jam
     Scene::socketEvent(event, data);
 
     if (strcmp(event, "pong") == 0) {
-      m_connectionStatus.setFillColor(sf::Color::Green);
-      m_pongTimer = 0.f;
-      m_pingTimer = 0.f;
+      const auto ms = getInstance().getLastPingTime().asMilliseconds();
+      sf::Color color = sf::Color::Red;
 
-      setConnectionString(std::to_string(m_pingClock.getElapsedTime().asMilliseconds()) + "ms");
+      if (ms < 80) {
+        color = sf::Color::Green;
+      }
+      else if (ms < 160) {
+        color = sf::Color::Yellow;
+      }
+
+      setConnectionString(std::to_string(ms) + "ms");
+      m_connectionStatus.setFillColor(sf::Color::Green);
     }
 
-    else if (m_findingGame && strcmp(event, "connected") == 0) {
-      const auto faction = static_cast<Player::Faction>(data["side"].GetUint());
-      const auto id = data["id"].GetString();
-
-      getInstance().currentScene = std::make_unique<LevelScene>(getInstance(), faction, id);
+    else if (m_findingGame && strcmp(event, "connect") == 0) {
+      getInstance().currentScene = std::make_unique<LevelScene>(getInstance(), data);
     }
   }
 
   void TitleScene::textEvent(const uint32_t code)
   {
-    if (!m_findingGame && code == 0xD && isConnected()) { // Enter
-      getInstance().sendMessage("connect");
-      m_findingGame = true;
+    if (!m_findingGame && code == 0xD) { // Enter
+      m_findingGame = getInstance().sendMessage("connect", true);
     }
     else if (code == 0x1B) { // Escape
-      getInstance().sendMessage("disconnect");
+      getInstance().sendMessage("disconnect", true);
       getInstance().window.close();
     }
-  }
-
-  bool TitleScene::isConnected() const
-  {
-    return m_pongTimer < ns_pingTime + 1.f;
   }
 
   void TitleScene::setConnectionString(const std::string& string)

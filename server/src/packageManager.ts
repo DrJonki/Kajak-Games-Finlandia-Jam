@@ -1,20 +1,25 @@
 import g from './global'
 import {includes} from 'lodash'
-class PackageManager {
+import {has} from 'lodash'
+export default class PackageManager {
     packages = {}
     sessions = {}
     constructor() {
     }
 
     create(name, method) {
-        if(!includes(this.packages, name)) {
+        if(!has(this.packages, name)) {
             this.packages[name] = method
         }
     }
-    apply(obj, remote) {
+    apply(obj, remote, protocol) {
         try {
             const sender = remote.address + ':' + remote.port
-            this.packages[obj.package](obj, remote)
+            console.log(' >>>>>>> ')
+            console.log( obj.package )
+            if(has(this.packages, obj.package)) {
+                this.packages[obj.package](obj, remote, protocol)
+            }
         }
         catch(err){console.log(err)}
     }
@@ -29,6 +34,4 @@ class PackageManager {
     }
 
 }
-
-g.packageManager = new PackageManager()
-import './packages'
+console.log('loaded packageManager')

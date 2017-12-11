@@ -20,9 +20,11 @@ namespace jam
 
     Player(Instance& ins, Scene& scene, const bool controllable, const Faction faction);
 
-    bool isDead() const;
+    void offsetHealth(const int health);
 
-    std::string killedBy() const;
+    void setHealth(const int health);
+
+    bool isDead() const;
 
   private:
 
@@ -37,6 +39,6 @@ namespace jam
     Instance& m_instance;
     const Faction m_faction;
     const bool m_controllable;
-    bool m_dead;
+    int m_health;
   };
 }

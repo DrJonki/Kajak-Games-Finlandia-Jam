@@ -1,10 +1,10 @@
 import * as dgram from 'dgram'
-import PackageManager from './package'
+import PackageManager from './packageManager'
 const g = {
 	players: {},
 	server: dgram.createSocket('udp4'),
 	actionBuffer: [],
-	packageManager: null,
+	packageManager: new PackageManager(),
 	maxSpeed: 100,
 	simoIsInDaHouse: 0,
 
@@ -24,11 +24,11 @@ const g = {
 		for(let key in g.players) {
 			if(exceptionID !== key) {
 				g.players[key].send(obj)
-				console.log('sent:' )
-				console.log(obj)
-				console.log('to all except' + exceptionID)
+				//console.log('sent:' )
+				//console.log(obj)
+				//console.log('to all except' + exceptionID)
 			}
-			console.log('sent to: '+ key)
+			//console.log('sent to: '+ key)
 		}
 	},
 

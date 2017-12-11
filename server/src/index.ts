@@ -7,6 +7,8 @@ import Shoot from './shoot'
 import { Server } from 'https';
 import {has} from 'lodash'
 import Session from './session'
+import './packages'
+
 //import Tick from './tick'
 
 commander
@@ -30,9 +32,10 @@ g.server.on('message', function (message, remote) {
       console.error(err);
       return;
     }
-
+    console.log('packMan >>>')
+    console.log(g.packageManager)
     /// testing new package manager
-    g.packageManager.apply(obj, remote)
+    g.packageManager.apply(obj, remote, false)
     
     ///////////////////////////////
 
@@ -83,6 +86,7 @@ net.createServer(function(sock) {
     
         /// testing new package manager
         g.packageManager.apply(obj, sock, true) // tcp === true udp === false
+        console.log("TCP-magic happened")
         //////////////////////////
         
     });

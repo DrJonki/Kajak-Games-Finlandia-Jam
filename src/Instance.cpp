@@ -24,6 +24,11 @@ sf::Uint32 getStyle() {
   #endif
 }
 
+namespace
+{
+  const float ns_pingTime = 2.f;
+}
+
 namespace jam
 {
   Instance::Instance()
@@ -33,25 +38,24 @@ namespace jam
       currentScene(),
       resourceManager(),
       postProcessor(*this),
-      socket(),
       m_clock(),
-      m_quad()
+      m_quad(),
+      m_sockets(),
+      m_pingClock(),
+      m_lastPingTime()
   {
     window.setVerticalSyncEnabled(true);
     window.setKeyRepeatEnabled(false);
-    window.setMouseCursorVisible(
-    #ifdef _DEBUG
-      false
-    #else
-      false
-    #endif
-    );
+    window.setMouseCursorVisible(false);
 
-    if (socket.bind(sf::Socket::AnyPort) != sf::Socket::Status::Done) {
-      assert(false);
+    connectTcp();
+
+    if (udpSocket().bind(sf::Socket::AnyPort) != sf::Socket::Status::Done) {
+      throw "Failed to bind UDP port";
     }
 
-    socket.setBlocking(false);
+    tcpSocket().setBlocking(false);
+    udpSocket().setBlocking(false);
   }
 
   Instance::~Instance()
@@ -69,24 +73,37 @@ namespace jam
       unsigned short port = 0;
       std::size_t received = 0;
 
-      while (socket.receive(&buffer[0], buffer.size(), received, addr, port) == sf::UdpSocket::Done) {
+      while (
+        m_sockets.first.receive(&buffer[0], buffer.size(), received) == sf::Socket::Done ||
+        m_sockets.second.receive(&buffer[0], buffer.size(), received, addr, port) == sf::Socket::Done
+      ) {
         rapidjson::Document doc;
         doc.ParseInsitu<rapidjson::kParseStopWhenDoneFlag>(buffer.data());
 
-        if (!doc.HasParseError() && doc.HasMember("package")) {
-          rapidjson::Value dummyData;
-          dummyData.SetObject();
+        if (!doc.HasParseError() && doc.HasMember("package") && doc["package"].IsString()) {
+          static const rapidjson::Value dummyData(rapidjson::kObjectType);
 
-          currentScene->socketEvent(doc["package"].GetString(), doc.HasMember("data") ? doc["data"] : dummyData);
+          auto pack = doc["package"].GetString();
+          if (strcmp(pack, "ping")) {
+            sendMessage("pong", false);
+          }
+          else if (strcmp(pack, "pong")) {
+            m_lastPingTime = m_pingClock.restart();
+          }
+
+          currentScene->socketEvent(pack, doc.HasMember("data") ? doc["data"] : dummyData);
         }
       }
 
-      currentScene->update(
-        delta * config.float_("SPEED_MULT") // Global game speed multiplier
-      );
+      currentScene->update(delta);
     }
 
-    postProcessor.update(delta),
+    if (m_pingClock.getElapsedTime().asSeconds() >= ns_pingTime) {
+      sendMessage("ping", false);
+      m_pingClock.restart();
+    }
+
+    postProcessor.update(delta);
     postProcessor.render(delta);
 
     if (currentScene)
@@ -115,13 +132,6 @@ namespace jam
         ));
         break;
       }
-      case sf::Event::KeyReleased:
-      {
-        /*if (event.key.code == sf::Keyboard::Escape)
-          window.close();*/
-
-        break;
-      }
       case sf::Event::TextEntered:
       {
         currentScene->textEvent(event.text.unicode);
@@ -136,23 +146,38 @@ namespace jam
     }
   }
 
-  bool Instance::sendMessage(const char * message)
+  sf::TcpSocket & Instance::tcpSocket()
   {
-    rapidjson::Value val;
-    val.SetObject();
-
-    return sendMessage(message, val);
+    return m_sockets.first;
   }
 
-  bool Instance::sendMessage(const char* message, rapidjson::Value& data)
+  sf::UdpSocket & Instance::udpSocket()
+  {
+    return m_sockets.second;
+  }
+
+  void Instance::connectTcp()
+  {
+    if (tcpSocket().connect(sf::IpAddress(config.string("SERVER_ADDRESS")), config.integer("SERVER_PORT_TCP"), sf::seconds(5.f)) != sf::Socket::Done) {
+      throw "Failed to connect";
+    }
+  }
+
+  bool Instance::sendMessage(const char * message, const bool tcp)
+  {
+    rapidjson::Value val(rapidjson::kObjectType);
+
+    return sendMessage(message, val, tcp);
+  }
+
+  bool Instance::sendMessage(const char* message, rapidjson::Value& data, const bool tcp)
   {
     using namespace rapidjson;
 
     static const sf::IpAddress address = sf::IpAddress(config.string("SERVER_ADDRESS"));
-    static const unsigned short port = config.integer("SERVER_PORT");
+    static const unsigned short port = config.integer("SERVER_PORT_UDP");
 
-    Document doc;
-    doc.SetObject();
+    Document doc(rapidjson::kObjectType);
     doc.AddMember(StringRef("package"), StringRef(message), doc.GetAllocator());
     doc.AddMember(StringRef("data"), data, doc.GetAllocator());
 
@@ -160,7 +185,29 @@ namespace jam
     Writer<StringBuffer> writer(buffer);
     doc.Accept(writer);
 
-    return socket.send(buffer.GetString(), buffer.GetSize(), address, port) == sf::UdpSocket::Done;
+    if (tcp) {
+      const auto status = tcpSocket().send(buffer.GetString(), buffer.GetSize());
+      switch (status)
+      {
+        case sf::Socket::Done:
+          return true;
+
+        case sf::Socket::Disconnected: {
+          tcpSocket().setBlocking(true);
+          connectTcp();
+          tcpSocket().setBlocking(false);
+        }
+
+      default:
+        return false;
+      };
+    }
+
+    return udpSocket().send(buffer.GetString(), buffer.GetSize(), address, port) == sf::Socket::Done;
+  }
+  const sf::Time & Instance::getLastPingTime() const
+  {
+    return m_lastPingTime;
   }
 }
 
