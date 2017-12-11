@@ -61,6 +61,7 @@ g.packageManager.create(
         } else {
             
             const ses = g.packageManager.getSession(remote.address + ':' + remote.port);
+            console.log(ses)
             const myId = remote.address + ':' + remote.port;
             const initPack = {
                 id: myId, // Unique player identifier
