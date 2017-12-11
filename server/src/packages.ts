@@ -65,8 +65,8 @@ g.packageManager.create(
             const myId = remote.address + ':' + remote.port;
             const initPack = {
                 id: myId, // Unique player identifier
-                faction: ses.player[myId].side, // 0 - Simo, 1 - Russian
-                health: ses.player[myId].health, // Initial health
+                faction: ses.players[myId].side, // 0 - Simo, 1 - Russian
+                health: ses.players[myId].health, // Initial health
                 level: new Level(),
                 players: filter(
                     map(ses.players, (value, key) => {
