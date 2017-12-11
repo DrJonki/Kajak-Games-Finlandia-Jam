@@ -186,7 +186,8 @@ namespace jam
     doc.Accept(writer);
 
     if (tcp) {
-      const auto status = tcpSocket().send(buffer.GetString(), buffer.GetSize());
+      size_t sent = 0;
+      const auto status = tcpSocket().send(buffer.GetString(), buffer.GetSize(), sent);
       switch (status)
       {
         case sf::Socket::Done:
