@@ -60,7 +60,7 @@ const HOST = '127.0.0.1'
 // Create a server instance, and chain the listen function to it
 // The function passed to net.createServer() becomes the event handler for the 'connection' event
 // The sock object the callback function receives UNIQUE for each connection
-net.createServer(function(sock) {
+const tcpServer = net.createServer(function(sock) {
     
     // We have a connection - a socket object is assigned to the connection automatically
     console.log('CONNECTED: ' + sock.remoteAddress +':'+ sock.remotePort);
@@ -101,7 +101,8 @@ console.log('TCP Server listening on ' + commander.tcpPort);
 ///////////////////////////
 
 process.on('SIGTERM', () => {
-    g.server.close();
+    g.server.close()
+    tcpServer.close()
     console.log('Closing...');
 });
 
