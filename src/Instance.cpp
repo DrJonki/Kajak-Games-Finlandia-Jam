@@ -68,7 +68,7 @@ namespace jam
     const auto delta = m_clock.restart().asSeconds();
 
     if (currentScene) {
-      static std::vector<char> buffer(sf::UdpSocket::MaxDatagramSize);
+      static std::vector<char> buffer(sf::UdpSocket::MaxDatagramSize * 5); // Bigger buffer for TCP messages
       sf::IpAddress addr;
       unsigned short port = 0;
       std::size_t received = 0;
@@ -186,7 +186,8 @@ namespace jam
     doc.Accept(writer);
 
     if (tcp) {
-      const auto status = tcpSocket().send(buffer.GetString(), buffer.GetSize());
+      size_t sent = 0;
+      const auto status = tcpSocket().send(buffer.GetString(), buffer.GetSize(), sent);
       switch (status)
       {
         case sf::Socket::Done:

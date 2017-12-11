@@ -2,17 +2,43 @@
 
 #include <Jam/Entity.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
+#include <SFML/Graphics/CircleShape.hpp>
+#include <rapidjson/document.h>
+#include <memory>
 
 namespace jam
 {
-  class Obstacle : public Entity, public sf::RectangleShape
+  class Instance;
+
+  class Obstacle : public Entity
   {
   public:
 
-    Obstacle();
+    enum class Type
+    {
+      Rock,
+      House,
+    };
+
+  public:
+
+    Obstacle(Instance& ins, const rapidjson::Value& data);
+
+    bool isBroken() const;
 
   private:
 
+    sf::CircleShape& circleShape();
+
+    sf::RectangleShape& rectangleShape();
+
     void draw(sf::RenderTarget& target) override;
+
+  private:
+
+    const Type m_type;
+    const bool m_breakable;
+    int m_health;
+    std::unique_ptr<sf::Drawable> m_drawable;
   };
 }

@@ -19,7 +19,7 @@ namespace jam
       m_instance(ins),
       m_controllable(controllable),
       m_faction(faction), 
-      m_health()
+      m_health(0)
   {
     if (controllable) {
       listen("forcePosition");
@@ -83,13 +83,11 @@ namespace jam
 
       if (input) {
         const auto pos = getCurrentPos();
-        rapidjson::Document doc;
-        rapidjson::Value positionVector;
-        positionVector.SetArray();
+        rapidjson::Document doc(rapidjson::kObjectType);
+        rapidjson::Value positionVector(rapidjson::kArrayType);
         positionVector.PushBack(pos.x, doc.GetAllocator());
         positionVector.PushBack(pos.y, doc.GetAllocator());
 
-        doc.SetObject();
         doc.AddMember("position", positionVector, doc.GetAllocator());
 
         sendMessage("updateMovement", doc, false);

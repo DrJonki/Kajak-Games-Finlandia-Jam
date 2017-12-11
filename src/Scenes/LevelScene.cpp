@@ -36,9 +36,6 @@ namespace jam
     m_crossHair.setTexture(&ins.resourceManager.GetTexture("crosshair.png"));
     m_crossHair.setOrigin(m_crossHair.getSize() * 0.5f);
 
-    m_propLayer.insert<Obstacle>("").setPosition(50, 50);
-    m_player.updatePosition(glm::vec2(50, 50), true);
-
     for (int i = 0; i < 2; ++i) {
       m_uiLayers.push_back(&addLayer(40 + i));
       m_uiLayers.back()->setSharedView(&m_uiView);
@@ -71,6 +68,16 @@ namespace jam
       deathText.setOrigin(bounds.width / 2, bounds.height / 2);
       deathText.setScale(0.00025f, 0.00025f);
       deathText.setPosition(0.5f, 0.55f);
+    }
+
+    // Level generation
+    {
+      auto& levelData = data["level"];
+      auto& propArray = levelData["props"];
+
+      for (auto itr = levelData.Begin(); itr != levelData.End(); ++itr) {
+        m_propLayer.insert<Obstacle>((*itr)["id"].GetString(), getInstance(), *itr);
+      }
     }
   }
 
@@ -173,6 +180,7 @@ namespace jam
       quit();
     }
   }
+
   void LevelScene::quit()
   {
     getInstance().currentScene = std::make_unique<TitleScene>(getInstance());
