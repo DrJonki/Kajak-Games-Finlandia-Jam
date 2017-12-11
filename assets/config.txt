@@ -3,7 +3,7 @@ VIEW_Y=600
 FBO_UPSCALE=1.0
 
 
-SERVER_ADDRESS=127.0.0.1
+SERVER_ADDRESS=gameserver.jonki.info
 #gameserver.jonki.info
 SERVER_PORT_TCP=9001
 SERVER_PORT_UDP=9002
