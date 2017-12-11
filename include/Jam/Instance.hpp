@@ -36,18 +36,20 @@ namespace jam
     ~Instance();
 
     void operator ()();
-    
-    bool tcpConnected() const;
 
     bool sendMessage(const char* message, const bool tcp);
 
     bool sendMessage(const char* message, rapidjson::Value& data, const bool tcp);
+
+    const sf::Time& getLastPingTime() const;
 
   private:
 
     sf::TcpSocket& tcpSocket();
 
     sf::UdpSocket& udpSocket();
+
+    void connectTcp();
 
   public:
 
@@ -66,7 +68,8 @@ namespace jam
   private:
 
     std::pair<sf::TcpSocket, sf::UdpSocket> m_sockets;
-    bool m_tcpConnected;
     sf::RectangleShape m_quad;
+    sf::Clock m_pingClock;
+    sf::Time m_lastPingTime;
   };
 }
