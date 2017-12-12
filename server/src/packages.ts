@@ -1,53 +1,84 @@
 import g from './global'
-import './package'
 import Player from './player'
 import Move from './move'
 import Shoot from './shoot'
-import {has} from 'lodash'
+import {has, map, filter} from 'lodash'
+import Level from './level'
 
 g.packageManager.create(
     'ping', 
-    (obj, remote) => {
+    (obj, remote, isTcp) => {
         g.server.send(JSON.stringify({ package: 'pong', data: {} }), remote.port, remote.address)
     }
 )
 
 g.packageManager.create(
     'connect', 
-    (obj, remote) => {
-        const player = new Player(obj.data.name, remote.address, remote.port)
-        console.log(remote.address, 'connected!')
-        g.players[remote.address+':'+remote.port].send({
-            package: 'connected',
-            data:{
-                message:'GLHF',
-                id: remote.address+':'+remote.port,
-                side: g.players[remote.address+':'+remote.port].side
+    (obj, remote, isTcp) => {
+        if(!isTcp) {
+            let session
+            const player = new Player(obj.data.name, remote.address, remote.port)
+            // find session with open player slots
+            for (let key in g.packageManager.sessions) {
+                if (g.packageManager.sessions[key].status === 'not-full') {
+                    g.packageManager.sessions[key].addPlayer(player.name)
+                    session = g.packageManager.sessions[key]
+                }
             }
-        })
+            console.log(remote.address, 'connected!')
+            g.players[remote.address+':'+remote.port].send({ // bug: this sends join to all not just session players
+                package: 'connected',
+                data:{
+                    message:'GLHF',
+                    id: remote.address+':'+remote.port,
+                    side: session.players[remote.address+':'+remote.port].side
+                }
+            })
 
-        g.sendAllExcept(
-            {
-            package: 'join', 
-            data:{ 
-                id: remote.address+':'+remote.port,
-                side: g.players[remote.address+':'+remote.port].side
-            }
-        }, remote.address+':'+remote.port)
+            g.sendAllExcept(
+                {
+                package: 'join', 
+                data:{ 
+                    id: remote.address+':'+remote.port,
+                    side: session.players[remote.address+':'+remote.port].side
+                }
+            }, remote.address+':'+remote.port)
 
-        for(let key in g.players) {
-            if(key !== remote.address+':'+remote.port) {
-                console.log(remote.address+':'+remote.port )
-                g.players[remote.address+':'+remote.port].send(
-                    {
-                        package: 'join', 
-                        data:{ 
-                            id: key,
-                            side: g.players[key].side
+            for(let key in session.players) {
+                if(key !== remote.address+':'+remote.port) {
+                    console.log(remote.address+':'+remote.port )
+                    session.players[remote.address+':'+remote.port].send(
+                        {
+                            package: 'join', 
+                            data:{ 
+                                id: key,
+                                side: session.players[key].side
+                            }
                         }
-                    }
-                )
+                    )
+                }
             }
+        } else {
+            
+            const ses = g.packageManager.getSession(remote.address + ':' + remote.port);
+            console.log(ses)
+            const myId = remote.address + ':' + remote.port;
+            const initPack = {
+                id: myId, // Unique player identifier
+                faction: ses.players[myId].side, // 0 - Simo, 1 - Russian
+                health: ses.players[myId].health, // Initial health
+                level: new Level(),
+                players: filter(
+                    map(ses.players, (value, key) => {
+                        return {
+                            id: key,
+                            health: value.hp,
+                            faction: value.side,
+                        }
+                    }), value => value.id !== myId)
+            }
+            const obj = {package: 'connect', data: initPack}
+            remote.write(JSON.stringify(obj))
         }
     }
 )
@@ -73,11 +104,11 @@ g.packageManager.create(
 
 g.packageManager.create(
     'updateMovement', 
-    (obj, remote) => {
+    (obj, remote, sessionId) => {
         console.log('making the move')
         const move = new Move(
             remote.address+':'+remote.port,
-            obj.data.position
+            obj.data.position,
         )
     }
 )

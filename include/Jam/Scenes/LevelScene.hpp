@@ -6,6 +6,7 @@
 #include <SFML/Graphics/View.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Audio/Music.hpp>
+#include <rapidjson/document.h>
 #include <unordered_map>
 
 namespace jam
@@ -14,15 +15,15 @@ namespace jam
   {
   private:
 
-    enum class UIState {
-      None,
-      Dead,
-      Last
+    enum UIState {
+      None = 0,
+      Dead = 1,
+      Leaderboard = 1 << 1,
     };
 
   public:
 
-    LevelScene(Instance& ins, const Player::Faction faction, const std::string& playerID);
+    LevelScene(Instance& ins, const rapidjson::Value& playerInfo);
 
     ~LevelScene() override;
 
@@ -38,13 +39,13 @@ namespace jam
 
   private:
 
-    sf::RectangleShape m_background;
+    void quit();
 
     Layer& m_backgroundLayer;
     Layer& m_propLayer;
     Layer& m_characterLayer;
     std::vector<Layer*> m_uiLayers;
-    UIState m_uiState;
+    std::size_t m_uiState;
 
     // Entities
     Player& m_player;

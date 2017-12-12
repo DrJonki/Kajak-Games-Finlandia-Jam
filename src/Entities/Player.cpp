@@ -13,13 +13,13 @@ namespace jam
 {
   Player::Player(Instance& ins, Scene& scene, const bool controllable, const Faction faction)
     : Entity(),
-      ListensMessages(scene, {"updateMovement", "dead", "respawn"}),
+      ListensMessages(scene, {"updateMovement"}),
       InterpolatesTransform(ins),
       sf::CircleShape(10.f),
       m_instance(ins),
       m_controllable(controllable),
       m_faction(faction), 
-      m_dead(false)
+      m_health(0)
   {
     if (controllable) {
       listen("forcePosition");
@@ -31,25 +31,28 @@ namespace jam
     setOutlineThickness(1.f);
 
     if (faction == Faction::Simo) {
-      // setFillColor(sf::Color::Blue);
       setOutlineColor(sf::Color::Blue);
       setTexture(&ins.resourceManager.GetTexture("white.jpg"));
     }
     else if (faction == Faction::Russian) {
-      //setFillColor(sf::Color::Red);
       setOutlineColor(sf::Color(255, 168, 0));
       setTexture(&ins.resourceManager.GetTexture("cheeki.png"));
     }
   }
 
-  bool Player::isDead() const
+  void Player::offsetHealth(const int health)
   {
-    return m_dead;
+    m_health += health;
   }
 
-  std::string Player::killedBy() const
+  void Player::setHealth(const int health)
   {
-    return std::string();
+    m_health = health;
+  }
+
+  bool Player::isDead() const
+  {
+    return m_health <= 0;
   }
 
   void Player::update(const float dt)
@@ -58,8 +61,7 @@ namespace jam
       using sf::Keyboard;
 
       bool input = false;
-      const float baseSpeed = 750.f * m_instance.config.float_("INTERPOLATION_TICK_LENGTH");
-      const float speed = m_faction == Faction::Simo ? baseSpeed : baseSpeed / 4;
+      const float speed = 750.f * m_instance.config.float_("INTERPOLATION_TICK_LENGTH");
       glm::vec2 currentPos = getCurrentPos();
       glm::vec2 targetDirection(0.f);
 
@@ -79,19 +81,17 @@ namespace jam
       const auto nextPos = currentPos + targetDirection;
       updatePosition(nextPos);
 
-      //if (input) {
+      if (input) {
         const auto pos = getCurrentPos();
-        rapidjson::Document doc;
-        rapidjson::Value positionVector;
-        positionVector.SetArray();
+        rapidjson::Document doc(rapidjson::kObjectType);
+        rapidjson::Value positionVector(rapidjson::kArrayType);
         positionVector.PushBack(pos.x, doc.GetAllocator());
         positionVector.PushBack(pos.y, doc.GetAllocator());
 
-        doc.SetObject();
         doc.AddMember("position", positionVector, doc.GetAllocator());
 
-        sendMessage("updateMovement", doc);
-      //}
+        sendMessage("updateMovement", doc, false);
+      }
     }
 
     InterpolatesTransform::update(dt);
@@ -116,17 +116,6 @@ namespace jam
 
     if (strcmp(message, "forcePosition") == 0) {
       posUpdate(true);
-    }
-
-    else if (strcmp(message, "dead") == 0 && strcmp(data["id"].GetString(), getID().c_str()) == 0) {
-      m_dead = true;
-      setActive(false);
-    }
-
-    else if (strcmp(message, "respawn") == 0 && strcmp(data["id"].GetString(), getID().c_str()) == 0) {
-      posUpdate(true);
-      setActive(true);
-      m_dead = false;
     }
 
     if (m_controllable) return;

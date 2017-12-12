@@ -27,22 +27,19 @@ namespace jam
 
   private:
 
-    bool isConnected() const;
-
     void setConnectionString(const std::string& string);
 
-    float m_pingTimer, m_pongTimer;
     sf::View m_view;
     sf::RectangleShape m_background;
     sf::Text m_titleText[3];
 
     sf::CircleShape m_connectionStatus;
     sf::Text m_connectionText;
-    sf::Clock m_pingClock;
 
     sf::Text m_instructionText[2];
 
     bool m_findingGame;
+    sf::Clock m_matchmakingTimer;
     sf::Text m_connectingText;
 
     sf::Music m_music;
