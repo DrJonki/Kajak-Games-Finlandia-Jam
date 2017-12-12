@@ -1,6 +1,7 @@
 import g from './global'
 import {includes} from 'lodash'
 import {has} from 'lodash'
+import Session from './session'
 export default class PackageManager {
     packages = {}
     sessions = {}
@@ -12,25 +13,46 @@ export default class PackageManager {
             this.packages[name] = method
         }
     }
+
     apply(obj, remote, protocol) {
         try {
             const sender = remote.address + ':' + remote.port
-            console.log(' >>>>>>> ')
-            console.log( obj.package )
+            // console.log(' >>>>>>> ')
+            // console.log( obj.package )
             if(has(this.packages, obj.package)) {
-                this.packages[obj.package](obj, remote, protocol)
+                return this.packages[obj.package](obj, remote, protocol)
             }
         }
         catch(err){console.log(err)}
     }
+
     getSession(id) {
+        console.log(id)
         for(let key in g.packageManager.sessions) {
+            console.log('session '+ key)
             for (let player in g.packageManager.sessions[key].players) {
                 if (id === player) {
                     return g.packageManager.sessions[key]
                 }
             }
         }
+    }
+
+    joinFree(player) {
+        for (let key in this.sessions) {
+            if (this.sessions[key].status === 'not-full') {
+                this.sessions[key].addPlayer(player)
+                console.log('added to excisting session: ' + key)
+                return this.sessions[key]
+            }
+        }
+        const newSes = new Session()
+        newSes.addPlayer(player)
+        return newSes
+    }
+
+    createSession() {
+
     }
 
 }

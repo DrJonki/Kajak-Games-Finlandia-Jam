@@ -10,8 +10,8 @@ import Session from './session'
 import './packages'
 
 //import Tick from './tick'
-const asdasdSession = new Session()
-console.log(g.packageManager.sessions)
+// const asdasdSession = new Session()
+// console.log(g.packageManager.sessions)
 commander
   .option('--udp-port <n>', '', parseInt)
   .option('--tcp-port <n>', '', parseInt)
@@ -65,13 +65,13 @@ const tcpServer = net.createServer(function(sock) {
     
     // We have a connection - a socket object is assigned to the connection automatically
     console.log('CONNECTED: ' + sock.remoteAddress +':'+ sock.remotePort);
+    sock.on('error', ()=>{})
     
     // Add a 'data' event handler to this instance of socket
     sock.on('data', function(data) {
         
         console.log('DATA ' + sock.remoteAddress + ': ' + data);
         // Write the data back to the socket, the client will receive it as data from the server
-        sock.write('You said "' + data + '"');
 
 
         ///>>>>>>>>>>>>>>>>>>>>>>
@@ -85,7 +85,18 @@ const tcpServer = net.createServer(function(sock) {
         }
     
         /// testing new package manager
-        g.packageManager.apply(obj, sock, true) // tcp === true udp === false
+        const sendingPackage = g.packageManager.apply(obj, sock, true) // tcp === true udp === false
+        if(sendingPackage) {
+            try {
+                console.log('Sending package')
+                if (!sock.write(JSON.stringify(sendingPackage))) {
+                    console.error("tcp send error");
+                }
+            }
+            catch(err){
+
+            }
+        }
         console.log("TCP-magic happened")
         //////////////////////////
         
@@ -97,6 +108,7 @@ const tcpServer = net.createServer(function(sock) {
     });
     
 }).listen(commander.tcpPort);
+tcpServer.on('error', ()=>{})
 
 console.log('TCP Server listening on ' + commander.tcpPort);
 ///////////////////////////

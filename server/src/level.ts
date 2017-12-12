@@ -5,6 +5,8 @@ export default class Level {
     level = {
 		props: [
 			{
+				id: '0',
+				radius: 50,
 				position: [0, 0],
 				type: 0, // Rock, fence, house, etc...
 				angle: 0

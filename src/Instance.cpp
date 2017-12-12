@@ -75,7 +75,7 @@ namespace jam
       std::size_t received = 0;
 
       while (
-        m_sockets.first.receive(&buffer[0], buffer.size(), received) == sf::Socket::Done ||
+		m_sockets.first.receive(&buffer[0], buffer.size(), received) == sf::Socket::Done ||
         m_sockets.second.receive(&buffer[0], buffer.size(), received, addr, port) == sf::Socket::Done
       ) {
         rapidjson::Document doc;
@@ -90,10 +90,14 @@ namespace jam
           }
           else if (strcmp(pack, "pong") == 0) {
             m_lastPingTime = m_pingTimer.restart();
-          }
+		  }
+		  std::cout << pack << std::endl;
 
           currentScene->socketEvent(pack, doc.HasMember("data") ? doc["data"] : dummyData);
-        }
+		}
+		else {
+			std::cout << "Invalid package" << std::endl;
+		}
       }
 
       currentScene->update(delta);

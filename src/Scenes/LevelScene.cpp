@@ -75,9 +75,9 @@ namespace jam
       auto& levelData = data["level"];
       auto& propArray = levelData["props"];
 
-      for (auto itr = levelData.Begin(); itr != levelData.End(); ++itr) {
-        m_propLayer.insert<Obstacle>((*itr)["id"].GetString(), getInstance(), *itr);
-      }
+	  for (auto& itr : propArray.GetArray()) {
+		  m_propLayer.insert<Obstacle>(itr["id"].GetString(), getInstance(), itr);
+	  }
     }
   }
 

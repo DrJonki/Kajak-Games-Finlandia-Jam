@@ -4,15 +4,15 @@ import Vec from './vec'
 export default class ScoreData {
     id
     session
-    side = 0
+    faction = 0
     hp = 100
     ammo = 50
     kills = 0
     deaths = 0
     position = new Vec(0,0)
 
-    constructor(session, id) {
-        this.session = session
+    constructor(sessionId, id) {
+        this.session = sessionId
         this.id = id
     }
 
