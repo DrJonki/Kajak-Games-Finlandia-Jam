@@ -190,22 +190,35 @@ namespace jam
     doc.Accept(writer);
 
     if (tcp) {
-      size_t sent = 0;
-      const auto status = tcpSocket().send(buffer.GetString(), buffer.GetSize(), sent);
-      switch (status)
-      {
-        case sf::Socket::Done:
-          return true;
+      size_t sentTotal = 0;
 
-        case sf::Socket::Disconnected: {
-          tcpSocket().setBlocking(true);
-          connectTcp();
-          tcpSocket().setBlocking(false);
-        }
+      while(true) {
+        size_t sent = 0;
+        const auto status = tcpSocket().send(&buffer.GetString()[sentTotal], buffer.GetSize() - sentTotal, sent);
+        
+        switch (status)
+        {
+          case sf::Socket::Done:
+            return true;
 
-      default:
-        return false;
-      };
+          case sf::Socket::NotReady:
+            continue;
+
+          case sf::Socket::Partial: {
+            sentTotal += sent;
+            continue;
+          }
+
+          case sf::Socket::Disconnected: {
+            tcpSocket().setBlocking(true);
+            connectTcp();
+            tcpSocket().setBlocking(false);
+          }
+
+          default:
+            return false;
+        };
+      }
     }
 
     return udpSocket().send(buffer.GetString(), buffer.GetSize(), address, port) == sf::Socket::Done;
