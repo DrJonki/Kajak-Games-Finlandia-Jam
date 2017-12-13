@@ -4,6 +4,7 @@
 #include <Jam/Entities/ListensMessages.hpp>
 #include <Jam/Entities/InterpolatesTransform.hpp>
 #include <SFML/Graphics/CircleShape.hpp>
+#include <SFML/Graphics/RectangleShape.hpp>
 namespace sf { class View; }
 
 
@@ -51,5 +52,6 @@ namespace jam
 	const sf::View& m_view;
 	glm::vec2 m_targetDirection;
 	float m_velocity;
+	sf::RectangleShape m_rectangles[4];
   };
 }

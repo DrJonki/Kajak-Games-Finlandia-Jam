@@ -30,10 +30,14 @@ namespace jam
 	  m_max_speedFloat(10),
 	  m_view(view),
 	  m_targetDirection(0.f),
-	  m_velocity(0.f)
+	  m_velocity(0.f),
+	  m_rectangles()
   {
     if (controllable) {
       listen("forcePosition");
+	  for (int i = 0; i < 4; i++) {
+		  m_rectangles[i].setFillColor(sf::Color::Red);
+	  }
     }
 
     setRadius(ns_radius);
@@ -69,9 +73,10 @@ namespace jam
   void Player::update(const float dt)
   {
     if (m_controllable && !isDead()) {
-      using sf::Keyboard;
-	  auto sfMousePos = m_instance.window.mapPixelToCoords( sf::Mouse::getPosition(m_instance.window), m_view);
-	  glm::vec2 mousePos = glm::vec2(sfMousePos.x, sfMousePos.y);
+			using sf::Keyboard;
+			auto sfMousePos = m_instance.window.mapPixelToCoords( sf::Mouse::getPosition(m_instance.window), m_view);
+			glm::vec2 mousePos = glm::vec2(sfMousePos.x, sfMousePos.y);
+
 
       bool input = false;
       const float speed = 750.f * m_instance.config.float_("INTERPOLATION_TICK_LENGTH");
@@ -111,9 +116,31 @@ namespace jam
 				m_targetDirection = glm::vec2(0, 0);
 			}
 		}
+
+		float rectThickness = 4.f;
+		float rectSize = 12.f;
+		float rectGap = 10.f;
+		float maxInaccuracy = 16;
+		float inAccuracy = maxInaccuracy * m_velocity / m_max_speedFloat;
 	 
       const auto nextPos = currentPos + m_targetDirection;
       updatePosition(nextPos);
+
+	  m_rectangles[0].setFillColor(sf::Color::Red);
+	  m_rectangles[0].setSize(sf::Vector2f(rectSize, rectThickness));
+	  m_rectangles[0].setPosition(sf::Vector2f(mousePos.x + inAccuracy + rectGap / 2, mousePos.y - rectThickness / 2));
+
+	  m_rectangles[1].setFillColor(sf::Color::Red);
+	  m_rectangles[1].setSize(sf::Vector2f(rectSize, rectThickness));
+	  m_rectangles[1].setPosition(sf::Vector2f(mousePos.x - rectGap / 2 - inAccuracy - rectSize, mousePos.y - rectThickness / 2));
+
+	  m_rectangles[2].setFillColor(sf::Color::Red);
+	  m_rectangles[2].setSize(sf::Vector2f(rectThickness, rectSize));
+	  m_rectangles[2].setPosition(sf::Vector2f(mousePos.x - rectThickness / 2, mousePos.y + rectGap / 2 + inAccuracy));
+
+	  m_rectangles[3].setFillColor(sf::Color::Red);
+	  m_rectangles[3].setSize(sf::Vector2f(rectThickness, rectSize));
+	  m_rectangles[3].setPosition(sf::Vector2f(mousePos.x - rectThickness / 2, mousePos.y - inAccuracy - rectGap / 2 - rectSize));
 
       if (glm::length(m_targetDirection) > 0) {
         const auto pos = getCurrentPos();
@@ -137,6 +164,11 @@ namespace jam
   void Player::draw(sf::RenderTarget& target)
   {
     target.draw(*this);
+	if (m_controllable) {
+		for (int i = 0; i < 4; i++) {
+			target.draw(m_rectangles[i]);
+		}
+	}
   }
 
   void Player::socketMessage(const char* message, const rapidjson::Value& data)

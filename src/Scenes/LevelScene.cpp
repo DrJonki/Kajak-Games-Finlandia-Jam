@@ -113,8 +113,8 @@ namespace jam
 
     Scene::draw(target);
 
-    if (!m_player.isDead())
-      target.draw(m_crossHair);
+    //if (!m_player.isDead())
+      //target.draw(m_crossHair);
   }
 
   void LevelScene::textEvent(const uint32_t code)
