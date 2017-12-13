@@ -169,7 +169,7 @@ namespace jam
     else if (strcmp(message, "join") == 0) {
       m_characterLayer.insert<Player>(
         data["id"].GetString(), getInstance(), *this, false, static_cast<Player::Faction>(data["faction"].GetUint()), m_gameView
-      ).setHealth(0);
+      ).setHealth(100);
     }
 
     else if (strcmp(message, "leave") == 0) {

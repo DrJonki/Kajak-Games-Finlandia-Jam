@@ -6,6 +6,7 @@
 #include <glm/vec2.hpp>
 #include <glm/geometric.hpp>
 #include <SFML/Window/Mouse.hpp>
+#include <iostream>
 
 namespace {
   const float ns_radius = 20.f;
@@ -21,12 +22,15 @@ namespace jam
       m_instance(ins),
       m_controllable(controllable),
       m_faction(faction), 
-      m_health(0),
+      m_health(100),
 	  m_speedVec(glm::vec2(0,0)),
 	  m_accelVec(glm::vec2(0,0)),
 	  m_friction(0.1f),
-	  m_accelFloat(2.f),
-	  m_view(view)
+	  m_accelFloat(0.8f),
+	  m_max_speedFloat(10),
+	  m_view(view),
+	  m_targetDirection(0.f),
+	  m_velocity(0.f)
   {
     if (controllable) {
       listen("forcePosition");
@@ -72,45 +76,46 @@ namespace jam
       bool input = false;
       const float speed = 750.f * m_instance.config.float_("INTERPOLATION_TICK_LENGTH");
       glm::vec2 currentPos = getCurrentPos();
-      glm::vec2 targetDirection(0.f);
 	  glm::vec2 m_lookDir = glm::normalize(mousePos - currentPos);
 
-	  m_accelVec = glm::vec2(0, 0);
-      if (sf::Keyboard::isKeyPressed(Keyboard::A)) {
-			m_accelVec += m_lookDir;
+	  m_accelVec = glm::vec2(0.f);
+      if (sf::Keyboard::isKeyPressed(Keyboard::W)) {
+			m_accelVec += m_accelFloat * m_lookDir;
 			input = true;
       }
-      if (sf::Keyboard::isKeyPressed(Keyboard::D)) {
-		  m_accelVec += glm::vec2(-m_lookDir.x, -m_lookDir.y);
-		  input = true;
-      }
       if (sf::Keyboard::isKeyPressed(Keyboard::S)) {
-		  m_accelVec += glm::vec2(-m_lookDir.y, m_lookDir.x);
+		  m_accelVec += m_accelFloat * glm::vec2(-m_lookDir.x, -m_lookDir.y);
 		  input = true;
       }
-      if (sf::Keyboard::isKeyPressed(Keyboard::W)) {
-		  m_accelVec += glm::vec2(m_lookDir.y, -m_lookDir.x);
+      if (sf::Keyboard::isKeyPressed(Keyboard::A)) {
+		  m_accelVec += m_accelFloat * glm::vec2(m_lookDir.y, -m_lookDir.x);
 		  input = true;
       }
+      if (sf::Keyboard::isKeyPressed(Keyboard::D)) {
+		  m_accelVec += m_accelFloat * glm::vec2(-m_lookDir.y, m_lookDir.x);
+		  input = true;
+      }
+	  std::cout << m_accelVec.x << " , " << m_accelVec.y << std::endl;
 
-	  if (glm::length(targetDirection) < m_max_speedFloat) {
-		  targetDirection += m_accelFloat * glm::normalize(m_accelVec);
-		  if (glm::length(targetDirection) > m_max_speedFloat) {
-			  targetDirection = m_max_speedFloat * glm::normalize(targetDirection);
-		  }
-	  }
-
-	  if(!input) {
-		  targetDirection -= m_friction * targetDirection;
-		  if (glm::length(targetDirection) < 0) {
-			  targetDirection = glm::vec2(0, 0);
-		  }
-	  }
-
-      const auto nextPos = currentPos + targetDirection;
+		if (glm::length(m_accelVec) != 0.f) {
+			m_targetDirection += m_accelFloat * glm::normalize(m_accelVec);
+			if (glm::length(m_targetDirection) > m_max_speedFloat) {
+				m_targetDirection = m_max_speedFloat * glm::normalize(m_targetDirection);
+			}
+		}
+		m_velocity = glm::length(m_targetDirection);
+		if(!input) {
+			if (m_velocity > m_friction ) {
+				m_targetDirection -= m_friction * m_targetDirection;
+			} else {
+				m_targetDirection = glm::vec2(0, 0);
+			}
+		}
+	 
+      const auto nextPos = currentPos + m_targetDirection;
       updatePosition(nextPos);
 
-      if (input) {
+      if (glm::length(m_targetDirection) > 0) {
         const auto pos = getCurrentPos();
         rapidjson::Document doc(rapidjson::kObjectType);
         rapidjson::Value positionVector(rapidjson::kArrayType);

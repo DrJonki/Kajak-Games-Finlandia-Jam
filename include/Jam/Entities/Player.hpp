@@ -49,5 +49,7 @@ namespace jam
 	float m_accelFloat;
 	float m_friction;
 	const sf::View& m_view;
+	glm::vec2 m_targetDirection;
+	float m_velocity;
   };
 }
