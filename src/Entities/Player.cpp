@@ -11,15 +11,15 @@ namespace {
 
 namespace jam
 {
-  Player::Player(Instance& ins, Scene& scene, const bool controllable, const Faction faction)
+  Player::Player(Instance& ins, Scene& scene, const bool controllable, const rapidjson::Value& data)
     : Entity(),
       ListensMessages(scene, {"updateMovement"}),
       InterpolatesTransform(ins),
       sf::CircleShape(10.f),
       m_instance(ins),
       m_controllable(controllable),
-      m_faction(faction), 
-      m_health(0)
+      m_faction(static_cast<Faction>(data["faction"].GetInt())), 
+      m_health(data["health"].GetInt())
   {
     if (controllable) {
       listen("forcePosition");
@@ -30,11 +30,11 @@ namespace jam
 
     setOutlineThickness(1.f);
 
-    if (faction == Faction::Simo) {
+    if (m_faction == Faction::Simo) {
       setOutlineColor(sf::Color::Blue);
       setTexture(&ins.resourceManager.GetTexture("white.jpg"));
     }
-    else if (faction == Faction::Russian) {
+    else if (m_faction == Faction::Russian) {
       setOutlineColor(sf::Color(255, 168, 0));
       setTexture(&ins.resourceManager.GetTexture("cheeki.png"));
     }

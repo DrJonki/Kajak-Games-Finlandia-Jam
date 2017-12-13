@@ -18,7 +18,7 @@ namespace jam
 
   public:
 
-    Player(Instance& ins, Scene& scene, const bool controllable, const Faction faction);
+    Player(Instance& ins, Scene& scene, const bool controllable, const rapidjson::Value& data);
 
     void offsetHealth(const int health);
 
