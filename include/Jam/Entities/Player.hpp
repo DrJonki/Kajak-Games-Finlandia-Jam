@@ -4,6 +4,11 @@
 #include <Jam/Entities/ListensMessages.hpp>
 #include <Jam/Entities/InterpolatesTransform.hpp>
 #include <SFML/Graphics/CircleShape.hpp>
+#include <SFML/Graphics/RectangleShape.hpp>
+
+namespace sf {
+  class View;
+}
 
 namespace jam
 {
@@ -18,7 +23,7 @@ namespace jam
 
   public:
 
-    Player(Instance& ins, Scene& scene, const bool controllable, const rapidjson::Value& data);
+    Player(Instance& ins, Scene& scene, const bool controllable, const rapidjson::Value& data, const sf::View& view);
 
     void offsetHealth(const int health);
 
@@ -40,5 +45,15 @@ namespace jam
     const Faction m_faction;
     const bool m_controllable;
     int m_health;
+    glm::vec2 m_speedVec;
+    glm::vec2 m_accelVec;
+    glm::vec2 m_pointingDir;
+    float m_max_speedFloat;
+    float m_accelFloat;
+    float m_friction;
+    const sf::View& m_view;
+    glm::vec2 m_targetDirection;
+    float m_velocity;
+    sf::RectangleShape m_rectangles[4];
   };
 }

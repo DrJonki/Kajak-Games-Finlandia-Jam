@@ -4,6 +4,9 @@
 #include <Jam/Instance.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <glm/vec2.hpp>
+#include <glm/geometric.hpp>
+#include <SFML/Window/Mouse.hpp>
+#include <iostream>
 
 namespace {
   const float ns_radius = 20.f;
@@ -11,7 +14,7 @@ namespace {
 
 namespace jam
 {
-  Player::Player(Instance& ins, Scene& scene, const bool controllable, const rapidjson::Value& data)
+  Player::Player(Instance& ins, Scene& scene, const bool controllable, const rapidjson::Value& data, const sf::View& view)
     : Entity(),
       ListensMessages(scene, {"updateMovement"}),
       InterpolatesTransform(ins),
@@ -19,10 +22,22 @@ namespace jam
       m_instance(ins),
       m_controllable(controllable),
       m_faction(static_cast<Faction>(data["faction"].GetInt())), 
-      m_health(data["health"].GetInt())
+      m_health(data["health"].GetInt()),
+      m_speedVec(glm::vec2(0)),
+      m_accelVec(glm::vec2(0)),
+      m_friction(0.1f),
+      m_accelFloat(0.8f),
+      m_max_speedFloat(10),
+      m_view(view),
+      m_targetDirection(0.f),
+      m_velocity(0.f),
+      m_rectangles()
   {
     if (controllable) {
       listen("forcePosition");
+      for (int i = 0; i < 4; i++) {
+        m_rectangles[i].setFillColor(sf::Color::Red);
+      }
     }
 
     setRadius(ns_radius);
@@ -59,29 +74,75 @@ namespace jam
   {
     if (m_controllable && !isDead()) {
       using sf::Keyboard;
+      auto sfMousePos = m_instance.window.mapPixelToCoords( sf::Mouse::getPosition(m_instance.window), m_view);
+      glm::vec2 mousePos = glm::vec2(sfMousePos.x, sfMousePos.y);
+
 
       bool input = false;
       const float speed = 750.f * m_instance.config.float_("INTERPOLATION_TICK_LENGTH");
       glm::vec2 currentPos = getCurrentPos();
-      glm::vec2 targetDirection(0.f);
+      glm::vec2 m_lookDir = glm::normalize(mousePos - currentPos);
 
-      if (sf::Keyboard::isKeyPressed(Keyboard::A)) {
-        targetDirection.x = -speed; input = true;
-      }
-      if (sf::Keyboard::isKeyPressed(Keyboard::D)) {
-        targetDirection.x = speed; input = true;
+      m_accelVec = glm::vec2(0.f);
+      if (sf::Keyboard::isKeyPressed(Keyboard::W)) {
+        m_accelVec += m_accelFloat * m_lookDir;
+        input = true;
       }
       if (sf::Keyboard::isKeyPressed(Keyboard::S)) {
-        targetDirection.y = speed; input = true;
+        m_accelVec += m_accelFloat * glm::vec2(-m_lookDir.x, -m_lookDir.y);
+        input = true;
       }
-      if (sf::Keyboard::isKeyPressed(Keyboard::W)) {
-        targetDirection.y = -speed; input = true;
+      if (sf::Keyboard::isKeyPressed(Keyboard::A)) {
+        m_accelVec += m_accelFloat * glm::vec2(m_lookDir.y, -m_lookDir.x);
+        input = true;
+      }
+      if (sf::Keyboard::isKeyPressed(Keyboard::D)) {
+        m_accelVec += m_accelFloat * glm::vec2(-m_lookDir.y, m_lookDir.x);
+        input = true;
+      }
+      std::cout << m_accelVec.x << " , " << m_accelVec.y << std::endl;
+
+      if (glm::length(m_accelVec) != 0.f) {
+        m_targetDirection += m_accelFloat * glm::normalize(m_accelVec);
+        if (glm::length(m_targetDirection) > m_max_speedFloat) {
+          m_targetDirection = m_max_speedFloat * glm::normalize(m_targetDirection);
+        }
+      }
+      m_velocity = glm::length(m_targetDirection);
+      if(!input) {
+        if (m_velocity > m_friction ) {
+          m_targetDirection -= m_friction * m_targetDirection;
+        } else {
+          m_targetDirection = glm::vec2(0, 0);
+        }
       }
 
-      const auto nextPos = currentPos + targetDirection;
+      float rectThickness = 4.f;
+      float rectSize = 12.f;
+      float rectGap = 10.f;
+      float maxInaccuracy = 16;
+      float inAccuracy = maxInaccuracy * m_velocity / m_max_speedFloat;
+   
+      const auto nextPos = currentPos + m_targetDirection;
       updatePosition(nextPos);
 
-      if (input) {
+      m_rectangles[0].setFillColor(sf::Color::Red);
+      m_rectangles[0].setSize(sf::Vector2f(rectSize, rectThickness));
+      m_rectangles[0].setPosition(sf::Vector2f(mousePos.x + inAccuracy + rectGap / 2, mousePos.y - rectThickness / 2));
+
+      m_rectangles[1].setFillColor(sf::Color::Red);
+      m_rectangles[1].setSize(sf::Vector2f(rectSize, rectThickness));
+      m_rectangles[1].setPosition(sf::Vector2f(mousePos.x - rectGap / 2 - inAccuracy - rectSize, mousePos.y - rectThickness / 2));
+
+      m_rectangles[2].setFillColor(sf::Color::Red);
+      m_rectangles[2].setSize(sf::Vector2f(rectThickness, rectSize));
+      m_rectangles[2].setPosition(sf::Vector2f(mousePos.x - rectThickness / 2, mousePos.y + rectGap / 2 + inAccuracy));
+
+      m_rectangles[3].setFillColor(sf::Color::Red);
+      m_rectangles[3].setSize(sf::Vector2f(rectThickness, rectSize));
+      m_rectangles[3].setPosition(sf::Vector2f(mousePos.x - rectThickness / 2, mousePos.y - inAccuracy - rectGap / 2 - rectSize));
+
+      if (glm::length(m_targetDirection) > 0) {
         const auto pos = getCurrentPos();
         rapidjson::Document doc(rapidjson::kObjectType);
         rapidjson::Value positionVector(rapidjson::kArrayType);
@@ -103,6 +164,11 @@ namespace jam
   void Player::draw(sf::RenderTarget& target)
   {
     target.draw(*this);
+    if (m_controllable) {
+      for (int i = 0; i < 4; i++) {
+        target.draw(m_rectangles[i]);
+      }
+    }
   }
 
   void Player::socketMessage(const char* message, const rapidjson::Value& data)
