@@ -61,7 +61,7 @@ namespace jam
 
   Instance::~Instance()
   {
-    tcpConnection().disconnect();
+    tcpSocket().disconnect();
   }
 
   void Instance::operator ()()
