@@ -57,6 +57,7 @@ namespace jam
     glm::vec2 m_targetDirection;
     float m_velocity;
     sf::RectangleShape m_rectangles[4];
-	sf::Sound m_bang_sound;
+	  sf::Sound m_bang_sound;
+    float m_playerRotatio;
   };
 }

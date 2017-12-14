@@ -57,7 +57,7 @@ namespace jam
     sf::View m_uiView;
 
     sf::Music m_music;
-	float m_reloadCounter;
-	float m_reloadTime;
+  float m_reloadCounter;
+  float m_reloadTime;
   };
 }

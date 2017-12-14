@@ -5,7 +5,9 @@
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <glm/vec2.hpp>
 #include <glm/geometric.hpp>
-#include <glm/gtx/vectorAngle.hpp>
+#include<glm/gtc/constants.hpp>
+#include <cmath>
+//#include <glm/gtx/vector_angle.hpp>
 #include <SFML/Window/Mouse.hpp>
 #include <iostream>
 
@@ -32,7 +34,8 @@ namespace jam
       m_view(view),
       m_targetDirection(0.f),
       m_velocity(0.f),
-      m_rectangles()
+      m_rectangles(),
+      m_playerRotatio(0.f)
   {
     if (controllable) {
       listen("forcePosition");
@@ -43,7 +46,7 @@ namespace jam
   m_bang_sound.setBuffer(ins.resourceManager.GetSoundBuffer("effects/bolt_shot_reload.wav"));
   m_bang_sound.setRelativeToListener(controllable);
     setRadius(ns_radius);
-    setOrigin(ns_radius / 2, ns_radius / 2);
+    setOrigin(ns_radius, ns_radius);
 
     setOutlineThickness(1.f);
 
@@ -89,7 +92,8 @@ namespace jam
       glm::vec2 currentPos = getCurrentPos();
       glm::vec2 m_lookDir = glm::normalize(mousePos - currentPos);
 
-    m_accelVec = glm::vec2(0.f);
+      setRotation(360/(2*glm::pi<float>())*std::atan2(m_lookDir.y, m_lookDir.x));
+      m_accelVec = glm::vec2(0.f);
       if (sf::Keyboard::isKeyPressed(Keyboard::W)) {
         m_accelVec += m_accelFloat * m_lookDir;
         input = true;
