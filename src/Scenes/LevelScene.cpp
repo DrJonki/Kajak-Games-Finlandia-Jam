@@ -149,29 +149,12 @@ namespace jam
       return data["id"].GetString();
     };
 
-    if (strcmp(message, "damage") == 0) {
-      auto player = static_cast<Player*>(m_characterLayer.get(findPlayerId()));
-
-      if (player) {
-        player->offsetHealth(data["amount"].GetInt());
-      }
-    }
-
-    else if (strcmp(message, "respawn") == 0) {
-      auto player = static_cast<Player*>(m_characterLayer.get(findPlayerId()));
-
-      if (player) {
-        player->setHealth(data["health"].GetInt());
-        player->setActive(true);
-      }
-    }
-
-    else if (strcmp(message, "join") == 0) {
-      m_characterLayer.insert<Player>(data["id"].GetString(), getInstance(), *this, false, data, m_gameView);
+    if (strcmp(message, "join") == 0) {
+      m_characterLayer.insert<Player>(findPlayerId(), getInstance(), *this, false, data, m_gameView);
     }
 
     else if (strcmp(message, "leave") == 0) {
-      m_characterLayer.get(data["id"].GetString())->erase();
+      m_characterLayer.get(findPlayerId())->erase();
     }
 
     else if (strcmp(message, "kick") == 0) {

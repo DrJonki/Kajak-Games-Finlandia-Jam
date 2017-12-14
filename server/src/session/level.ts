@@ -15,12 +15,12 @@ interface IProp {
 }
 
 export default class Level {
-  private readonly props: IProp[];
-  private idCounter = 0;
+  private readonly mLevel: any = {};
+  private mIdCounter = 0;
 
   public constructor() {
     // TODO:Generate
-    this.props = [
+    this.mLevel.props = [
       {
         id: '0',
         radius: 50,
@@ -29,5 +29,9 @@ export default class Level {
         angle: 0,
       },
     ];
+  }
+
+  public get level() {
+    return this.mLevel;
   }
 }

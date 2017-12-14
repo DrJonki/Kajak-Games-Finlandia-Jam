@@ -13,7 +13,7 @@ namespace jam
 
   public:
 
-    ListensMessages(Scene& scene, const std::initializer_list<const char*>& listeners);
+    ListensMessages(Scene& scene, const std::initializer_list<const std::string>& listeners);
 
     virtual ~ListensMessages() = 0;
 
@@ -25,9 +25,9 @@ namespace jam
 
     bool sendMessage(const char* message, rapidjson::Value& data, const bool tcp);
 
-    void listen(const char* message);
+    void listen(const std::string& message);
 
-    void stopListening(const char* message);
+    void stopListening(const std::string& message);
 
   private:
 

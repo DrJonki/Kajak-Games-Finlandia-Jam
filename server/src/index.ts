@@ -2,7 +2,7 @@ import './alias';
 import * as net from 'net';
 import * as dgram from 'dgram';
 import * as commander from 'commander';
-import { has } from 'lodash';
+import { each, has } from 'lodash';
 
 import Socket, { ISocketContainer } from '@/util/socket';
 import Router from '@/services/router';
@@ -55,7 +55,7 @@ const tcpServer = net.createServer((sock) => {
     delete socketContainer[sock.remoteAddress];
   });
 }).on('listening', () => {
-  console.log('TCP Server listening on', commander.tcpPort);
+  console.log('TCP Server listening on', `${tcpServer.address().address}:${tcpServer.address().port}`);
 }).on('error', (err) => {
   console.error(err);
 }).listen(commander.tcpPort, hostname);
@@ -74,7 +74,9 @@ udpServer = dgram.createSocket('udp4').on('error', (err) => {
 udpServer.bind(commander.udpPort, hostname);
 
 const handleClose = () => {
-  // TODO: Send 'restart' message to all clients.
+  each(socketContainer, (socket) => {
+    socket.send('restart', undefined, false);
+  });
 
   udpServer.close();
   tcpServer.close();
@@ -82,7 +84,9 @@ const handleClose = () => {
 };
 
 const handleCrash = () => {
-  // TODO: Try to send 'crash' message & disconnect all clients.
+  each(socketContainer, (socket) => {
+    socket.send('crash', undefined, false);
+  });
 };
 
 process.on('uncaughtException', () => {

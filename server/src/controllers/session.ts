@@ -3,15 +3,15 @@ import Session from '@/session';
 import { find } from 'lodash';
 
 export default class SessionController {
-  private sessions: { [i: string]: Session } = {};
-  private socketSessionMap: { [i: string]: Session } = {};
+  private mSessions: { [i: string]: Session } = {};
+  private mSocketSessionMap: { [i: string]: Session } = {};
 
   public connect(data: any, socket: Socket) {
-    let session = find(this.sessions, (value) => !value.full);
+    let session = find(this.mSessions, (value) => !value.full);
 
     if (!session) {
       session = new Session();
-      this.sessions[session.id] = session;
+      this.mSessions[session.id] = session;
     }
 
     this.mapSocket(socket, session);
@@ -19,7 +19,7 @@ export default class SessionController {
   }
 
   public disconnect(data: any, socket: Socket) {
-    const session = this.socketSessionMap[socket.id];
+    const session = this.mSocketSessionMap[socket.id];
 
     if (session) {
       session.leave(socket);
@@ -31,8 +31,16 @@ export default class SessionController {
     this.passMessage('pong', data, socket);
   }
 
+  public move(data: any, socket: Socket) {
+    this.passMessage('move', data, socket);
+  }
+
+  public shoot(data: any, socket: Socket) {
+    this.passMessage('shoot', data, socket);
+  }
+
   private passMessage(event: string, data: any, socket: Socket) {
-    const session = this.socketSessionMap[socket.id];
+    const session = this.mSocketSessionMap[socket.id];
 
     if (session) {
       session[event].bind(session)(data, socket);
@@ -43,10 +51,10 @@ export default class SessionController {
   }
 
   private mapSocket(socket: Socket, session: Session) {
-    this.socketSessionMap[socket.id] = session;
+    this.mSocketSessionMap[socket.id] = session;
   }
 
   private unmapSocket(socket: Socket) {
-    delete this.socketSessionMap[socket.id];
+    delete this.mSocketSessionMap[socket.id];
   }
 }

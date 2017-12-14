@@ -9,21 +9,21 @@ export interface ISocketContainer {
 export default class Socket {
   public readonly id: string;
   public readonly address: string;
-  private udpPort: number;
-  private readonly container: ISocketContainer;
-  private readonly tcpSocket?: net.Socket;
-  private udpSocket: dgram.Socket;
+  private mUdpPort: number;
+  private readonly mContainer: ISocketContainer;
+  private readonly mTcpSocket: net.Socket;
+  private mUdpSocket: dgram.Socket;
 
   public constructor(id: string, container: ISocketContainer, tcp: net.Socket) {
     this.id = id;
-    this.container = container;
-    this.tcpSocket = tcp;
+    this.mContainer = container;
+    this.mTcpSocket = tcp;
     this.address = tcp.remoteAddress;
   }
 
   public setupUdp(port: number, udpSocket: dgram.Socket) {
-    this.udpPort = port;
-    this.udpSocket = udpSocket;
+    this.mUdpPort = port;
+    this.mUdpSocket = udpSocket;
   }
 
   public send(event: string, data: any, tcp: boolean) {
@@ -34,9 +34,9 @@ export default class Socket {
       });
 
       if (tcp) {
-        this.tcpSocket.write(obj);
+        this.mTcpSocket.write(obj);
       } else {
-        this.udpSocket.send(obj, this.udpPort, this.address);
+        this.mUdpSocket.send(obj, this.mUdpPort, this.address);
       }
     } catch (err) {
       console.error(err);
@@ -45,7 +45,7 @@ export default class Socket {
 
   public broadcast(event: string, data: any, tcp: boolean) {
     try {
-      each(filter(this.container, (value) => value.id !== this.id), (value) => {
+      each(filter(this.mContainer, (value) => value.id !== this.id), (value) => {
         value.send(event, data, tcp);
       });
     } catch (err) {
@@ -55,7 +55,7 @@ export default class Socket {
 
   public emit(event: string, data: any, tcp: boolean) {
     try {
-      each(this.container, (value) => {
+      each(this.mContainer, (value) => {
         value.send(event, data, tcp);
       });
     } catch (err) {

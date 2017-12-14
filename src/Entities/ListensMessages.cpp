@@ -4,7 +4,7 @@
 
 namespace jam
 {
-  ListensMessages::ListensMessages(Scene& scene, const std::initializer_list<const char*>& listeners)
+  ListensMessages::ListensMessages(Scene& scene, const std::initializer_list<const std::string>& listeners)
     : m_scene(scene),
       m_listening(listeners.begin(), listeners.end())
   {
@@ -28,12 +28,12 @@ namespace jam
     return m_scene.getInstance().sendMessage(message, data, tcp);
   }
 
-  void ListensMessages::listen(const char* message)
+  void ListensMessages::listen(const std::string& message)
   {
     m_listening.insert(message);
   }
 
-  void ListensMessages::stopListening(const char* message)
+  void ListensMessages::stopListening(const std::string& message)
   {
     m_listening.erase(message);
   }

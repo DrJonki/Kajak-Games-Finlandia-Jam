@@ -1,10 +1,19 @@
+import { isArray } from 'lodash';
+
 export default class Vec {
   public x: number;
   public y: number;
 
-  constructor(x: number, y: number) {
-    this.x = x;
-    this.y = y;
+  constructor(x: number, y: number);
+  constructor(xy: [number, number]);
+  constructor(...args: any[]) {
+    if (isArray(args[0])) {
+      this.x = args[0][0];
+      this.y = args[0][1];
+      return;
+    }
+    this.x = args[0];
+    this.y = args[1];
   }
 
   public get length() {
@@ -19,7 +28,7 @@ export default class Vec {
     return new Vec(this.x + vec.x, this.y + vec.y);
   }
 
-  public distanceToVector(vec) {
+  public distanceToVector(vec: Vec) {
     return Math.sqrt((vec.x - this.x) * (vec.x - this.x) + (vec.y - this.y) * (vec.y - this.y));
   }
 }
