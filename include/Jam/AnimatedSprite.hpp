@@ -24,6 +24,7 @@ namespace jam
     int getCurFrame();
 
   private:
+
     int m_frameWidth;
     int m_frameHeight;
     int m_curFrame;

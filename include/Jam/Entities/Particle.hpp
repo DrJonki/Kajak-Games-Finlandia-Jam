@@ -27,6 +27,7 @@ namespace jam
     bool isDone = false;
 
   private:
+
     Randomizer m_random;
 
     float m_width;

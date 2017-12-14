@@ -21,7 +21,7 @@ namespace jam
         std::string value;
         if (std::getline(is_line, value))
           m_config[key] = value;
-      }
+        }
     }
   }
 

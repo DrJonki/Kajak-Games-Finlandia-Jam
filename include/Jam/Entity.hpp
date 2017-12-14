@@ -41,6 +41,8 @@ namespace jam
 
     virtual void draw(sf::RenderTarget& target);
 
+  private:
+
     std::string m_id;
     bool m_active;
     bool m_deleted;

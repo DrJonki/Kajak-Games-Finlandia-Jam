@@ -9,9 +9,7 @@ namespace jam
       m_sharedView(nullptr),
       m_view(),
       m_active(true)
-  {
-
-  }
+  {}
 
   Layer::~Layer()
   {}
@@ -23,8 +21,8 @@ namespace jam
 
     for (auto itr = m_entities.begin(); itr != m_entities.end();) {
       if (itr->second->isErased()) {
-        itr = m_entities.erase(itr);
-        continue;
+      itr = m_entities.erase(itr);
+      continue;
       }
 
       itr->second->baseUpdate(dt);
@@ -88,7 +86,7 @@ namespace jam
     std::vector<Entity*> entities;
     for (auto& i : m_entities) {
       if (i.second->isActive())
-        entities.push_back(i.second.get());
+      entities.push_back(i.second.get());
     }
     return entities;
   }
@@ -102,5 +100,4 @@ namespace jam
   {
     return m_active;
   }
-
 }

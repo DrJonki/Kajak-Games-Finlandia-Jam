@@ -80,33 +80,33 @@ target_link_libraries(Jam
 
 if (WIN32)
   target_link_libraries(Jam
-    debug ${BINARY_DIR}/lib/${CMAKE_CFG_INTDIR}/${CMK_SLP}sfml-main-d${CMK_SLS}
+  debug ${BINARY_DIR}/lib/${CMAKE_CFG_INTDIR}/${CMK_SLP}sfml-main-d${CMK_SLS}
   )
   target_link_libraries(Jam
-    optimized ${BINARY_DIR}/lib/${CMAKE_CFG_INTDIR}/${CMK_SLP}sfml-main${CMK_SLS}
+  optimized ${BINARY_DIR}/lib/${CMAKE_CFG_INTDIR}/${CMK_SLP}sfml-main${CMK_SLS}
   )
 
   target_link_libraries(Jam
-    # SFML dependencies
-    ${SOURCE_DIR}/extlibs/libs-msvc-universal/x86/flac.lib
-    ${SOURCE_DIR}/extlibs/libs-msvc-universal/x86/freetype.lib
-    ${SOURCE_DIR}/extlibs/libs-msvc-universal/x86/ogg.lib
-    ${SOURCE_DIR}/extlibs/libs-msvc-universal/x86/openal32.lib
-    ${SOURCE_DIR}/extlibs/libs-msvc-universal/x86/vorbis.lib
-    ${SOURCE_DIR}/extlibs/libs-msvc-universal/x86/vorbisenc.lib
-    ${SOURCE_DIR}/extlibs/libs-msvc-universal/x86/vorbisfile.lib
+  # SFML dependencies
+  ${SOURCE_DIR}/extlibs/libs-msvc-universal/x86/flac.lib
+  ${SOURCE_DIR}/extlibs/libs-msvc-universal/x86/freetype.lib
+  ${SOURCE_DIR}/extlibs/libs-msvc-universal/x86/ogg.lib
+  ${SOURCE_DIR}/extlibs/libs-msvc-universal/x86/openal32.lib
+  ${SOURCE_DIR}/extlibs/libs-msvc-universal/x86/vorbis.lib
+  ${SOURCE_DIR}/extlibs/libs-msvc-universal/x86/vorbisenc.lib
+  ${SOURCE_DIR}/extlibs/libs-msvc-universal/x86/vorbisfile.lib
 
-    opengl32.lib
-    winmm.lib
-    gdi32.lib
-    ws2_32.lib
-    Wldap32.lib
+  opengl32.lib
+  winmm.lib
+  gdi32.lib
+  ws2_32.lib
+  Wldap32.lib
   )
 
   set_target_properties(Jam PROPERTIES LINK_FLAGS_RELEASE "/SUBSYSTEM:WINDOWS")
 elseif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   if (${CMAKE_BUILD_TYPE} MATCHES "Debug")
-    add_definitions(-D_DEBUG)
+  add_definitions(-D_DEBUG)
   endif()
 
   find_package(X11 REQUIRED)
@@ -117,15 +117,15 @@ elseif (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   find_package(FLAC REQUIRED)
 
   target_link_libraries(Jam
-    libudev.so
-    libpthread.so
-    libXrandr.so
-    ${X11_LIBRARIES}
-    ${OPENGL_LIBRARIES}
-    ${FREETYPE_LIBRARIES}
-    ${OPENAL_LIBRARY}
-    ${VORBIS_LIBRARIES}
-    ${FLAC_LIBRARY}
+  libudev.so
+  libpthread.so
+  libXrandr.so
+  ${X11_LIBRARIES}
+  ${OPENGL_LIBRARIES}
+  ${FREETYPE_LIBRARIES}
+  ${OPENAL_LIBRARY}
+  ${VORBIS_LIBRARIES}
+  ${FLAC_LIBRARY}
   )
 endif()
 
@@ -135,20 +135,20 @@ add_custom_command(OUTPUT asset_copy PRE_BUILD
   DEPENDS always_rebuild
   
   COMMAND ${CMAKE_COMMAND} -E copy
-          ${SOURCE_DIR}/extlibs/bin/x86/openal32.dll
-          ${CMAKE_CURRENT_BINARY_DIR}/openal32.dll
+      ${SOURCE_DIR}/extlibs/bin/x86/openal32.dll
+      ${CMAKE_CURRENT_BINARY_DIR}/openal32.dll
 
   COMMAND ${CMAKE_COMMAND} -E copy
-          ${SOURCE_DIR}/extlibs/bin/x86/openal32.dll
-          ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/openal32.dll
+      ${SOURCE_DIR}/extlibs/bin/x86/openal32.dll
+      ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/openal32.dll
 
   COMMAND ${CMAKE_COMMAND} -E copy_directory
-          ${CMAKE_SOURCE_DIR}/assets
-          ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/assets
+      ${CMAKE_SOURCE_DIR}/assets
+      ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/assets
 
   COMMAND ${CMAKE_COMMAND} -E copy_directory
-          ${CMAKE_SOURCE_DIR}/assets
-          ${CMAKE_CURRENT_BINARY_DIR}/assets
+      ${CMAKE_SOURCE_DIR}/assets
+      ${CMAKE_CURRENT_BINARY_DIR}/assets
 )
 
 add_custom_command(OUTPUT always_rebuild COMMAND cmake -E echo)

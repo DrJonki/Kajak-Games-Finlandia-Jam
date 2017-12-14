@@ -16,16 +16,17 @@ namespace jam
     float startTorgue,
     float maxAlpha,
     float minAlpha
-  ) : m_texture(inst.resourceManager.GetTexture(texturePath)),
-    m_emitTime(emitTime),
-    m_curTime(0.f),
-    m_lifeTime(lifetime),
-    m_startSpeed(startSpeed),
-    m_friction(friction),
-    m_startAngle(startAngle),
-    m_startTorgue(startTorgue),
-    m_maxAlpha(maxAlpha),
-    m_minAlpha(minAlpha)
+  )
+    : m_texture(inst.resourceManager.GetTexture(texturePath)),
+      m_emitTime(emitTime),
+      m_curTime(0.f),
+      m_lifeTime(lifetime),
+      m_startSpeed(startSpeed),
+      m_friction(friction),
+      m_startAngle(startAngle),
+      m_startTorgue(startTorgue),
+      m_maxAlpha(maxAlpha),
+      m_minAlpha(minAlpha)
   {
     isStartedEmitting = false;
     m_textureSize = textureSize;

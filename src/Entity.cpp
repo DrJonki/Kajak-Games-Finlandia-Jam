@@ -6,9 +6,7 @@ namespace jam
   Entity::Entity()
     : m_active(true),
       m_deleted(false)
-  {
-
-  }
+  {}
 
   Entity::~Entity()
   {}

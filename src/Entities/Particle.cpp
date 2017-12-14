@@ -13,7 +13,8 @@ namespace jam {
     float startTorgue,
     float maxAlpha,
     float minAlpha
-  ) : m_width(width),
+  )
+    : m_width(width),
     m_height(height),
     m_startPosition(startPosition),
     m_startSpeed(startSpeed),
@@ -59,5 +60,4 @@ namespace jam {
       alpha = 0;
     setColor(sf::Color(255, 255, 255, (int)alpha));
   }
-
 }

@@ -57,4 +57,3 @@ namespace jam
 
   #include <Jam/Layer.inl>
 }
-

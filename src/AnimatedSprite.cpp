@@ -10,7 +10,8 @@ namespace jam
     int frames,
     float frameSpeed,
     int startFrame
-  ) : sf::Sprite(texture)
+  )
+    : sf::Sprite(texture)
   {
     m_frameWidth = width;
     m_frameHeight = height;
@@ -28,26 +29,25 @@ namespace jam
       m_curFrame += 1;
       if (m_curFrame > m_maxFrames)
       {
-        m_curFrame = m_startFrame;
+      m_curFrame = m_startFrame;
       }
       updateSprite();
       m_curTime = 0;
     }
-        
   }
 
   void AnimatedSprite::updateSprite()
   {
     setTextureRect(
       sf::IntRect(
-        m_curFrame * m_frameWidth, // rectleft
-        0,                         // recttop
-        m_frameWidth,              // width
-        m_frameHeight              // height
+      m_curFrame * m_frameWidth, // rectleft
+      0,             // recttop
+      m_frameWidth,        // width
+      m_frameHeight        // height
       )
     );
   }
-    
+  
   void AnimatedSprite::resetAnimation()
   {
     m_curTime = 0;
@@ -70,5 +70,4 @@ namespace jam
   {
     return m_curFrame;
   }
-
 }

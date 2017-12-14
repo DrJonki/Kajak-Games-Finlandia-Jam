@@ -13,9 +13,7 @@ namespace jam
   }
 
   PostEffect::~PostEffect()
-  {
-
-  }
+  {}
 
   void PostEffect::update(const float delta)
   {}

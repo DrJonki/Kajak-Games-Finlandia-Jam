@@ -7,8 +7,7 @@ namespace jam
   Scene::Scene(Instance& ins)
     : m_instance(ins),
       m_layers()
-  {
-  }
+  {}
 
   Scene::~Scene()
   {}
@@ -43,7 +42,6 @@ namespace jam
   {
     return m_instance;
   }
-
 
   const Instance& Scene::getInstance() const
   {
@@ -81,8 +79,7 @@ namespace jam
   {}
 
   void Scene::mousePressed(const int mouseKey, const int x, const int y)
-  {
-  }
+  {}
 
   void Scene::socketEvent(const char* event, const rapidjson::Value& data)
   {

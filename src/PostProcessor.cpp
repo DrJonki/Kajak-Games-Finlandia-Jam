@@ -7,9 +7,9 @@
 namespace jam
 {
   PostProcessor::PostProcessor(Instance& ins)
-    : m_instance(ins),
-      m_effects(),
-      m_fboRes(sf::Vector2f(ins.window.getSize()) * ins.config.float_("FBO_UPSCALE"))
+  : m_instance(ins),
+    m_effects(),
+    m_fboRes(sf::Vector2f(ins.window.getSize()) * ins.config.float_("FBO_UPSCALE"))
   {
     for (std::size_t i = 0; i < 2; ++i) {
       auto& fbo = ins.framebuffer[i];
@@ -73,7 +73,5 @@ namespace jam
       m_quad.setTexture(&framebuffer[!zero].getTexture());
       window.draw(m_quad);
     }
-
   }
-
 }

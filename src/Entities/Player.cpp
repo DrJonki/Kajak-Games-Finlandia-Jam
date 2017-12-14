@@ -5,6 +5,9 @@
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <glm/vec2.hpp>
 #include <glm/geometric.hpp>
+#include<glm/gtc/constants.hpp>
+#include <cmath>
+//#include <glm/gtx/vector_angle.hpp>
 #include <SFML/Window/Mouse.hpp>
 #include <iostream>
 
@@ -27,7 +30,8 @@ namespace jam
       m_view(view),
       m_targetDirection(0.f),
       m_velocity(0.f),
-      m_rectangles()
+      m_rectangles(),
+      m_playerRotatio(0.f)
   {
     if (controllable) {
       listen("forcePosition:" + std::string(data["id"].GetString()));
@@ -36,11 +40,14 @@ namespace jam
       }
     }
 
+    m_bang_sound.setBuffer(ins.resourceManager.GetSoundBuffer("effects/bolt_shot_reload.wav"));
+    m_bang_sound.setRelativeToListener(controllable);
+
     const auto id = std::string(data["id"].GetString());
     const std::vector<std::string> listeners = {
       "updateMovement:" + id,
       "damage:" + id,
-      "respawn:" + id, 
+      "respawn:" + id,
     };
 
     for (auto& i : listeners) {
@@ -61,7 +68,6 @@ namespace jam
       setTexture(&ins.resourceManager.GetTexture("cheeki.png"));
     }
   }
-
   void Player::offsetHealth(const int health)
   {
     m_health += health;
@@ -77,6 +83,11 @@ namespace jam
     return m_health <= 0;
   }
 
+  void Player::shoot()
+  {
+    m_bang_sound.play();
+  }
+
   void Player::update(const float dt)
   {
     if (m_controllable && !isDead()) {
@@ -90,6 +101,7 @@ namespace jam
       glm::vec2 currentPos = getCurrentPos();
       glm::vec2 m_lookDir = glm::normalize(mousePos - currentPos);
 
+      setRotation(360/(2*glm::pi<float>())*std::atan2(m_lookDir.y, m_lookDir.x));
       m_accelVec = glm::vec2(0.f);
       if (sf::Keyboard::isKeyPressed(Keyboard::W)) {
         m_accelVec += m_accelFloat * m_lookDir;

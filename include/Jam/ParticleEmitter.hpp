@@ -8,6 +8,7 @@
 namespace jam
 {
   class Instance;
+
   class ParticleEmitter final : public Entity
   {
   public:
@@ -54,7 +55,5 @@ namespace jam
     float m_startTorgue;
     float m_maxAlpha;
     float m_minAlpha;
-
-
   };
 }

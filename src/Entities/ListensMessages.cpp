@@ -5,8 +5,8 @@
 namespace jam
 {
   ListensMessages::ListensMessages(Scene& scene, const std::initializer_list<const std::string>& listeners)
-    : m_scene(scene),
-      m_listening(listeners.begin(), listeners.end())
+  : m_scene(scene),
+    m_listening(listeners.begin(), listeners.end())
   {
     for (auto& it : m_listening) {
       scene.addListener(it, *this);

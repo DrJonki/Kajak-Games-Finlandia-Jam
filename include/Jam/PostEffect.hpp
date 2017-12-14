@@ -5,7 +5,6 @@
 
 namespace jam
 {
-
   class PostEffect
   {
   protected:
