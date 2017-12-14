@@ -5,6 +5,7 @@
 #include <Jam/Entities/InterpolatesTransform.hpp>
 #include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
+#include <SFML/Audio/Sound.hpp>
 namespace sf { class View; }
 
 
@@ -28,6 +29,7 @@ namespace jam
     void setHealth(const int health);
 
     bool isDead() const;
+	void shoot();
 
   private:
 
@@ -53,5 +55,6 @@ namespace jam
 	glm::vec2 m_targetDirection;
 	float m_velocity;
 	sf::RectangleShape m_rectangles[4];
+	sf::Sound m_bang_sound;
   };
 }

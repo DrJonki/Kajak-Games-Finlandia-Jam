@@ -22,7 +22,8 @@ namespace jam
       m_gameView(sf::Vector2f(), sf::Vector2f(ins.config.float_("VIEW_X"), ins.config.float_("VIEW_Y"))),
       m_uiView(sf::Vector2f(0.5f, 0.5f), sf::Vector2f(1.f, 1.f)),
       m_player(m_characterLayer.insert<Player>(data["id"].GetString(), ins, *this, true, static_cast<Player::Faction>(data["faction"].GetInt()),m_gameView)),
-      m_music()
+      m_music(),
+	  m_reloadTime(1.5f)
   {
     /*m_music.setLoop(true);
     m_music.setRelativeToListener(true);
@@ -89,6 +90,12 @@ namespace jam
   void LevelScene::update(const float dt)
   {
     Scene::update(dt);
+	if (m_reloadCounter >= 0) {
+		m_reloadCounter -= dt;
+	}
+	else {
+		m_reloadCounter = 0;
+	}
 
     if (m_player.isDead()) {
       m_uiState |= UIState::Dead;
@@ -126,9 +133,10 @@ namespace jam
 
   void LevelScene::mousePressed(const int mouseKey, const int x, const int y)
   {
-    if (mouseKey == sf::Mouse::Button::Left && !m_player.isDead()) {
+    if (mouseKey == sf::Mouse::Button::Left && !m_player.isDead() && m_reloadCounter <= 0) {
+	  m_reloadCounter = m_reloadTime;
       const auto world = getInstance().window.mapPixelToCoords(sf::Vector2i(x, y), m_gameView);
-
+	  m_player.shoot();
       rapidjson::Document data;
       data.SetObject();
       rapidjson::Value point;

@@ -14,31 +14,31 @@ namespace jam
   {
   public:
 
-    enum class Type
-    {
-      Rock,
-      House,
-    };
+  enum class Type
+  {
+    Rock,
+    House,
+  };
 
   public:
 
-    Obstacle(Instance& ins, const rapidjson::Value& data);
+  Obstacle(Instance& ins, const rapidjson::Value& data);
 
-    bool isBroken() const;
-
-  private:
-
-    sf::CircleShape& circleShape();
-
-    sf::RectangleShape& rectangleShape();
-
-    void draw(sf::RenderTarget& target) override;
+  bool isBroken() const;
 
   private:
 
-    const Type m_type;
-    const bool m_breakable;
-    int m_health;
-    std::unique_ptr<sf::Drawable> m_drawable;
+  sf::CircleShape& circleShape();
+
+  sf::RectangleShape& rectangleShape();
+
+  void draw(sf::RenderTarget& target) override;
+
+  private:
+
+  const Type m_type;
+  const bool m_breakable;
+  int m_health;
+  std::unique_ptr<sf::Drawable> m_drawable;
   };
 }

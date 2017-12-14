@@ -21,41 +21,41 @@ namespace jam
   {
   public:
 
-    Scene(Instance& ins);
+  Scene(Instance& ins);
 
-    virtual ~Scene() = 0;
+  virtual ~Scene() = 0;
 
-    Layer& addLayer(const uint32_t weight);
+  Layer& addLayer(const uint32_t weight);
 
-    virtual void update(const float dt);
+  virtual void update(const float dt);
 
-    virtual void draw(sf::RenderTarget& target);
+  virtual void draw(sf::RenderTarget& target);
 
-    virtual void postDraw(sf::RenderTarget& target);
+  virtual void postDraw(sf::RenderTarget& target);
 
-    Instance& getInstance();
+  Instance& getInstance();
 
-    const Instance& getInstance() const;
+  const Instance& getInstance() const;
 
-    void setView(const sf::View& view);
+  void setView(const sf::View& view);
 
-    const sf::View& getView() const;
+  const sf::View& getView() const;
 
-    void addListener(const std::string& message, ListensMessages& entity);
+  void addListener(const std::string& message, ListensMessages& entity);
 
-    void removeListener(const std::string& message, ListensMessages& entity);
+  void removeListener(const std::string& message, ListensMessages& entity);
 
-    virtual void textEvent(const uint32_t code);
+  virtual void textEvent(const uint32_t code);
 
-    virtual void mousePressed(const int mouseKey, const int x, const int y);
+  virtual void mousePressed(const int mouseKey, const int x, const int y);
 
-    virtual void socketEvent(const char* event, const rapidjson::Value& data);
+  virtual void socketEvent(const char* event, const rapidjson::Value& data);
 
   private:
 
-    Instance& m_instance;
-    std::multimap<std::string, ListensMessages*> m_listeners;
-    std::multimap<uint32_t, std::unique_ptr<Layer>> m_layers;
-    sf::View m_view;
+  Instance& m_instance;
+  std::multimap<std::string, ListensMessages*> m_listeners;
+  std::multimap<uint32_t, std::unique_ptr<Layer>> m_layers;
+  sf::View m_view;
   };
 }
