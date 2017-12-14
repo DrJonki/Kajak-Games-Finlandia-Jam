@@ -7,6 +7,7 @@
 #include <rapidjson/writer.h>
 #include <iostream>
 #include <string>
+#include <thread>
 
 sf::VideoMode getVideomode(const jam::ConfigManager& config) {
   #ifdef _DEBUG
@@ -57,6 +58,26 @@ namespace jam
 
     tcpSocket().setBlocking(false);
     udpSocket().setBlocking(false);
+
+    // UDP handshake
+    size_t attempts = 0;
+    while (true) {
+      sendMessage("handshake", false);
+
+      std::vector<char> buffer(255);
+      sf::IpAddress address;
+      unsigned short port = 0;
+      size_t received = 0;
+      if (udpSocket().receive(&buffer[0], buffer.size(), received, address, port) == sf::Socket::Done) {
+        break;
+      }
+
+      if (++attempts >= 5) {
+        throw "Handshake with server failed";
+      }
+
+      std::this_thread::sleep_for(std::chrono::seconds(1));
+    }
   }
 
   Instance::~Instance()
@@ -75,7 +96,7 @@ namespace jam
       std::size_t received = 0;
 
       while (
-		m_sockets.first.receive(&buffer[0], buffer.size(), received) == sf::Socket::Done ||
+        m_sockets.first.receive(&buffer[0], buffer.size(), received) == sf::Socket::Done ||
         m_sockets.second.receive(&buffer[0], buffer.size(), received, addr, port) == sf::Socket::Done
       ) {
         rapidjson::Document doc;
@@ -90,14 +111,13 @@ namespace jam
           }
           else if (strcmp(pack, "pong") == 0) {
             m_lastPingTime = m_pingTimer.restart();
-		  }
-		  std::cout << pack << std::endl;
+          }
 
           currentScene->socketEvent(pack, doc.HasMember("data") ? doc["data"] : dummyData);
-		}
-		else {
-			std::cout << "Invalid package" << std::endl;
-		}
+        }
+        else {
+          std::cout << "Invalid package" << std::endl;
+        }
       }
 
       currentScene->update(delta);

@@ -1,121 +1,98 @@
-import g from './global'
-import * as net from 'net'
-import * as commander from 'commander'
-import Player from './player'
-import Move from './move'
-import Shoot from './shoot'
-import { Server } from 'https';
-import {has} from 'lodash'
-import Session from './session'
-import './packages'
+import './alias';
+import * as net from 'net';
+import * as dgram from 'dgram';
+import * as commander from 'commander';
+import { has } from 'lodash';
 
-//import Tick from './tick'
-// const asdasdSession = new Session()
-// console.log(g.packageManager.sessions)
+import Socket, { ISocketContainer } from '@/util/socket';
+import Router from '@/services/router';
+import registerRoutes from '@/routes';
+
+const router = new Router();
+registerRoutes(router);
+
 commander
   .option('--udp-port <n>', '', parseInt)
   .option('--tcp-port <n>', '', parseInt)
   .parse(process.argv);
 
-g.server.on('error', (err) => {
-  console.log(`server error:\n${err.message}`);
-  g.server.close();
-});
+const hostname = '0.0.0.0';
+let udpServer: dgram.Socket;
+const socketContainer: ISocketContainer = {};
 
-g.server.on('message', function (message, remote) {
-    // console.log(message.toString());
+const handleMessage = (data: Buffer, socket: Socket, tcp = true, udpPort?: number) => {
+  try {
+    const obj = JSON.parse(data.toString());
 
-    let obj;
-    try {
-      obj = JSON.parse(message.toString());
-      // console.log(obj);
-    } catch (err) {
-      console.error(err);
+    if (!has(obj, 'package')) {
+      throw new Error(`Invalid socket message: no 'package' property`);
+    }
+
+    if (!tcp && obj.package === 'handshake') {
+      socket.setupUdp(udpPort, udpServer);
+      socket.send('handshake', undefined, false);
       return;
     }
-    /// testing new package manager
-    g.packageManager.apply(obj, remote, false)
-    
-    ///////////////////////////////
 
-    // g.server.send("reply", remote.port, remote.address);
+    router.invoke(obj.package, obj.data, socket);
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const tcpServer = net.createServer((sock) => {
+  console.log('TCP connected:', `${sock.remoteAddress}:${sock.remotePort}`);
+
+  const sockInstance = socketContainer[sock.remoteAddress] = new Socket(sock.remoteAddress, socketContainer, sock);
+
+  sock.on('error', (err) => {
+    console.error(err);
+  }).on('data', (data) => {
+    handleMessage(data, sockInstance);
+  }).on('close', () => {
+    handleMessage(new Buffer(JSON.stringify({ package: 'disconnect' })), sockInstance);
+
+    delete socketContainer[sock.remoteAddress];
+  });
+}).on('listening', () => {
+  console.log('TCP Server listening on', commander.tcpPort);
+}).on('error', (err) => {
+  console.error(err);
+}).listen(commander.tcpPort, hostname);
+
+udpServer = dgram.createSocket('udp4').on('error', (err) => {
+  console.error(err);
+}).on('message', (message, remote) => {
+  if (has(socketContainer, remote.address)) {
+    handleMessage(message, socketContainer[remote.address], false, remote.port);
+  }
+}).on('listening', () => {
+  const address = udpServer.address();
+  console.log('UDP Server listening on', `${address.address}:${address.port}`);
 });
 
+udpServer.bind(commander.udpPort, hostname);
 
-g.server.on('listening', () => {
-    const address = g.server.address();
-    console.log('UDP Server listening on', `${address.address}:${address.port}`);
-    /*
-    setTimeout(() => {
-        for(let i=0, j=g.actionBuffer.length; i<j; i++) {
-            console.log(g.actionBuffer[i]);
-        }
-    }, 10);
-    */
+const handleClose = () => {
+  // TODO: Send 'restart' message to all clients.
+
+  udpServer.close();
+  tcpServer.close();
+  console.log('Closing...');
+};
+
+const handleCrash = () => {
+  // TODO: Try to send 'crash' message & disconnect all clients.
+};
+
+process.on('uncaughtException', () => {
+  handleCrash();
 });
 
-g.server.bind(commander.udpPort);
-
-/// TCP stuff
-const HOST = '127.0.0.1'
-// Create a server instance, and chain the listen function to it
-// The function passed to net.createServer() becomes the event handler for the 'connection' event
-// The sock object the callback function receives UNIQUE for each connection
-const tcpServer = net.createServer(function(sock) {
-    
-    // We have a connection - a socket object is assigned to the connection automatically
-    console.log('CONNECTED: ' + sock.remoteAddress +':'+ sock.remotePort);
-    sock.on('error', ()=>{})
-    
-    // Add a 'data' event handler to this instance of socket
-    sock.on('data', function(data) {
-        
-        console.log('DATA ' + sock.remoteAddress + ': ' + data);
-        // Write the data back to the socket, the client will receive it as data from the server
-
-
-        ///>>>>>>>>>>>>>>>>>>>>>>
-        let obj;
-        try {
-          obj = JSON.parse(data.toString());
-          // console.log(obj);
-        } catch (err) {
-          console.error(err);
-          return;
-        }
-    
-        /// testing new package manager
-        const sendingPackage = g.packageManager.apply(obj, sock, true) // tcp === true udp === false
-        if(sendingPackage) {
-            try {
-                console.log('Sending package')
-                if (!sock.write(JSON.stringify(sendingPackage))) {
-                    console.error("tcp send error");
-                }
-            }
-            catch(err){
-
-            }
-        }
-        console.log("TCP-magic happened")
-        //////////////////////////
-        
-    });
-    
-    // Add a 'close' event handler to this instance of socket
-    sock.on('close', function(data) {
-        console.log('CLOSED: ' + sock.remoteAddress +' '+ sock.remotePort);
-    });
-    
-}).listen(commander.tcpPort);
-tcpServer.on('error', ()=>{})
-
-console.log('TCP Server listening on ' + commander.tcpPort);
-///////////////////////////
+process.on('unhandledRejection', () => {
+  handleCrash();
+});
 
 process.on('SIGTERM', () => {
-    g.server.close()
-    tcpServer.close()
-    console.log('Closing...');
+  handleClose();
 });
-
