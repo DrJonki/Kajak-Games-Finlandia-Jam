@@ -6,6 +6,7 @@
 #include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Audio/Sound.hpp>
+#include <array>
 
 namespace sf {
   class View;
@@ -31,7 +32,8 @@ namespace jam
     void setHealth(const int health);
 
     bool isDead() const;
-	void shoot();
+	  void shoot();
+    bool getTriggerReady();
 
   private:
 
@@ -59,5 +61,11 @@ namespace jam
     sf::RectangleShape m_rectangles[4];
 	  sf::Sound m_bang_sound;
     float m_playerRotatio;
+    float m_recyle[2];
+    std::array<float, 2> m_recyle_counter;
+    int m_currentWeapon;
+    float m_reloadCounter[2];
+    float m_reloadTime[2];
+    float m_recyleRecovery[2];
   };
 }

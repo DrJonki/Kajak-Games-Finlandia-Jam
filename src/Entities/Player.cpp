@@ -35,7 +35,10 @@ namespace jam
       m_targetDirection(0.f),
       m_velocity(0.f),
       m_rectangles(),
-      m_playerRotatio(0.f)
+      m_playerRotatio(0.f),
+      m_recyle(),
+      m_recyle_counter(),
+      m_currentWeapon(0)
   {
     if (controllable) {
       listen("forcePosition");
@@ -43,16 +46,23 @@ namespace jam
         m_rectangles[i].setFillColor(sf::Color::Red);
       }
     }
-  m_bang_sound.setBuffer(ins.resourceManager.GetSoundBuffer("effects/bolt_shot_reload.wav"));
-  m_bang_sound.setRelativeToListener(controllable);
+    m_bang_sound.setBuffer(ins.resourceManager.GetSoundBuffer("effects/bolt_shot_reload.wav"));
+    m_bang_sound.setRelativeToListener(controllable);
     setRadius(ns_radius);
     setOrigin(ns_radius, ns_radius);
 
     setOutlineThickness(1.f);
-
+    m_recyle[0] = 20;
+    m_recyle[1] = 1;
+    m_reloadTime[0] = 1.5;
+    m_reloadTime[1] = 0.2;
+    m_reloadCounter[0] = 0;
+    m_reloadCounter[1] = 0;
+    m_recyleRecovery[0] = 10;
+    m_recyleRecovery[1] = 1;
     if (m_faction == Faction::Simo) {
       setOutlineColor(sf::Color::Blue);
-      setTexture(&ins.resourceManager.GetTexture("white.jpg"));
+      setTexture(&ins.resourceManager.GetTexture("white.png"));
     }
     else if (m_faction == Faction::Russian) {
       setOutlineColor(sf::Color(255, 168, 0));
@@ -76,7 +86,12 @@ namespace jam
 
   void Player::shoot()
   {
+    m_recyle_counter[m_currentWeapon] += 5;
+    m_reloadCounter[m_currentWeapon] += 1.5;
     m_bang_sound.play();
+  }
+  bool Player::getTriggerReady() {
+    return m_reloadCounter[m_currentWeapon] == 0 ? true : false;
   }
 
   void Player::update(const float dt)
@@ -88,6 +103,15 @@ namespace jam
 
 
       bool input = false;
+      for (auto& itr:m_recyle_counter) {
+        if (itr > 0) {
+          itr -= m_recyleRecovery[m_currentWeapon]*dt;
+        }
+        else {
+          itr = 0;
+        }
+      }
+      float recyle = m_recyle[m_currentWeapon] * m_recyle_counter[m_currentWeapon];
       const float speed = 750.f * m_instance.config.float_("INTERPOLATION_TICK_LENGTH");
       glm::vec2 currentPos = getCurrentPos();
       glm::vec2 m_lookDir = glm::normalize(mousePos - currentPos);
@@ -110,7 +134,12 @@ namespace jam
         m_accelVec += m_accelFloat * glm::vec2(-m_lookDir.y, m_lookDir.x);
         input = true;
       }
-      std::cout << m_accelVec.x << " , " << m_accelVec.y << std::endl;
+      if (sf::Keyboard::isKeyPressed(Keyboard::Key::Num1)) {
+        m_currentWeapon = 0;
+      }
+      if (sf::Keyboard::isKeyPressed(Keyboard::Key::Num1)) {
+        m_currentWeapon = 1;
+      }
 
       if (glm::length(m_accelVec) != 0.f) {
         m_targetDirection += m_accelFloat * glm::normalize(m_accelVec);
@@ -131,7 +160,7 @@ namespace jam
       float rectSize = 12.f;
       float rectGap = 10.f;
       float maxInaccuracy = 16;
-      float inAccuracy = maxInaccuracy * m_velocity / m_max_speedFloat;
+      float inAccuracy = recyle + maxInaccuracy * m_velocity / m_max_speedFloat;
    
       const auto nextPos = currentPos + m_targetDirection;
       updatePosition(nextPos);
