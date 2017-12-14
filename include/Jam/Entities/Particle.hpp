@@ -10,44 +10,45 @@ namespace jam
   {
   public:
 
-  Particle(
-    sf::Texture& texture,
-    float width,
-    float height,
-    sf::Vector2f startPosition,
-    float lifetime,
-    float startSpeed,
-    float friction,
-    float startAngle,
-    float startTorgue,
-    float maxAlpha,
-    float minAlpha
-  );
-  void update(const float dt);
-  bool isDone = false;
+    Particle(
+      sf::Texture& texture,
+      float width,
+      float height,
+      sf::Vector2f startPosition,
+      float lifetime,
+      float startSpeed,
+      float friction,
+      float startAngle,
+      float startTorgue,
+      float maxAlpha,
+      float minAlpha
+    );
+    void update(const float dt);
+    bool isDone = false;
 
   private:
-  Randomizer m_random;
 
-  float m_width;
-  float m_height;
+    Randomizer m_random;
 
-  sf::Vector2f m_startPosition;
+    float m_width;
+    float m_height;
 
-  float m_startSpeed;
-  float m_friction;
-  float m_curSpeed;
+    sf::Vector2f m_startPosition;
 
-  float m_curTime;
-  float m_lifeTime;
+    float m_startSpeed;
+    float m_friction;
+    float m_curSpeed;
 
-  float m_torgue;
+    float m_curTime;
+    float m_lifeTime;
 
-  float m_maxAlpha;
-  float m_minAlpha;
+    float m_torgue;
 
-  sf::Vector2f m_direction;
+    float m_maxAlpha;
+    float m_minAlpha;
 
-  void moveParticle(const float dt);
+    sf::Vector2f m_direction;
+
+    void moveParticle(const float dt);
   };
 }

@@ -1,5 +1,6 @@
 import Vec from '@/util/vec';
 import Socket from '@/util/socket';
+import Session from '@/session';
 import * as uuid from 'uuid/v4';
 import { size } from 'lodash';
 import { setTimeout } from 'timers';
@@ -17,20 +18,25 @@ const initialHealth = [
 ];
 
 export default class Player {
+  public static readonly radius = 30.0;
+
   public readonly socket: Socket;
   public readonly id = uuid();
   public readonly faction: Faction;
   public readonly name: string;
+  private readonly mSession: Session;
+  private readonly mOnDisconnect: TOnDisconnectFunc;
   private mHealth: number;
-  private mOnDisconnect: TOnDisconnectFunc;
   private mPinger: NodeJS.Timer;
   private mTimeout: NodeJS.Timer;
+  private mPosition = new Vec(0, 0);
 
-  constructor(faction: Faction, data: any, socket: Socket, onDisconnect: TOnDisconnectFunc) {
+  constructor(faction: Faction, data: any, socket: Socket, session: Session, onDisconnect: TOnDisconnectFunc) {
     this.faction = faction;
     this.name = data.name;
     this.socket = socket;
     this.mOnDisconnect = onDisconnect;
+    this.mSession = session;
 
     this.mHealth = initialHealth[faction];
 
@@ -57,7 +63,42 @@ export default class Player {
     }
   }
 
+  public shootPosition(vec: Vec) {
+    // TODO: calculate spread
+    return vec;
+  }
+
+  public damage(amount: number) {
+    this.mHealth -= amount;
+
+    setTimeout(() => {
+      this.mHealth = initialHealth[this.faction];
+
+      this.mSession.broadcast(`respawn:${this.id}`, {
+        health: this.health,
+        position: [
+          (Math.random() + 1) / 2 * 1000,
+          (Math.random() + 1) / 2 * 800,
+        ],
+      }, true);
+    }, this.respawnTime);
+
+    return this.mHealth;
+  }
+
+  public set position(pos: Vec) {
+    this.mPosition = pos;
+  }
+
+  public get position() {
+    return this.mPosition;
+  }
+
   public get health() {
     return this.mHealth;
+  }
+
+  public get respawnTime() {
+    return this.faction === Faction.Simo ? 15000 : 5000;
   }
 }

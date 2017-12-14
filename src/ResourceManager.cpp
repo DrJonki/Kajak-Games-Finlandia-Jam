@@ -62,15 +62,14 @@ namespace jam {
 
     auto itr = shaderFiles.find(combined);
     if (itr == shaderFiles.end()) {
-    sf::Shader& shader = shaderFiles[combined];
+      sf::Shader& shader = shaderFiles[combined];
 
-    if (!shader.loadFromFile(assetPathV, assetPathF)) {
-      assert(false);
-    }
-    return shader;
+      if (!shader.loadFromFile(assetPathV, assetPathF)) {
+        assert(false);
+      }
+      return shader;
     }
 
     return itr->second;
   }
-
 }

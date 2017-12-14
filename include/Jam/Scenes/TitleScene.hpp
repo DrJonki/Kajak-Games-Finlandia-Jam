@@ -13,35 +13,35 @@ namespace jam
   {
   public:
 
-  TitleScene(Instance& ins);
+    TitleScene(Instance& ins);
 
-  ~TitleScene() override;
+    ~TitleScene() override;
 
-  void update(const float dt) override;
+    void update(const float dt) override;
 
-  void draw(sf::RenderTarget& target) override;
+    void draw(sf::RenderTarget& target) override;
 
-  void socketEvent(const char* event, const rapidjson::Value& data) override;
+    void socketEvent(const char* event, const rapidjson::Value& data) override;
 
-  void textEvent(const uint32_t code) override;
+    void textEvent(const uint32_t code) override;
 
   private:
 
-  void setConnectionString(const std::string& string);
+    void setConnectionString(const std::string& string);
 
-  sf::View m_view;
-  sf::RectangleShape m_background;
-  sf::Text m_titleText[3];
+    sf::View m_view;
+    sf::RectangleShape m_background;
+    sf::Text m_titleText[3];
 
-  sf::CircleShape m_connectionStatus;
-  sf::Text m_connectionText;
+    sf::CircleShape m_connectionStatus;
+    sf::Text m_connectionText;
 
-  sf::Text m_instructionText[2];
+    sf::Text m_instructionText[2];
 
-  bool m_findingGame;
-  sf::Clock m_matchmakingTimer;
-  sf::Text m_connectingText;
+    bool m_findingGame;
+    sf::Clock m_matchmakingTimer;
+    sf::Text m_connectingText;
 
-  sf::Music m_music;
+    sf::Music m_music;
   };
 }

@@ -84,8 +84,7 @@ namespace jam
   }
 
   TitleScene::~TitleScene()
-  {
-  }
+  {}
 
   void TitleScene::update(const float dt)
   {
@@ -121,7 +120,6 @@ namespace jam
     Scene::draw(target);
 
     target.setView(m_view);
-
     target.draw(m_background);
 
     for (int i = 0; i < sizeof(m_titleText) / sizeof(m_titleText[0]); ++i) {

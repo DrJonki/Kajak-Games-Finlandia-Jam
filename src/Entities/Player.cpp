@@ -11,15 +11,11 @@
 #include <SFML/Window/Mouse.hpp>
 #include <iostream>
 
-namespace {
-  const float ns_radius = 20.f;
-}
-
 namespace jam
 {
   Player::Player(Instance& ins, Scene& scene, const bool controllable, const rapidjson::Value& data, const sf::View& view)
     : Entity(),
-      ListensMessages(scene, {"updateMovement"}),
+      ListensMessages(scene, {}),
       InterpolatesTransform(ins),
       sf::CircleShape(10.f),
       m_instance(ins),
@@ -41,15 +37,28 @@ namespace jam
       m_currentWeapon(0)
   {
     if (controllable) {
-      listen("forcePosition");
+      listen("forcePosition:" + std::string(data["id"].GetString()));
       for (int i = 0; i < 4; i++) {
         m_rectangles[i].setFillColor(sf::Color::Red);
       }
     }
+
     m_bang_sound.setBuffer(ins.resourceManager.GetSoundBuffer("effects/bolt_shot_reload.wav"));
     m_bang_sound.setRelativeToListener(controllable);
-    setRadius(ns_radius);
-    setOrigin(ns_radius, ns_radius);
+
+    const auto id = std::string(data["id"].GetString());
+    const std::vector<std::string> listeners = {
+      "updateMovement:" + id,
+      "damage:" + id,
+      "respawn:" + id,
+    };
+
+    for (auto& i : listeners) {
+      listen(i);
+    }
+
+    setRadius(data["radius"].GetFloat());
+    setOrigin(getRadius(), getRadius());
 
     setOutlineThickness(1.f);
     m_recyle[0] = 20;
@@ -219,13 +228,21 @@ namespace jam
       ), force);
     };
 
-    if (strcmp(message, "forcePosition") == 0) {
+    if (strstr(message, "forcePosition:")) {
       posUpdate(true);
+    }
+    else if (strstr(message, "respawn:")) {
+      setHealth(data["health"].GetInt());
+      posUpdate(true);
+      setActive(true);
+    }
+    else if (strstr(message, "damage:")) {
+      offsetHealth(data["amount"].GetInt());
     }
 
     if (m_controllable) return;
 
-    if (strcmp(message, "updateMovement") == 0 && strcmp(getID().c_str(), data["id"].GetString()) == 0) {
+    if (strstr(message, "updateMovement:")) {
       posUpdate();
     }
   }

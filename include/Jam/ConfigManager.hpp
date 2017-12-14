@@ -8,18 +8,18 @@ namespace jam
   {
   public:
 
-  ConfigManager();
+    ConfigManager();
 
-  std::string string(const std::string& key) const;
+    std::string string(const std::string& key) const;
 
-  int integer(const std::string& key) const;
+    int integer(const std::string& key) const;
 
-  float float_(const std::string& key) const;
+    float float_(const std::string& key) const;
 
-  bool boolean(const std::string& key) const;
+    bool boolean(const std::string& key) const;
 
   private:
 
-  std::unordered_map<std::string, std::string> m_config;
+    std::unordered_map<std::string, std::string> m_config;
   };
 }

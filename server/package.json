@@ -4,7 +4,7 @@
   "description": "description",
   "main": "lib/index.js",
   "scripts": {
-    "start": "cross-env NODE_ENV=development nodemon --watch lib ./lib/index.js",
+    "start": "cross-env NODE_ENV=development nodemon --watch lib ./lib/index.js -- --tcp-port=9001 --udp-port=9002",
     "production": "cross-env NODE_ENV=production node ./lib/index.js",
     "build": "tsc",
     "watch": "tsc -w",
@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/DrJonki/Kajak-Games-Finlandia-Jam#readme",
   "devDependencies": {
+    "@types/async": "^2.0.45",
     "@types/commander": "^2.11.0",
     "@types/lodash": "^4.14.88",
     "@types/node": "^8.0.53",
@@ -30,6 +31,7 @@
     "typescript": "^2.6.2"
   },
   "dependencies": {
+    "async": "^2.6.0",
     "commander": "^2.12.2",
     "cross-env": "^5.1.1",
     "lodash": "^4.17.4",

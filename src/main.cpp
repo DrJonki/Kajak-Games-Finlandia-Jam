@@ -9,7 +9,7 @@ int main() {
   instance.currentScene = std::make_unique<jam::TitleScene>(instance);
 
   while (instance.window.isOpen()) {
-  instance();
+    instance();
   }
 
   return 0;

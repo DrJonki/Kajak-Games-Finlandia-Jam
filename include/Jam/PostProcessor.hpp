@@ -18,25 +18,25 @@ namespace jam
   {
   public:
 
-  PostProcessor(Instance& ins);
+    PostProcessor(Instance& ins);
 
-  ~PostProcessor();
+    ~PostProcessor();
 
-  template<typename T, typename ... Args>
-  T& createEffect(const std::string& name, Args&&... args);
+    template<typename T, typename ... Args>
+    T& createEffect(const std::string& name, Args&&... args);
 
-  void clearEffects();
+    void clearEffects();
 
-  void update(const float delta);
+    void update(const float delta);
 
-  void render(const float delta);
+    void render(const float delta);
 
   private:
 
-  const sf::Vector2f m_fboRes;
-  Instance& m_instance;
-  sf::RectangleShape m_quad;
-  std::vector<std::unique_ptr<PostEffect>> m_effects;
+    const sf::Vector2f m_fboRes;
+    Instance& m_instance;
+    sf::RectangleShape m_quad;
+    std::vector<std::unique_ptr<PostEffect>> m_effects;
   };
 
   #include <Jam/PostProcessor.inl>

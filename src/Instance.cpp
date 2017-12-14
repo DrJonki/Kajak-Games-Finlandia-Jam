@@ -144,32 +144,32 @@ namespace jam
     while (window.pollEvent(event)) {
       switch (event.type)
       {
-      case sf::Event::Closed:
-        if (currentScene) {
-          currentScene.reset();
+        case sf::Event::Closed:
+          if (currentScene) {
+            currentScene.reset();
+          }
+          window.close();
+          break;
+        case sf::Event::Resized:
+        {
+          const auto view = window.getView().getSize();
+          const auto ratio = view.x / view.y;
+          window.setSize(sf::Vector2u(
+            static_cast<unsigned int>(window.getSize().y * ratio),
+            window.getSize().y
+          ));
+          break;
         }
-        window.close();
-        break;
-      case sf::Event::Resized:
-      {
-        const auto view = window.getView().getSize();
-        const auto ratio = view.x / view.y;
-        window.setSize(sf::Vector2u(
-          static_cast<unsigned int>(window.getSize().y * ratio),
-          window.getSize().y
-        ));
-        break;
-      }
-      case sf::Event::TextEntered:
-      {
-        currentScene->textEvent(event.text.unicode);
-        break;
-      }
-      case sf::Event::MouseButtonPressed: 
-      {
-        currentScene->mousePressed(event.mouseButton.button, event.mouseButton.x, event.mouseButton.y);
-        break;
-      }
+        case sf::Event::TextEntered:
+        {
+          currentScene->textEvent(event.text.unicode);
+          break;
+        }
+        case sf::Event::MouseButtonPressed: 
+        {
+          currentScene->mousePressed(event.mouseButton.button, event.mouseButton.x, event.mouseButton.y);
+          break;
+        }
       }
     }
   }

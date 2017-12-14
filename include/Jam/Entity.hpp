@@ -11,38 +11,40 @@ namespace jam
 {
   class Entity
   {
-  friend class Layer;
+    friend class Layer;
 
   public:
 
-  Entity();
+    Entity();
 
-  virtual ~Entity() = 0;
+    virtual ~Entity() = 0;
 
-  void erase();
+    void erase();
 
-  bool isErased() const;
+    bool isErased() const;
 
-  void setActive(const bool active);
+    void setActive(const bool active);
 
-  bool isActive() const;
+    bool isActive() const;
 
-  void setID(const std::string& id);
+    void setID(const std::string& id);
 
-  const std::string& getID() const;
+    const std::string& getID() const;
 
   private:
 
-  void baseUpdate(const float dt);
+    void baseUpdate(const float dt);
 
-  void baseDraw(sf::RenderTarget& target);
+    void baseDraw(sf::RenderTarget& target);
 
-  virtual void update(const float dt);
+    virtual void update(const float dt);
 
-  virtual void draw(sf::RenderTarget& target);
+    virtual void draw(sf::RenderTarget& target);
 
-  std::string m_id;
-  bool m_active;
-  bool m_deleted;
+  private:
+
+    std::string m_id;
+    bool m_active;
+    bool m_deleted;
   };
 }

@@ -26,51 +26,51 @@ namespace jam
 
   class Instance final
   {
-  Instance(const Instance&) = delete;
-  void operator =(const Instance&) = delete;
+    Instance(const Instance&) = delete;
+    void operator =(const Instance&) = delete;
 
   public:
 
-  Instance();
+    Instance();
 
-  ~Instance();
+    ~Instance();
 
-  void operator ()();
+    void operator ()();
 
-  bool sendMessage(const char* message, const bool tcp);
+    bool sendMessage(const char* message, const bool tcp);
 
-  bool sendMessage(const char* message, rapidjson::Value& data, const bool tcp);
+    bool sendMessage(const char* message, rapidjson::Value& data, const bool tcp);
 
-  sf::Time getLastPingTime() const;
+    sf::Time getLastPingTime() const;
 
   private:
 
-  sf::TcpSocket& tcpSocket();
+    sf::TcpSocket& tcpSocket();
 
-  sf::UdpSocket& udpSocket();
+    sf::UdpSocket& udpSocket();
 
-  void connectTcp();
-
-  public:
-
-  // Globals
-  ConfigManager config;
-  sf::RenderWindow window;
-  sf::RenderTexture framebuffer[2];
-  std::unique_ptr<Scene> currentScene;
-  ResourceManager resourceManager;
-  PostProcessor postProcessor;
+    void connectTcp();
 
   public:
 
-  sf::Clock m_clock;
+    // Globals
+    ConfigManager config;
+    sf::RenderWindow window;
+    sf::RenderTexture framebuffer[2];
+    std::unique_ptr<Scene> currentScene;
+    ResourceManager resourceManager;
+    PostProcessor postProcessor;
+
+  public:
+
+    sf::Clock m_clock;
 
   private:
 
-  std::pair<sf::TcpSocket, sf::UdpSocket> m_sockets;
-  sf::RectangleShape m_quad;
-  sf::Clock m_pingTimer;
-  sf::Clock m_pingClock;
-  sf::Time m_lastPingTime;
+    std::pair<sf::TcpSocket, sf::UdpSocket> m_sockets;
+    sf::RectangleShape m_quad;
+    sf::Clock m_pingTimer;
+    sf::Clock m_pingClock;
+    sf::Time m_lastPingTime;
   };
 }
