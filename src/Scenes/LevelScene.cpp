@@ -88,7 +88,12 @@ namespace jam
 
   void LevelScene::update(const float dt)
   {
+
     Scene::update(dt);
+    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)  && !m_player.isDead() && m_player.getTriggerReady()) {
+      m_player.shoot();
+    }
+
     if (m_player.isDead()) {
       m_uiState |= UIState::Dead;
     }
@@ -128,7 +133,6 @@ namespace jam
     if (mouseKey == sf::Mouse::Button::Left && !m_player.isDead() && m_player.getTriggerReady()) {
 
       const auto world = getInstance().window.mapPixelToCoords(sf::Vector2i(x, y), m_gameView);
-      m_player.shoot();
       rapidjson::Document data;
       data.SetObject();
       rapidjson::Value point;

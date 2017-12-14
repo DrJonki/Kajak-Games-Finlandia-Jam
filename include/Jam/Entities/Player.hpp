@@ -61,6 +61,7 @@ namespace jam
     float m_velocity;
     sf::RectangleShape m_rectangles[4];
     sf::Sound m_bang_sound;
+    sf::Sound  m_sub_bang_sound;
     float m_playerRotatio;
     float m_recyle[2];
     std::array<float, 2> m_recyle_counter;

@@ -44,6 +44,7 @@ namespace jam
     }
 
     m_bang_sound.setBuffer(ins.resourceManager.GetSoundBuffer("effects/bolt_shot_reload.wav"));
+    m_sub_bang_sound.setBuffer(ins.resourceManager.GetSoundBuffer("effects/smg_shot.wav"));
     m_bang_sound.setRelativeToListener(controllable);
 
     const auto id = std::string(data["id"].GetString());
@@ -62,13 +63,13 @@ namespace jam
 
     setOutlineThickness(1.f);
     m_recyle[0] = 20;
-    m_recyle[1] = 1;
+    m_recyle[1] = 3;
     m_reloadTime[0] = 1.5;
-    m_reloadTime[1] = 0.2;
+    m_reloadTime[1] = 0.05;
     m_reloadCounter[0] = 0;
     m_reloadCounter[1] = 0;
     m_recyleRecovery[0] = 10;
-    m_recyleRecovery[1] = 1;
+    m_recyleRecovery[1] = 25;
     if (m_faction == Faction::Simo) {
       setOutlineColor(sf::Color::Blue);
       setTexture(&ins.resourceManager.GetTexture("white.png"));
@@ -95,9 +96,19 @@ namespace jam
 
   void Player::shoot()
   {
-    m_recyle_counter[m_currentWeapon] += 5;
-    m_reloadCounter[m_currentWeapon] += 1.5;
-    m_bang_sound.play();
+    float recyle_max = 35;
+    if (m_recyle_counter[m_currentWeapon] < recyle_max) {
+      m_recyle_counter[m_currentWeapon] += 5;
+    }
+    m_reloadCounter[m_currentWeapon] += m_reloadTime[m_currentWeapon];
+    switch (m_currentWeapon){
+    case 0:
+      m_bang_sound.play();
+      break;
+    case 1:
+      m_sub_bang_sound.play();
+      break;
+    }
   }
   bool Player::getTriggerReady() {
     return m_reloadCounter[m_currentWeapon] == 0 ? true : false;
@@ -120,6 +131,16 @@ namespace jam
           itr = 0;
         }
       }
+
+      for (auto& itr : m_reloadCounter) {
+        if (itr > 0) {
+          itr -= dt;
+        }
+        else {
+          itr = 0;
+        }
+      }
+
       float recyle = m_recyle[m_currentWeapon] * m_recyle_counter[m_currentWeapon];
       const float speed = 750.f * m_instance.config.float_("INTERPOLATION_TICK_LENGTH");
       glm::vec2 currentPos = getCurrentPos();
@@ -146,7 +167,7 @@ namespace jam
       if (sf::Keyboard::isKeyPressed(Keyboard::Key::Num1)) {
         m_currentWeapon = 0;
       }
-      if (sf::Keyboard::isKeyPressed(Keyboard::Key::Num1)) {
+      if (sf::Keyboard::isKeyPressed(Keyboard::Key::Num2)) {
         m_currentWeapon = 1;
       }
 
