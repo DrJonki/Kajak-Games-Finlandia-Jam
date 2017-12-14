@@ -21,7 +21,7 @@ namespace jam
       m_crossHair(sf::Vector2f(20, 20)),
       m_gameView(sf::Vector2f(), sf::Vector2f(ins.config.float_("VIEW_X"), ins.config.float_("VIEW_Y"))),
       m_uiView(sf::Vector2f(0.5f, 0.5f), sf::Vector2f(1.f, 1.f)),
-      m_player(m_characterLayer.insert<Player>(data["id"].GetString(), ins, *this, true, data)),
+      m_player(m_characterLayer.insert<Player>(data["id"].GetString(), ins, *this, true, data, m_gameView)),
       m_music()
   {
     /*m_music.setLoop(true);
@@ -167,7 +167,7 @@ namespace jam
     }
 
     else if (strcmp(message, "join") == 0) {
-      m_characterLayer.insert<Player>(data["id"].GetString(), getInstance(), *this, false, data).setHealth(0);
+      m_characterLayer.insert<Player>(data["id"].GetString(), getInstance(), *this, false, data, m_gameView);
     }
 
     else if (strcmp(message, "leave") == 0) {
