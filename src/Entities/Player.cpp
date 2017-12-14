@@ -60,7 +60,6 @@ namespace jam
     setRadius(data["radius"].GetFloat());
     setOrigin(getRadius(), getRadius());
 
-    setOutlineThickness(1.f);
     m_recyle[0] = 20;
     m_recyle[1] = 1;
     m_reloadTime[0] = 1.5;
@@ -70,11 +69,9 @@ namespace jam
     m_recyleRecovery[0] = 10;
     m_recyleRecovery[1] = 1;
     if (m_faction == Faction::Simo) {
-      setOutlineColor(sf::Color::Blue);
       setTexture(&ins.resourceManager.GetTexture("white.png"));
     }
     else if (m_faction == Faction::Russian) {
-      setOutlineColor(sf::Color(255, 168, 0));
       setTexture(&ins.resourceManager.GetTexture("cheeki.png"));
     }
   }
