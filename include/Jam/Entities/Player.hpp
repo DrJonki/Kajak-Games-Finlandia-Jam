@@ -75,6 +75,8 @@ namespace jam
     float m_recyleRecovery[2];
     float m_inacuracy[2];
     float m_minInacuracy[2];
+    float m_standingInacuracy[2];
+    float m_distance;
     Randomizer m_rand;
 
     sf::Text m_nameText;
