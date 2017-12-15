@@ -42,6 +42,10 @@ export default class Player {
   }
 
   public damage(amount: number) {
+    if (this.dead) {
+      return;
+    }
+
     const wasDead = this.dead;
 
     this.mHealth -= amount;

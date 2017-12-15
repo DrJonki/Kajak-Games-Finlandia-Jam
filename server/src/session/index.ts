@@ -122,7 +122,7 @@ export default class Session {
         weaponType: data.weaponType,
       }, false, player);
 
-      eachAsync(this.mPlayers, (value) => {
+      each(this.mPlayers, (value) => {
         const dist = value.position.distanceToVector(pos);
         const headshot = dist < (Player.radius / 3);
 
