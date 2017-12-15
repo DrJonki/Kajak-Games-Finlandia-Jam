@@ -82,6 +82,15 @@ namespace jam
       deathText.setPosition(0.5f, 0.55f);
     }
 
+    // Other players
+    {
+      auto& playerArray = data["players"];
+
+      for (auto& itr : playerArray.GetArray()) {
+        m_characterLayer.insert<Player>(data["id"].GetString(), ins, *this, false, data, m_gameView);
+      }
+    }
+
     // Level generation
     {
       auto& levelData = data["level"];
