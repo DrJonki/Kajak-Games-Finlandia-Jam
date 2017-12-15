@@ -43,7 +43,6 @@ const tcpServer = net.createServer((sock) => {
   sock.on('error', (err) => {
     console.error(err);
   }).on('data', (data) => {
-    console.log('UDP message -', url, ':', data.toString());
     handleMessage(data, sockInstance);
   }).on('close', () => {
     handleMessage(new Buffer(JSON.stringify({ package: 'disconnect' })), sockInstance);

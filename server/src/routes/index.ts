@@ -10,7 +10,6 @@ export default (router: Router) => {
 
   router.register('connect', 'SessionController@connect');
   router.register('disconnect', 'SessionController@disconnect');
-  router.register('pong', 'SessionController@pong');
   router.register('updateMovement', 'SessionController@move');
   router.register('shoot', 'SessionController@shoot');
 };

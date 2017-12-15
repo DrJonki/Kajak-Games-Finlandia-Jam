@@ -73,7 +73,6 @@ export default class Session {
 
       console.log(player.name, 'left session', this.id, '-', reason);
 
-      player.destroy();
       delete this.mPlayers[socket.id];
     }
   }
@@ -96,15 +95,6 @@ export default class Session {
 
   public get empty() {
     return size(this.mPlayers) === 0;
-  }
-
-  // Events
-  public pong(data: any, socket: Socket) {
-    const player = this.mPlayers[socket.id];
-
-    if (player) {
-      player.pong();
-    }
   }
 
   public move(data: any, socket: Socket) {
