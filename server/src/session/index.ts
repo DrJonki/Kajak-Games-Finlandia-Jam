@@ -128,7 +128,7 @@ export default class Session {
 
         if (dist < Player.radius) {
           this.broadcast(`damage:${value.id}`, {
-            health: Math.floor(player.damage((headshot ? 100 : 50) / (data.weaponType === 0 ? 1 : 5))),
+            health: value.damage((headshot ? 100 : 50) / (data.weaponType === 0 ? 1 : 5)),
             headshot,
             respawnTime: player.respawnTime,
           }, true);
