@@ -31,7 +31,7 @@ export default class Player {
 
   constructor(faction: Faction, data: any, socket: Socket, session: Session, onDisconnect: TOnDisconnectFunc) {
     this.faction = faction;
-    this.name = randName();
+    this.name = faction === Faction.Simo ? 'Simo' : randName();
     this.socket = socket;
     this.mOnDisconnect = onDisconnect;
     this.mSession = session;
@@ -39,12 +39,15 @@ export default class Player {
     this.mHealth = Config.initialHealth[faction];
 
     this.mPinger = setInterval(() => {
+      console.log('ping', this.name);
       this.socket.send('ping', undefined, false);
     }, 5000);
     this.pong();
   }
 
   public pong() {
+    console.log('pong', this.name);
+
     if (this.mTimeout) {
       clearTimeout(this.mTimeout);
       this.mTimeout = undefined;
@@ -67,19 +70,23 @@ export default class Player {
   }
 
   public damage(amount: number) {
+    const wasDead = this.dead;
+
     this.mHealth -= amount;
 
-    setTimeout(() => {
-      this.mHealth = Config.initialHealth[this.faction];
+    if (!wasDead && this.dead) {
+      setTimeout(() => {
+        this.mHealth = Config.initialHealth[this.faction];
 
-      this.mSession.broadcast(`respawn:${this.id}`, {
-        health: this.health,
-        position: [
-          (Math.random() + 1) / 2 * 1000,
-          (Math.random() + 1) / 2 * 800,
-        ],
-      }, true);
-    }, this.respawnTime);
+        this.mSession.broadcast(`respawn:${this.id}`, {
+          health: this.health,
+          position: [
+            (Math.random() + 1) / 2 * 1000,
+            (Math.random() + 1) / 2 * 800,
+          ],
+        }, true);
+      }, 2000); // this.respawnTime);
+    }
 
     return this.mHealth;
   }
@@ -102,6 +109,10 @@ export default class Player {
 
   public get health() {
     return this.mHealth;
+  }
+
+  public get dead() {
+    return this.mHealth <= 0;
   }
 
   public get respawnTime() {

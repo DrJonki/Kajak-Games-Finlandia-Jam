@@ -97,4 +97,6 @@ process.on('unhandledRejection', () => {
 
 process.on('SIGTERM', () => {
   handleClose();
+}).on('SIGINT', () => {
+  handleClose();
 });

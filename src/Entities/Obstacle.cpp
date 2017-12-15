@@ -11,6 +11,9 @@ namespace jam
       m_health(data.HasMember("health") ? data["health"].GetInt() : 0),
       m_drawable()
   {
+    const auto angle = data["angle"].GetFloat();
+    const auto pos = sf::Vector2f(data["position"][0u].GetFloat(), data["position"][1].GetFloat());
+
     switch (m_type)
     {
       case Type::Rock: {
@@ -20,6 +23,8 @@ namespace jam
         d->setRadius(radius);
         d->setOrigin(radius, radius);
         d->setTexture(&ins.resourceManager.GetTexture("rock.png"));
+        d->setPosition(pos);
+        d->setRotation(angle);
 
         m_drawable = std::move(d);
 
@@ -32,6 +37,8 @@ namespace jam
         d->setSize(size);
         d->setOrigin(size * 0.5f);
         d->setTexture(&ins.resourceManager.GetTexture("roof_square.png"));
+        d->setPosition(pos);
+        d->setRotation(angle);
 
         m_drawable = std::move(d);
 
@@ -41,10 +48,6 @@ namespace jam
         assert(false);
       }
     }
-
-    auto& d = reinterpret_cast<sf::Transformable&>(*m_drawable);
-    d.setPosition(data["position"][0u].GetFloat(), data["position"][1].GetFloat());
-    d.setRotation(data["angle"].GetFloat());
   }
 
   Obstacle::Type Obstacle::getType() const
