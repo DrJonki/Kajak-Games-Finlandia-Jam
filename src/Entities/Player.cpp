@@ -45,7 +45,8 @@ namespace jam
       m_recyle(),
       m_recyle_counter(),
       m_currentWeapon(0),
-      m_nameText()
+      m_nameText(),
+      m_distance(0)
   {
     const auto id = std::string(data["id"].GetString());
     if (controllable) {
@@ -90,6 +91,8 @@ namespace jam
     m_inacuracy[1] = 15;
     m_minInacuracy[0] = 0.f;
     m_minInacuracy[1] = 20.f;
+    m_standingInacuracy[0] = 0.f;
+    m_standingInacuracy[1] = 0.08f;
     if (m_faction == Faction::Simo) {
       setTexture(&ins.resourceManager.GetTexture("white.png"));
     }
@@ -134,11 +137,12 @@ namespace jam
 
   void Player::update(const float dt)
   {
+    auto sfMousePos = m_instance.window.mapPixelToCoords(sf::Mouse::getPosition(m_instance.window), m_view);
+    glm::vec2 mousePos = glm::vec2(sfMousePos.x, sfMousePos.y);
+    
+    m_distance = glm::length(getCurrentPos() - mousePos);
     if (m_controllable && !isDead()) {
       using sf::Keyboard;
-      auto sfMousePos = m_instance.window.mapPixelToCoords( sf::Mouse::getPosition(m_instance.window), m_view);
-      glm::vec2 mousePos = glm::vec2(sfMousePos.x, sfMousePos.y);
-
       bool input = false;
       for (auto& itr:m_recyle_counter) {
         if (itr > 0) {
@@ -275,8 +279,8 @@ namespace jam
 
   sf::Vector2f Player::getInAccuracy() {
 
-    float x = m_rand.range(0.f, m_inacuracy[m_currentWeapon] * m_velocity);
-    float y = m_rand.range(0.f, m_inacuracy[m_currentWeapon] * m_velocity);
+    float x = m_rand.range(0.f, m_inacuracy[m_currentWeapon] * m_velocity) + m_distance*(m_rand.range(0.f, m_standingInacuracy[m_currentWeapon]) - 0.5*m_standingInacuracy[m_currentWeapon]);
+    float y = m_rand.range(0.f, m_inacuracy[m_currentWeapon] * m_velocity) + m_distance*(m_rand.range(0.f, m_standingInacuracy[m_currentWeapon]) - 0.5*m_standingInacuracy[m_currentWeapon]);
     return  sf::Vector2f(x,y);
   }
 
