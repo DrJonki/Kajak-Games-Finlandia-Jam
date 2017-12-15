@@ -72,5 +72,6 @@ namespace jam
     sf::Clock m_pingTimer;
     sf::Clock m_pingClock;
     sf::Time m_lastPingTime;
+    std::string m_udpId;
   };
 }

@@ -1,5 +1,6 @@
 import * as net from 'net';
 import * as dgram from 'dgram';
+import * as uuid from 'uuid/v4';
 import { each, filter } from 'lodash';
 
 export interface ISocketContainer {
@@ -8,8 +9,9 @@ export interface ISocketContainer {
 
 export default class Socket {
   public readonly id: string;
+  public readonly udpId = uuid();
   public readonly address: string;
-  public readonly port: number;
+  private mPort: number;
   private readonly mContainer: ISocketContainer;
   private readonly mTcpSocket: net.Socket;
   private readonly mUdpSocket: dgram.Socket;
@@ -19,8 +21,11 @@ export default class Socket {
     this.mContainer = container;
     this.mTcpSocket = tcp;
     this.address = tcp.remoteAddress;
-    this.port = tcp.remotePort;
     this.mUdpSocket = udp;
+  }
+
+  public setUdpPort(port: number) {
+    this.mPort = port;
   }
 
   public send(event: string, data: any, tcp: boolean) {
@@ -34,7 +39,7 @@ export default class Socket {
         this.mTcpSocket.write(`${obj};end;`);
       } else {
         console.log('UDP message TO -', this.id, ':', obj);
-        this.mUdpSocket.send(obj, this.port + 1, this.address, (err) => {
+        this.mUdpSocket.send(obj, this.mPort, this.address, (err) => {
           console.log('UDP ERROR', err);
         });
       }

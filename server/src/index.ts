@@ -20,15 +20,13 @@ const hostname = '0.0.0.0';
 let udpServer: dgram.Socket;
 const socketContainer: ISocketContainer = {};
 
-const handleMessage = (data: Buffer, socket: Socket) => {
+const handleMessage = (data: any, socket: Socket) => {
   try {
-    const obj = JSON.parse(data.toString());
-
-    if (!has(obj, 'package')) {
+    if (!has(data, 'package')) {
       throw new Error(`Invalid socket message: no 'package' property`);
     }
 
-    router.invoke(obj.package, obj.data, socket);
+    router.invoke(data.package, data.data, socket);
   } catch (err) {
     console.error(err);
   }
@@ -43,7 +41,17 @@ const tcpServer = net.createServer((sock) => {
   sock.on('error', (err) => {
     console.error(err);
   }).on('data', (data) => {
-    handleMessage(data, sockInstance);
+    const obj = JSON.parse(data.toString());
+
+    if (obj.package === 'info') {
+      sockInstance.send('info', {
+        udpId: url,
+      }, true);
+
+      return;
+    }
+
+    handleMessage(obj, sockInstance);
   }).on('close', () => {
     handleMessage(new Buffer(JSON.stringify({ package: 'disconnect' })), sockInstance);
     delete socketContainer[url];
@@ -59,12 +67,18 @@ const tcpServer = net.createServer((sock) => {
 udpServer = dgram.createSocket('udp4').on('error', (err) => {
   console.error(err);
 }).on('message', (message, remote) => {
-  const url = `${remote.address}:${remote.port - 1}`;
+  const url = `${remote.address}:${remote.port}`;
   console.log('UDP message -', url, ':', message.toString());
 
-  if (has(socketContainer, url)) {
-    handleMessage(message, socketContainer[url]);
+  const obj = JSON.parse(message.toString());
+
+  if (!has(obj, 'udpId')) {
+    return;
   }
+
+  socketContainer[obj.udpId].setUdpPort(remote.port);
+
+  handleMessage(obj, socketContainer[obj.udpId]);
 }).on('listening', () => {
   const address = udpServer.address();
   console.log('UDP Server listening on', `${address.address}:${address.port}`);

@@ -44,7 +44,8 @@ namespace jam
       m_sockets(),
       m_pingTimer(),
       m_pingClock(),
-      m_lastPingTime()
+      m_lastPingTime(),
+      m_udpId()
   {
     window.setVerticalSyncEnabled(true);
     window.setKeyRepeatEnabled(false);
@@ -52,12 +53,18 @@ namespace jam
 
     connectTcp();
 
-    if (udpSocket().bind(tcpSocket().getLocalPort() + 1) != sf::Socket::Status::Done) {
+    if (udpSocket().bind(sf::Socket::AnyPort) != sf::Socket::Status::Done) {
       throw "Failed to bind UDP port";
     }
 
-    tcpSocket().setBlocking(false);
     udpSocket().setBlocking(false);
+    tcpSocket().setBlocking(false);
+
+    sendMessage("info", true);
+
+    while (m_udpId.empty()) {
+      (*this)();
+    }
   }
 
   Instance::~Instance()
@@ -75,56 +82,63 @@ namespace jam
         static const rapidjson::Value dummyData(rapidjson::kObjectType);
 
         auto pack = doc["package"].GetString();
+        auto& data = doc.HasMember("data") ? doc["data"] : dummyData;
+
         if (strcmp(pack, "ping") == 0) {
           std::cout << sendMessage("pong", false) << std::endl;
         }
         else if (strcmp(pack, "pong") == 0) {
           m_lastPingTime = m_pingTimer.restart();
         }
+        else if (strcmp(pack, "info") == 0) {
+          m_udpId = data["udpId"].GetString();
+          return;
+        }
 
-        currentScene->socketEvent(pack, doc.HasMember("data") ? doc["data"] : dummyData);
+        if (currentScene)
+          currentScene->socketEvent(pack, data);
       }
       else {
         std::cout << "Invalid package" << std::endl;
       }
     };
 
+    // TCP packets
+    {
+      static std::string buffer(sf::UdpSocket::MaxDatagramSize, '\0');
+      static size_t tcpCursor = 0;
+      std::size_t received = 0;
+
+      while (m_sockets.first.receive(&buffer[tcpCursor], buffer.size(), received) == sf::Socket::Done) {
+        const auto pos = buffer.find(";end;", tcpCursor);
+        tcpCursor += received;
+
+        if (pos != std::string::npos) {
+          handlePacket(buffer.substr(0, pos));
+
+          const auto sub = buffer.substr(pos + 5, tcpCursor - received + pos + 5);
+          memcpy(&buffer[0], sub.c_str(), sub.size());
+
+          tcpCursor -= pos + 5;
+        }
+      }
+    }
+
+    // UDP packets
+    {
+      static std::string buffer(sf::UdpSocket::MaxDatagramSize, '\0'); // Bigger buffer for TCP messages
+      sf::IpAddress addr;
+      unsigned short port = 0;
+      std::size_t received = 0;
+
+      while (m_sockets.second.receive(&buffer[0], buffer.size(), received, addr, port) == sf::Socket::Done) {
+        handlePacket(buffer);
+      }
+    }
+
     const auto delta = m_clock.restart().asSeconds();
 
     if (currentScene) {
-      // TCP packets
-      {
-        static std::string buffer(sf::UdpSocket::MaxDatagramSize, '\0');
-        static size_t tcpCursor = 0;
-        std::size_t received = 0;
-
-        while (m_sockets.first.receive(&buffer[tcpCursor], buffer.size(), received) == sf::Socket::Done) {
-          const auto pos = buffer.find(";end;", tcpCursor);
-          tcpCursor += received;
-
-          if (pos != std::string::npos) {
-            handlePacket(buffer.substr(0, pos));
-
-            const auto sub = buffer.substr(pos + 5, tcpCursor - received + pos + 5);
-            memcpy(&buffer[0], sub.c_str(), sub.size());
-
-            tcpCursor -= pos + 5;
-          }
-        }
-      }
-
-      // UDP packets
-      {
-        static std::string buffer(sf::UdpSocket::MaxDatagramSize, '\0'); // Bigger buffer for TCP messages
-        sf::IpAddress addr;
-        unsigned short port = 0;
-        std::size_t received = 0;
-
-        while (m_sockets.second.receive(&buffer[0], buffer.size(), received, addr, port) == sf::Socket::Done) {
-          handlePacket(buffer);
-        }
-      }
-
       currentScene->update(delta);
     }
 
@@ -167,12 +181,16 @@ namespace jam
         }
         case sf::Event::TextEntered:
         {
-          currentScene->textEvent(event.text.unicode);
+          if (currentScene)
+            currentScene->textEvent(event.text.unicode);
+
           break;
         }
         case sf::Event::MouseButtonPressed: 
         {
-          currentScene->mousePressed(event.mouseButton.button, event.mouseButton.x, event.mouseButton.y);
+          if (currentScene)
+            currentScene->mousePressed(event.mouseButton.button, event.mouseButton.x, event.mouseButton.y);
+
           break;
         }
       }
@@ -213,6 +231,7 @@ namespace jam
     Document doc(rapidjson::kObjectType);
     doc.AddMember(StringRef("package"), StringRef(message), doc.GetAllocator());
     doc.AddMember(StringRef("data"), data, doc.GetAllocator());
+    doc.AddMember(StringRef("udpId"), StringRef(m_udpId.c_str()), doc.GetAllocator());
 
     StringBuffer buffer;
     Writer<StringBuffer> writer(buffer);
@@ -250,7 +269,7 @@ namespace jam
       }
     }
 
-    while (true) {
+    while (!m_udpId.empty()) {
       const auto status = udpSocket().send(buffer.GetString(), buffer.GetSize(), address, port);
 
       switch (status) {
@@ -264,6 +283,8 @@ namespace jam
           return false;
       }
     }
+
+    return false;
   }
 
   sf::Time Instance::getLastPingTime() const
