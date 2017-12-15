@@ -107,7 +107,7 @@ namespace jam
       }
 
       setConnectionString(std::to_string(ms) + "ms");
-      m_connectionStatus.setFillColor(sf::Color::Green);
+      m_connectionStatus.setFillColor(color);
     }
 
     if (m_findingGame && m_matchmakingTimer.getElapsedTime().asSeconds() >= 5.f) {

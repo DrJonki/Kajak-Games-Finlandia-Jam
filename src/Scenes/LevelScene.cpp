@@ -109,7 +109,6 @@ namespace jam
 
   void LevelScene::update(const float dt)
   {
-
     Scene::update(dt);
     if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)  && !m_player.isDead() && m_player.getTriggerReady()) {
       m_player.shoot();

@@ -67,36 +67,61 @@ namespace jam
 
   void Instance::operator ()()
   {
+    static auto handlePacket = [this](std::string& buffer) {
+      rapidjson::Document doc;
+      doc.ParseInsitu<rapidjson::kParseStopWhenDoneFlag>(&buffer[0]);
+
+      if (!doc.HasParseError() && doc.HasMember("package") && doc["package"].IsString()) {
+        static const rapidjson::Value dummyData(rapidjson::kObjectType);
+
+        auto pack = doc["package"].GetString();
+        if (strcmp(pack, "ping") == 0) {
+          sendMessage("pong", false);
+        }
+        else if (strcmp(pack, "pong") == 0) {
+          m_lastPingTime = m_pingTimer.restart();
+        }
+
+        currentScene->socketEvent(pack, doc.HasMember("data") ? doc["data"] : dummyData);
+      }
+      else {
+        std::cout << "Invalid package" << std::endl;
+      }
+    };
+
     const auto delta = m_clock.restart().asSeconds();
 
     if (currentScene) {
-      static std::vector<char> buffer(sf::UdpSocket::MaxDatagramSize * 5); // Bigger buffer for TCP messages
-      sf::IpAddress addr;
-      unsigned short port = 0;
-      std::size_t received = 0;
+      // TCP packets
+      {
+        static std::string buffer(sf::UdpSocket::MaxDatagramSize, '\0');
+        static size_t tcpCursor = 0;
+        std::size_t received = 0;
 
-      while (
-        m_sockets.first.receive(&buffer[0], buffer.size(), received) == sf::Socket::Done ||
-        m_sockets.second.receive(&buffer[0], buffer.size(), received, addr, port) == sf::Socket::Done
-      ) {
-        rapidjson::Document doc;
-        doc.ParseInsitu<rapidjson::kParseStopWhenDoneFlag>(buffer.data());
+        while (m_sockets.first.receive(&buffer[tcpCursor], buffer.size(), received) == sf::Socket::Done) {
+          const auto pos = buffer.find(";end;", tcpCursor);
+          tcpCursor += received;
 
-        if (!doc.HasParseError() && doc.HasMember("package") && doc["package"].IsString()) {
-          static const rapidjson::Value dummyData(rapidjson::kObjectType);
+          if (pos != std::string::npos) {
+            handlePacket(buffer.substr(0, pos));
 
-          auto pack = doc["package"].GetString();
-          if (strcmp(pack, "ping") == 0) {
-            sendMessage("pong", false);
+            const auto sub = buffer.substr(pos + 5, tcpCursor - received + pos + 5);
+            memcpy(&buffer[0], sub.c_str(), sub.size());
+
+            tcpCursor -= pos + 5;
           }
-          else if (strcmp(pack, "pong") == 0) {
-            m_lastPingTime = m_pingTimer.restart();
-          }
-
-          currentScene->socketEvent(pack, doc.HasMember("data") ? doc["data"] : dummyData);
         }
-        else {
-          std::cout << "Invalid package" << std::endl;
+      }
+
+      // UDP packets
+      {
+        static std::string buffer(sf::UdpSocket::MaxDatagramSize, '\0'); // Bigger buffer for TCP messages
+        sf::IpAddress addr;
+        unsigned short port = 0;
+        std::size_t received = 0;
+
+        while (m_sockets.second.receive(&buffer[0], buffer.size(), received, addr, port) == sf::Socket::Done) {
+          handlePacket(buffer);
         }
       }
 
