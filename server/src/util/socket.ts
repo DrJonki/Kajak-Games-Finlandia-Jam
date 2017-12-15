@@ -33,11 +33,11 @@ export default class Socket {
         package: event,
       });
 
-      if (tcp) {
-        this.mTcpSocket.write(obj);
-      } else {
-        this.mUdpSocket.send(obj, this.mUdpPort, this.address);
-      }
+      // if (tcp) {
+      //   this.mTcpSocket.write(new Buffer(obj));
+      // } else {
+      this.mUdpSocket.send(obj, this.mUdpPort, this.address);
+      // }
     } catch (err) {
       console.error(err);
     }
