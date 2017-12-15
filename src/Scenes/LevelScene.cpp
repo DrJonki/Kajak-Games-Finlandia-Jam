@@ -197,6 +197,14 @@ namespace jam
     else if (strcmp(message, "kick") == 0) {
       quit();
     }
+
+    else if (strcmp(message, "restart") == 0) {
+      quit();
+    }
+
+    else if (strcmp(message, "crash") == 0) {
+      quit();
+    }
   }
 
   void LevelScene::quit()

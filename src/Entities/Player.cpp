@@ -262,7 +262,7 @@ namespace jam
 
   void Player::socketMessage(const char* message, const rapidjson::Value& data)
   {
-    auto posUpdate = [this, &data](const bool force = false) {
+    auto posUpdate = [this](const rapidjson::Value& data, const bool force = false) {
       updatePosition(glm::vec2(
         static_cast<float>(rapidjson::GetValueByPointer(data, "/position/0")->GetDouble()),
         static_cast<float>(rapidjson::GetValueByPointer(data, "/position/1")->GetDouble())
@@ -274,11 +274,11 @@ namespace jam
       shoot();
     }
     else if (strstr(message, "forcePosition:")) {
-      posUpdate(true);
+      posUpdate(data, true);
     }
     else if (strstr(message, "respawn:")) {
       setHealth(data["health"].GetInt());
-      posUpdate(true);
+      posUpdate(data, true);
       setActive(true);
     }
     else if (strstr(message, "damage:")) {
@@ -288,7 +288,7 @@ namespace jam
     if (m_controllable) return;
 
     if (strstr(message, "updateMovement:")) {
-      posUpdate();
+      posUpdate(data);
     }
   }
 }

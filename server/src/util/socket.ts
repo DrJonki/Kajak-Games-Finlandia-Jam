@@ -9,21 +9,18 @@ export interface ISocketContainer {
 export default class Socket {
   public readonly id: string;
   public readonly address: string;
-  private mUdpPort: number;
+  public readonly port: number;
   private readonly mContainer: ISocketContainer;
   private readonly mTcpSocket: net.Socket;
-  private mUdpSocket: dgram.Socket;
+  private readonly mUdpSocket: dgram.Socket;
 
-  public constructor(id: string, container: ISocketContainer, tcp: net.Socket) {
+  public constructor(id: string, container: ISocketContainer, tcp: net.Socket, udp: dgram.Socket) {
     this.id = id;
     this.mContainer = container;
     this.mTcpSocket = tcp;
     this.address = tcp.remoteAddress;
-  }
-
-  public setupUdp(port: number, udpSocket: dgram.Socket) {
-    this.mUdpPort = port;
-    this.mUdpSocket = udpSocket;
+    this.port = tcp.remotePort;
+    this.mUdpSocket = udp;
   }
 
   public send(event: string, data: any, tcp: boolean) {
@@ -33,13 +30,11 @@ export default class Socket {
         package: event,
       });
 
-      console.log("sending", obj);
-
-      // if (tcp) {
-      //   this.mTcpSocket.write(new Buffer(obj));
-      // } else {
-      this.mUdpSocket.send(obj, this.mUdpPort, this.address);
-      // }
+      if (tcp) {
+        this.mTcpSocket.write(obj);
+      } else {
+        this.mUdpSocket.send(obj, this.port, this.address);
+      }
     } catch (err) {
       console.error(err);
     }

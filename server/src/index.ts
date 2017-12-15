@@ -20,18 +20,12 @@ const hostname = '0.0.0.0';
 let udpServer: dgram.Socket;
 const socketContainer: ISocketContainer = {};
 
-const handleMessage = (data: Buffer, socket: Socket, tcp = true, udpPort?: number) => {
+const handleMessage = (data: Buffer, socket: Socket) => {
   try {
     const obj = JSON.parse(data.toString());
 
     if (!has(obj, 'package')) {
       throw new Error(`Invalid socket message: no 'package' property`);
-    }
-
-    if (!tcp && obj.package === 'handshake') {
-      socket.setupUdp(udpPort, udpServer);
-      socket.send('handshake', undefined, false);
-      return;
     }
 
     router.invoke(obj.package, obj.data, socket);
@@ -41,9 +35,10 @@ const handleMessage = (data: Buffer, socket: Socket, tcp = true, udpPort?: numbe
 };
 
 const tcpServer = net.createServer((sock) => {
-  console.log('TCP connected:', `${sock.remoteAddress}:${sock.remotePort}`);
+  const url = `${sock.remoteAddress}:${sock.remotePort}`;
+  console.log('TCP connected:', url);
 
-  const sockInstance = socketContainer[sock.remoteAddress] = new Socket(sock.remoteAddress, socketContainer, sock);
+  const sockInstance = socketContainer[url] = new Socket(url, socketContainer, sock, udpServer);
 
   sock.on('error', (err) => {
     console.error(err);
@@ -51,8 +46,7 @@ const tcpServer = net.createServer((sock) => {
     handleMessage(data, sockInstance);
   }).on('close', () => {
     handleMessage(new Buffer(JSON.stringify({ package: 'disconnect' })), sockInstance);
-
-    delete socketContainer[sock.remoteAddress];
+    delete socketContainer[url];
   });
 }).on('listening', () => {
   console.log('TCP Server listening on', `${tcpServer.address().address}:${tcpServer.address().port}`);
@@ -63,8 +57,10 @@ const tcpServer = net.createServer((sock) => {
 udpServer = dgram.createSocket('udp4').on('error', (err) => {
   console.error(err);
 }).on('message', (message, remote) => {
-  if (has(socketContainer, remote.address)) {
-    handleMessage(message, socketContainer[remote.address], false, remote.port);
+  const url = `${remote.address}:${remote.port}`;
+
+  if (has(socketContainer, url)) {
+    handleMessage(message, socketContainer[url]);
   }
 }).on('listening', () => {
   const address = udpServer.address();

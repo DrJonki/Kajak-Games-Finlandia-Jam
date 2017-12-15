@@ -5,7 +5,7 @@ import Config from '@/services/config';
 import Socket from '@/util/socket';
 import Vec from '@/util/vec';
 import Level from './level';
-import { each, map, size } from 'lodash';
+import { each, map, size, has } from 'lodash';
 
 const maxPlayers = 10;
 
@@ -13,6 +13,7 @@ export default class Session {
   public readonly id = uuid();
   private mLevel = new Level();
   private mPlayers: { [i: string]: Player } = {};
+  private mEvents: { [i: string]: any } = {};
 
   public join(data: any, socket: Socket) {
     const player = new Player(
@@ -57,6 +58,10 @@ export default class Session {
     const player = this.mPlayers[socket.id];
 
     if (player) {
+      if (has(this.mEvents, 'leave')) {
+        this.mEvents.leave(player);
+      }
+
       this.broadcast('leave', {
         id: player.id,
         reason,
@@ -69,6 +74,10 @@ export default class Session {
     }
   }
 
+  public on(event: 'leave', func: any) {
+    this.mEvents[event] = func;
+  }
+
   public broadcast(event: string, data: any, tcp: boolean, except?: Player) {
     each(this.mPlayers, (player, key) => {
       if (!except || except.socket.id !== key) {
@@ -79,6 +88,10 @@ export default class Session {
 
   public get full() {
     return size(this.mPlayers) >= maxPlayers;
+  }
+
+  public get empty() {
+    return size(this.mPlayers) === 0;
   }
 
   // Events

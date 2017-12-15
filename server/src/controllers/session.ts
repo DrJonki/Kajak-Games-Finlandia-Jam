@@ -1,5 +1,6 @@
 import Socket from '@/util/socket';
 import Session from '@/session';
+import Player from '@/session/player';
 import { find } from 'lodash';
 
 export default class SessionController {
@@ -11,6 +12,13 @@ export default class SessionController {
 
     if (!session) {
       session = new Session();
+
+      session.on('leave', () => {
+        if (session.empty) {
+          delete this.mSessions[session.id];
+        }
+      });
+
       this.mSessions[session.id] = session;
     }
 

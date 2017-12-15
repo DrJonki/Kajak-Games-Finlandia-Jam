@@ -52,32 +52,12 @@ namespace jam
 
     connectTcp();
 
-    if (udpSocket().bind(sf::Socket::AnyPort) != sf::Socket::Status::Done) {
+    if (udpSocket().bind(tcpSocket().getLocalPort()) != sf::Socket::Status::Done) {
       throw "Failed to bind UDP port";
     }
 
     tcpSocket().setBlocking(false);
     udpSocket().setBlocking(false);
-
-    // UDP handshake
-    size_t attempts = 0;
-    while (true) {
-      sendMessage("handshake", false);
-
-      std::vector<char> buffer(255);
-      sf::IpAddress address;
-      unsigned short port = 0;
-      size_t received = 0;
-      if (udpSocket().receive(&buffer[0], buffer.size(), received, address, port) == sf::Socket::Done) {
-        break;
-      }
-
-      if (++attempts >= 5) {
-        throw "Handshake with server failed";
-      }
-
-      std::this_thread::sleep_for(std::chrono::seconds(1));
-    }
   }
 
   Instance::~Instance()
