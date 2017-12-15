@@ -35,11 +35,12 @@ export default class Socket {
         package: event,
       });
 
-      if (tcp) {
+      if (true) {
         this.mTcpSocket.write(`${obj};end;`);
-      } else {
-        this.mUdpSocket.send(obj, this.mPort, this.address);
       }
+      // else {
+      //   this.mUdpSocket.send(obj, this.mPort, this.address);
+      // }
     } catch (err) {
       console.error(err);
     }
