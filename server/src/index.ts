@@ -43,6 +43,7 @@ const tcpServer = net.createServer((sock) => {
   sock.on('error', (err) => {
     console.error(err);
   }).on('data', (data) => {
+    console.log('UDP message -', url, ':', data);
     handleMessage(data, sockInstance);
   }).on('close', () => {
     handleMessage(new Buffer(JSON.stringify({ package: 'disconnect' })), sockInstance);
@@ -60,6 +61,7 @@ udpServer = dgram.createSocket('udp4').on('error', (err) => {
   console.error(err);
 }).on('message', (message, remote) => {
   const url = `${remote.address}:${remote.port}`;
+  console.log('UDP message -', url, ':', message);
 
   if (has(socketContainer, url)) {
     handleMessage(message, socketContainer[url]);
