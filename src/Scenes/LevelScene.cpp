@@ -115,6 +115,10 @@ namespace jam
   {
     target.clear(sf::Color(222, 222, 222));
 
+    for (auto& itr : m_bulletHoles) {
+      target.draw(itr);
+    }
+
     Scene::draw(target);
 
     //if (!m_player.isDead())
@@ -132,7 +136,8 @@ namespace jam
   {
     if (mouseKey == sf::Mouse::Button::Left && !m_player.isDead() && m_player.getTriggerReady()) {
 
-      const auto world = getInstance().window.mapPixelToCoords(sf::Vector2i(x, y), m_gameView);
+      const auto world = getInstance().window.mapPixelToCoords(sf::Vector2i(x, y), m_gameView) + m_player.getInAccuracy();
+      spawnBulletHole(world);
       rapidjson::Document data(rapidjson::kObjectType);
       rapidjson::Value point(rapidjson::kArrayType);
       point.PushBack(world.x, data.GetAllocator());
@@ -142,6 +147,14 @@ namespace jam
       data.AddMember("weaponType", weaponType, data.GetAllocator());
       getInstance().sendMessage("shoot", data, false);
     }
+  }
+
+  void LevelScene::spawnBulletHole(sf::Vector2f pos) {
+    sf::CircleShape bullet = sf::CircleShape();
+    bullet.setPosition(pos);
+    bullet.setRadius(2);
+    bullet.setFillColor(sf::Color(40, 40, 40));
+    m_bulletHoles.push_back(bullet);
   }
 
   void LevelScene::socketEvent(const char * message, const rapidjson::Value & data)

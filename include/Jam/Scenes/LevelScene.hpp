@@ -36,6 +36,7 @@ namespace jam
     void mousePressed(const int mouseKey, const int x, const int y) override;
 
     void socketEvent(const char* message, const rapidjson::Value& data) override;
+    void spawnBulletHole(sf::Vector2f pos);
 
   private:
 
@@ -55,7 +56,7 @@ namespace jam
 
     sf::View m_gameView;
     sf::View m_uiView;
-
+    std::vector<sf::CircleShape> m_bulletHoles;
     sf::Music m_music;
   };
 }

@@ -7,6 +7,7 @@
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Audio/Sound.hpp>
 #include <array>
+#include <Jam/Randomizer.hpp>
 
 namespace sf {
   class View;
@@ -31,6 +32,7 @@ namespace jam
     int getCurrentWeapon();
 
     void setHealth(const int health);
+    sf::Vector2f getInAccuracy();
 
     bool isDead() const;
 
@@ -70,5 +72,7 @@ namespace jam
     float m_reloadCounter[2];
     float m_reloadTime[2];
     float m_recyleRecovery[2];
+    float m_inacuracy[2];
+    Randomizer m_rand;
   };
 }
