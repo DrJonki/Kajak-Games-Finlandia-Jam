@@ -114,6 +114,10 @@ namespace jam
     return m_reloadCounter[m_currentWeapon] == 0 ? true : false;
   }
 
+  int Player::getCurrentWeapon() {
+    return m_currentWeapon;
+  }
+
   void Player::update(const float dt)
   {
     if (m_controllable && !isDead()) {

@@ -139,6 +139,7 @@ namespace jam
       point.SetArray();
       point.PushBack(world.x, data.GetAllocator());
       point.PushBack(world.y, data.GetAllocator());
+      point.PushBack(m_player.getCurrentWeapon(), data.GetAllocator());
       data.AddMember("crosshairPosition", point, data.GetAllocator());
 
       getInstance().sendMessage("shoot", data, false);
