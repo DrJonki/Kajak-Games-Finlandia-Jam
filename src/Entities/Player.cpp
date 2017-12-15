@@ -243,7 +243,7 @@ namespace jam
       sf::Listener::setPosition(currentPos.x, currentPos.y, 0.f);
       sf::Listener::setDirection(lookDir.x, lookDir.y, 0.f);
 
-      // if (glm::length(m_targetDirection) > 0) {
+      if (/* true || */ glm::length(m_targetDirection) > 0) {
         const auto pos = getCurrentPos();
         rapidjson::Document doc(rapidjson::kObjectType);
         rapidjson::Value positionVector(rapidjson::kArrayType);
@@ -256,7 +256,7 @@ namespace jam
         doc.AddMember("angle", angle, doc.GetAllocator());
 
         sendMessage("updateMovement", doc, false);
-      // }
+      }
     }
 
     InterpolatesTransform::update(dt);
