@@ -68,7 +68,6 @@ udpServer = dgram.createSocket('udp4').on('error', (err) => {
   console.error(err);
 }).on('message', (message, remote) => {
   const url = `${remote.address}:${remote.port}`;
-  console.log('UDP message -', url, ':', message.toString());
 
   const obj = JSON.parse(message.toString());
 

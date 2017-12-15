@@ -57,7 +57,7 @@ export default class Player {
             (Math.random() + 1) / 2 * 800,
           ],
         }, true);
-      }, 2000); // this.respawnTime);
+      }, this.respawnTime);
     }
 
     return this.mHealth;
