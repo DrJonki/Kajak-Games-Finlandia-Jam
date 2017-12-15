@@ -31,6 +31,7 @@ namespace jam
   {
     m_sound.openFromFile("assets/Audio/effects/snow_storm.ogg");
     m_sound.setLoop(true);
+    m_sound.setVolume(8.f);
     m_sound.setRelativeToListener(true);
     m_sound.play();
 
