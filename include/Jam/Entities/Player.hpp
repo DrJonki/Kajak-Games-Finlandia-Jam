@@ -28,6 +28,7 @@ namespace jam
     Player(Instance& ins, Scene& scene, const bool controllable, const rapidjson::Value& data, const sf::View& view);
 
     void offsetHealth(const int health);
+    int getCurrentWeapon();
 
     void setHealth(const int health);
 

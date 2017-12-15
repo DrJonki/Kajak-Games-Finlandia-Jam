@@ -145,14 +145,13 @@ namespace jam
     if (mouseKey == sf::Mouse::Button::Left && !m_player.isDead() && m_player.getTriggerReady()) {
 
       const auto world = getInstance().window.mapPixelToCoords(sf::Vector2i(x, y), m_gameView);
-      rapidjson::Document data;
-      data.SetObject();
-      rapidjson::Value point;
-      point.SetArray();
+      rapidjson::Document data(rapidjson::kObjectType);
+      rapidjson::Value point(rapidjson::kArrayType);
       point.PushBack(world.x, data.GetAllocator());
       point.PushBack(world.y, data.GetAllocator());
       data.AddMember("crosshairPosition", point, data.GetAllocator());
-
+      rapidjson::Value weaponType(m_player.getCurrentWeapon());
+      data.AddMember("weaponType", weaponType, data.GetAllocator());
       getInstance().sendMessage("shoot", data, false);
     }
   }
