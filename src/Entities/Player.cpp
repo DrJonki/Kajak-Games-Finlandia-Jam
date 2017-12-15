@@ -74,6 +74,8 @@ namespace jam
     m_reloadCounter[1] = 0;
     m_recyleRecovery[0] = 10;
     m_recyleRecovery[1] = 25;
+    m_inacuracy[0] = 100;
+    m_inacuracy[1] = 15;
     if (m_faction == Faction::Simo) {
       setTexture(&ins.resourceManager.GetTexture("white.png"));
     }
@@ -249,6 +251,13 @@ namespace jam
         target.draw(m_rectangles[i]);
       }
     }
+  }
+
+  sf::Vector2f Player::getInAccuracy() {
+
+    float x = m_rand.range(0.f, m_inacuracy[m_currentWeapon] * m_velocity);
+    float y = m_rand.range(0.f, m_inacuracy[m_currentWeapon] * m_velocity);
+    return  sf::Vector2f(x,y);
   }
 
   void Player::socketMessage(const char* message, const rapidjson::Value& data)

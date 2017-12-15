@@ -57,7 +57,12 @@ namespace jam
 
     sf::View m_gameView;
     sf::View m_uiView;
+<<<<<<< HEAD
     std::vector<sf::CircleShape> m_bulletHoles;
+    sf::Music m_music;
+=======
+
     sf::Music m_backgroundSound[2];
+>>>>>>> 08bc7e96f073046932251ad5b5a8710f9f85b5e0
   };
 }
