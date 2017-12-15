@@ -45,6 +45,7 @@ export default class Session {
       id: player.id,
       health: player.health,
       faction: player.faction,
+      radius: Player.radius,
     }, true);
 
     this.mPlayers[socket.id] = player;
