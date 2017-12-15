@@ -31,6 +31,7 @@ namespace jam
     void update(const float dt) override;
 
     void draw(sf::RenderTarget& target) override;
+    bool bulletGotToTarget(glm::vec2);
 
     void textEvent(const uint32_t code) override;
 

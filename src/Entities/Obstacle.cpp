@@ -50,9 +50,20 @@ namespace jam
     }
   }
 
+  Obstacle::Type Obstacle::getType() const
+  {
+    return m_type;
+  }
+
   bool Obstacle::isBroken() const
   {
     return m_breakable && m_health <= 0;
+  }
+
+  const sf::Shape & Obstacle::getShape() const
+  {
+    return reinterpret_cast<sf::Shape&> (*m_drawable);
+    // TODO: insert return statement here
   }
 
   sf::CircleShape & Obstacle::circleShape()

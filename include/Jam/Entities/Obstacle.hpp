@@ -23,9 +23,12 @@ namespace jam
   public:
 
     Obstacle(Instance& ins, const rapidjson::Value& data);
+    
+    Type getType() const;
 
     bool isBroken() const;
 
+    const sf::Shape& getShape() const;
   private:
 
     sf::CircleShape& circleShape();

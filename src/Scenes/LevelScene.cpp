@@ -108,6 +108,28 @@ namespace jam
     getInstance().sendMessage("disconnect", true);
   }
 
+  bool LevelScene::bulletGotToTarget(glm::vec2 from) {
+    bool nohit = true;
+    glm::vec2 to = m_player.getCurrentPos();
+    for (auto& itr : m_propLayer.getAll()) {
+      auto& shape = static_cast<Obstacle&>(*itr);
+
+      if (shape.getType() == Obstacle::Type::Rock) {
+        glm::vec2 point = glm::vec2(shape.getShape().getPosition().x, shape.getShape().getPosition().y);
+        glm::vec2 line = to - from;
+        glm::vec2 helpVec = from - point;
+        glm::vec2 ansVec = helpVec - glm::dot(helpVec, line)*line;
+
+        
+
+        if (glm::length(ansVec) < static_cast<const sf::CircleShape&> (shape.getShape()).getRadius()) {
+          nohit = false;
+        }
+      }
+    }
+    return nohit;
+  }
+
   void LevelScene::update(const float dt)
   {
     Scene::update(dt);
@@ -181,6 +203,10 @@ namespace jam
       quit();
     }
   }
+
+
+      //if (bulletGotToTarget(glm::vec2(world.x, world.y)) {
+      //}
 
   void LevelScene::spawnBulletHole(sf::Vector2f pos) {
     sf::CircleShape bullet = sf::CircleShape();
