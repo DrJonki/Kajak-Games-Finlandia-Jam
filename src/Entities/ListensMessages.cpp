@@ -31,10 +31,12 @@ namespace jam
   void ListensMessages::listen(const std::string& message)
   {
     m_listening.insert(message);
+    m_scene.addListener(message, *this);
   }
 
   void ListensMessages::stopListening(const std::string& message)
   {
     m_listening.erase(message);
+    m_scene.removeListener(message, *this);
   }
 }

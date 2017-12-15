@@ -31,7 +31,8 @@ namespace jam
       m_instance(ins),
       m_controllable(controllable),
       m_faction(static_cast<Faction>(data["faction"].GetInt())), 
-      m_health(data["health"].GetInt()),
+      m_maxHealth(data["health"].GetInt()),
+      m_health(m_maxHealth),
       m_speedVec(glm::vec2(0)),
       m_accelVec(glm::vec2(0)),
       m_friction(0.1f),
@@ -45,7 +46,8 @@ namespace jam
       m_recyle(),
       m_recyle_counter(),
       m_currentWeapon(0),
-      m_nameText()
+      m_nameText(),
+      m_healthShape()
   {
     const auto id = std::string(data["id"].GetString());
     if (controllable) {
@@ -73,6 +75,10 @@ namespace jam
       const auto bounds = m_nameText.getLocalBounds();
       m_nameText.setOrigin(bounds.width / 2, bounds.height);
       m_nameText.setScale(0.4f, 0.4f);
+
+      m_healthShape.setFillColor(sf::Color::Green);
+      m_healthShape.setOutlineThickness(2.f);
+      m_healthShape.setOutlineColor(sf::Color::Black);
     }
 
     setRadius(data["radius"].GetFloat());
@@ -233,7 +239,7 @@ namespace jam
       sf::Listener::setPosition(currentPos.x, currentPos.y, 0.f);
       sf::Listener::setDirection(lookDir.x, lookDir.y, 0.f);
 
-      if (glm::length(m_targetDirection) > 0) {
+      // if (glm::length(m_targetDirection) > 0) {
         const auto pos = getCurrentPos();
         rapidjson::Document doc(rapidjson::kObjectType);
         rapidjson::Value positionVector(rapidjson::kArrayType);
@@ -246,7 +252,7 @@ namespace jam
         doc.AddMember("angle", angle, doc.GetAllocator());
 
         sendMessage("updateMovement", doc, false);
-      }
+      // }
     }
 
     InterpolatesTransform::update(dt);
@@ -255,6 +261,9 @@ namespace jam
     setPosition(sf::Vector2f(currentPos.x, currentPos.y));
 
     m_nameText.setPosition(getPosition().x, getPosition().y - 60.f);
+    m_healthShape.setPosition(getPosition().x, getPosition().y + 60.f);
+    m_healthShape.setSize(sf::Vector2f(static_cast<float>(m_health) / m_maxHealth * 65.f, 10.f));
+    m_healthShape.setOrigin(m_healthShape.getSize().x / 2, 0.f);
 
     if (!m_controllable) {
       m_bang_sound.setPosition(getPosition().x, getPosition().y, 0.f);
@@ -265,6 +274,7 @@ namespace jam
   {
     target.draw(*this);
     target.draw(m_nameText);
+    target.draw(m_healthShape);
 
     if (m_controllable) {
       for (int i = 0; i < 4; i++) {
@@ -302,7 +312,9 @@ namespace jam
       setActive(true);
     }
     else if (strstr(message, "damage:")) {
-      offsetHealth(data["amount"].GetInt());
+      setHealth(static_cast<int>(data["health"].GetFloat()));
+
+      setActive(!isDead());
     }
 
     if (m_controllable) return;

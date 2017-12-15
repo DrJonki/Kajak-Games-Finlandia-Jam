@@ -53,6 +53,7 @@ namespace jam
     Instance& m_instance;
     const Faction m_faction;
     const bool m_controllable;
+    const int m_maxHealth;
     int m_health;
     glm::vec2 m_speedVec;
     glm::vec2 m_accelVec;
@@ -77,5 +78,6 @@ namespace jam
     Randomizer m_rand;
 
     sf::Text m_nameText;
+    sf::RectangleShape m_healthShape;
   };
 }

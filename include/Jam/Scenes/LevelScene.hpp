@@ -6,6 +6,7 @@
 #include <SFML/Graphics/View.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Audio/Music.hpp>
+#include <SFML/System/Clock.hpp>
 #include <rapidjson/document.h>
 #include <unordered_map>
 
@@ -33,9 +34,8 @@ namespace jam
 
     void textEvent(const uint32_t code) override;
 
-    void mousePressed(const int mouseKey, const int x, const int y) override;
-
     void socketEvent(const char* message, const rapidjson::Value& data) override;
+
     void spawnBulletHole(sf::Vector2f pos);
 
   private:
@@ -57,7 +57,7 @@ namespace jam
 
     sf::View m_gameView;
     sf::View m_uiView;
-    std::vector<sf::CircleShape> m_bulletHoles;
+    std::vector<std::pair<sf::CircleShape, sf::Clock>> m_bulletHoles;
     sf::Music m_backgroundSound[2];
   };
 }

@@ -8,6 +8,7 @@
 #include <Jam/Entities/GenericEntity.hpp>
 #include <Jam/Entities/Storm.hpp>
 #include <SFML/Window/Mouse.hpp>
+#include <glm/common.hpp>
 #include <iostream>
 
 namespace jam
@@ -87,7 +88,7 @@ namespace jam
       auto& playerArray = data["players"];
 
       for (auto& itr : playerArray.GetArray()) {
-        m_characterLayer.insert<Player>(data["id"].GetString(), ins, *this, false, data, m_gameView);
+        m_characterLayer.insert<Player>(itr["id"].GetString(), ins, *this, false, itr, m_gameView);
       }
     }
 
@@ -112,6 +113,21 @@ namespace jam
     Scene::update(dt);
     if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)  && !m_player.isDead() && m_player.getTriggerReady()) {
       m_player.shoot();
+
+      const auto world = getInstance().window.mapPixelToCoords(sf::Mouse::getPosition(getInstance().window), m_gameView) + m_player.getInAccuracy();
+      spawnBulletHole(world);
+
+      rapidjson::Document data(rapidjson::kObjectType);
+
+      rapidjson::Value point(rapidjson::kArrayType);
+      point.PushBack(world.x, data.GetAllocator());
+      point.PushBack(world.y, data.GetAllocator());
+      data.AddMember("crosshairPosition", point, data.GetAllocator());
+
+      rapidjson::Value weaponType(m_player.getCurrentWeapon());
+      data.AddMember("weaponType", weaponType, data.GetAllocator());
+
+      getInstance().sendMessage("shoot", data, false);
     }
 
     if (m_player.isDead()) {
@@ -121,14 +137,28 @@ namespace jam
       m_uiState &= ~UIState::Dead;
     }
 
-    m_gameView.setCenter(m_player.getPosition());
+    const glm::vec2 target(m_player.getPosition().x, m_player.getPosition().y);
+    const glm::vec2 camPos(m_gameView.getCenter().x, m_gameView.getCenter().y);
+    const glm::vec2 currentPos(glm::mix(camPos, target, dt * 10.f));
 
-    for (std::size_t i = 0; i < m_uiLayers.size(); ++i) {
-      m_uiLayers[i]->setActive(i == static_cast<std::size_t>((m_uiState & 1 << (i + 1)) != 0));
+    m_gameView.setCenter(currentPos.x, currentPos.y);
+
+    for (std::size_t i = 0; i < m_uiLayers.size() - 1; ++i) {
+      m_uiLayers[i + 1]->setActive(static_cast<std::size_t>((m_uiState & 1 << i) != 0));
     }
 
     const auto mouseWorld = getInstance().window.mapPixelToCoords(sf::Mouse::getPosition(getInstance().window), m_gameView);
     m_crossHair.setPosition(mouseWorld);
+
+    // Remove old bullet holes
+    m_bulletHoles.erase(std::remove_if(m_bulletHoles.begin(), m_bulletHoles.end(), [](decltype(m_bulletHoles[0])& value) {
+      const float holeLifetime = 5.f;
+      const auto col = value.first.getFillColor();
+      const auto secs = value.second.getElapsedTime().asSeconds();
+
+      value.first.setFillColor(sf::Color(col.r, col.g, col.b, 255 - static_cast<sf::Uint8>(secs / holeLifetime * 255)));
+      return secs > 5.f;
+    }), m_bulletHoles.end());
   }
 
   void LevelScene::draw(sf::RenderTarget & target)
@@ -136,7 +166,7 @@ namespace jam
     target.clear(sf::Color(222, 222, 222));
 
     for (auto& itr : m_bulletHoles) {
-      target.draw(itr);
+      target.draw(itr.first);
     }
 
     Scene::draw(target);
@@ -152,45 +182,28 @@ namespace jam
     }
   }
 
-  void LevelScene::mousePressed(const int mouseKey, const int x, const int y)
-  {
-    if (mouseKey == sf::Mouse::Button::Left && !m_player.isDead() && m_player.getTriggerReady()) {
-
-      const auto world = getInstance().window.mapPixelToCoords(sf::Vector2i(x, y), m_gameView) + m_player.getInAccuracy();
-      spawnBulletHole(world);
-      rapidjson::Document data(rapidjson::kObjectType);
-      rapidjson::Value point(rapidjson::kArrayType);
-      point.PushBack(world.x, data.GetAllocator());
-      point.PushBack(world.y, data.GetAllocator());
-      data.AddMember("crosshairPosition", point, data.GetAllocator());
-      rapidjson::Value weaponType(m_player.getCurrentWeapon());
-      data.AddMember("weaponType", weaponType, data.GetAllocator());
-      getInstance().sendMessage("shoot", data, false);
-    }
-  }
-
   void LevelScene::spawnBulletHole(sf::Vector2f pos) {
     sf::CircleShape bullet = sf::CircleShape();
     bullet.setPosition(pos);
     bullet.setRadius(2);
     bullet.setFillColor(sf::Color(40, 40, 40));
-    m_bulletHoles.push_back(bullet);
+    m_bulletHoles.push_back(std::make_pair(bullet, sf::Clock()));
   }
 
   void LevelScene::socketEvent(const char * message, const rapidjson::Value & data)
   {
     Scene::socketEvent(message, data);
 
-    auto findPlayerId = [&data]() -> const char* {
-      return data["id"].GetString();
-    };
-
     if (strcmp(message, "join") == 0) {
-      m_characterLayer.insert<Player>(findPlayerId(), getInstance(), *this, false, data, m_gameView);
+      m_characterLayer.insert<Player>(data["id"].GetString(), getInstance(), *this, false, data, m_gameView);
     }
 
     else if (strcmp(message, "leave") == 0) {
-      m_characterLayer.get(findPlayerId())->erase();
+      auto player = m_characterLayer.get(data["id"].GetString());
+
+      if (player) {
+        player->erase();
+      }
     }
 
     else if (strcmp(message, "kick") == 0) {

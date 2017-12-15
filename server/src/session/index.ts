@@ -37,8 +37,9 @@ export default class Session {
       players: map(this.mPlayers, (value) => {
         return {
           id: value.id,
-          health: value.id,
+          health: value.health,
           name: value.name,
+          radius: Player.radius,
           faction: value.faction,
         };
       }),
@@ -54,7 +55,7 @@ export default class Session {
 
     this.mPlayers[socket.id] = player;
 
-    console.log(player.id, 'joined session', this.id);
+    console.log(player.name, 'joined session', this.id);
   }
 
   public leave(socket: Socket, reason = 0) {
@@ -70,10 +71,10 @@ export default class Session {
         reason,
       }, true, player);
 
+      console.log(player.name, 'left session', this.id, '-', reason);
+
       player.destroy();
       delete this.mPlayers[socket.id];
-
-      console.log(player.id, 'left session', this.id, '-', reason);
     }
   }
 
@@ -114,7 +115,7 @@ export default class Session {
       player.angle = data.angle;
 
       this.broadcast(`updateMovement:${player.id}`, {
-        position: player.position,
+        position: player.position.array,
         angle: player.angle,
       }, false, player);
     }
@@ -127,7 +128,7 @@ export default class Session {
       const pos = player.shootPosition(new Vec(data.crosshairPosition));
 
       this.broadcast(`shoot:${player.id}`, {
-        position: pos,
+        position: pos.array,
         weaponType: data.weaponType,
       }, false, player);
 
@@ -137,7 +138,7 @@ export default class Session {
 
         if (dist < Player.radius) {
           this.broadcast(`damage:${value.id}`, {
-            health: player.damage(headshot ? 100 : 50) * data.weaponType === 0 ? 1.0 : 0.2,
+            health: Math.floor(player.damage((headshot ? 100 : 50) / (data.weaponType === 0 ? 1 : 5))),
             headshot,
             respawnTime: player.respawnTime,
           }, true);
