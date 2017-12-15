@@ -5,6 +5,7 @@ export default (router: Router) => {
   router.registerController('SessionController', new SessionController());
 
   router.register('ping', (data, socket) => {
+    console.log('ponging', socket.id);
     socket.send('pong', undefined, false);
   });
 

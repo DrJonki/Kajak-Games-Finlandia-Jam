@@ -34,9 +34,12 @@ export default class Socket {
         this.mTcpSocket.write(`${obj};end;`);
       } else {
         console.log('UDP message TO -', this.id, ':', obj);
-        this.mUdpSocket.send(obj, this.port, this.address);
+        this.mUdpSocket.send(obj, this.port, this.address, (err) => {
+          console.log('UDP ERROR', err);
+        });
       }
     } catch (err) {
+      console.log(err);
       console.error(err);
     }
   }
