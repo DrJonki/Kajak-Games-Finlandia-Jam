@@ -33,6 +33,8 @@ export default class Socket {
         package: event,
       });
 
+      console.log("sending", obj);
+
       // if (tcp) {
       //   this.mTcpSocket.write(new Buffer(obj));
       // } else {
