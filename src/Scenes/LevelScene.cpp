@@ -6,6 +6,7 @@
 #include <SFML/Graphics/View.hpp>
 #include <Jam/Scenes/TitleScene.hpp>
 #include <Jam/Entities/GenericEntity.hpp>
+#include <Jam/Entities/Storm.hpp>
 #include <SFML/Window/Mouse.hpp>
 #include <iostream>
 
@@ -16,22 +17,31 @@ namespace jam
       m_backgroundLayer(addLayer(10)),
       m_propLayer(addLayer(20)),
       m_characterLayer(addLayer(30)),
+      m_stormLayer(addLayer(32)),
       m_uiLayers(),
       m_uiState(UIState::None),
       m_crossHair(sf::Vector2f(20, 20)),
       m_gameView(sf::Vector2f(), sf::Vector2f(data["view"][0u].GetFloat(), data["view"][1].GetFloat())),
       m_uiView(sf::Vector2f(0.5f, 0.5f), sf::Vector2f(1.f, 1.f)),
       m_player(m_characterLayer.insert<Player>(data["id"].GetString(), ins, *this, true, data, m_gameView)),
-      m_music()
+      m_backgroundSound()
   {
-    /*m_music.setLoop(true);
-    m_music.setRelativeToListener(true);
-    m_music.openFromFile("assets/Audio/sandstorm.ogg");
-    m_music.play();*/
+    m_backgroundSound[0].setLoop(true);
+    m_backgroundSound[0].setVolume(15);
+    m_backgroundSound[0].setRelativeToListener(true);
+    m_backgroundSound[0].openFromFile("assets/Audio/effects/background_gunfire_distant.ogg");
+    m_backgroundSound[0].play();
+
+    m_backgroundSound[1].setLoop(true);
+    m_backgroundSound[1].setVolume(25);
+    m_backgroundSound[1].setRelativeToListener(true);
+    m_backgroundSound[1].openFromFile("assets/Audio/effects/background_gunfire.ogg");
+    m_backgroundSound[1].play();
 
     m_backgroundLayer.setSharedView(&m_gameView);
     m_propLayer.setSharedView(&m_gameView);
     m_characterLayer.setSharedView(&m_gameView);
+    m_stormLayer.setSharedView(&m_gameView);
 
     m_crossHair.setTexture(&ins.resourceManager.GetTexture("crosshair.png"));
     m_crossHair.setOrigin(m_crossHair.getSize() * 0.5f);
@@ -40,6 +50,8 @@ namespace jam
       m_uiLayers.push_back(&addLayer(40 + i));
       m_uiLayers.back()->setSharedView(&m_uiView);
     }
+
+    m_stormLayer.insert<Storm>("storm", *this, m_gameView);
 
     const auto& font = ins.resourceManager.GetFont("BEBAS.ttf");
 

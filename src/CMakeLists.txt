@@ -41,6 +41,8 @@ set(SRC
   ${SRCDIR}/Entities/Particle.cpp
   ${INCDIR}/Entities/Player.hpp
   ${SRCDIR}/Entities/Player.cpp
+  ${INCDIR}/Entities/Storm.hpp
+  ${SRCDIR}/Entities/Storm.cpp
   ${INCDIR}/Entities/GenericEntity.hpp
   ${INCDIR}/Entities/GenericEntity.inl
   

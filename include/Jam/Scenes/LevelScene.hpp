@@ -45,6 +45,7 @@ namespace jam
     Layer& m_backgroundLayer;
     Layer& m_propLayer;
     Layer& m_characterLayer;
+    Layer& m_stormLayer;
     std::vector<Layer*> m_uiLayers;
     std::size_t m_uiState;
 
@@ -57,6 +58,6 @@ namespace jam
     sf::View m_gameView;
     sf::View m_uiView;
     std::vector<sf::CircleShape> m_bulletHoles;
-    sf::Music m_music;
+    sf::Music m_backgroundSound[2];
   };
 }

@@ -3,13 +3,22 @@
 #include <rapidjson/pointer.h>
 #include <Jam/Instance.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
+#include <SFML/Audio/Listener.hpp>
 #include <glm/vec2.hpp>
 #include <glm/geometric.hpp>
-#include<glm/gtc/constants.hpp>
+#include <glm/gtc/constants.hpp>
 #include <cmath>
 //#include <glm/gtx/vector_angle.hpp>
 #include <SFML/Window/Mouse.hpp>
 #include <iostream>
+
+namespace
+{
+  const char* ns_weaponSounds[] = {
+    "effects/bolt_shot_reload.wav",
+    "effects/smg_shot.wav"
+  };
+}
 
 namespace jam
 {
@@ -36,35 +45,31 @@ namespace jam
       m_recyle_counter(),
       m_currentWeapon(0)
   {
+    const auto id = std::string(data["id"].GetString());
     if (controllable) {
-      listen("forcePosition:" + std::string(data["id"].GetString()));
+      listen("forcePosition:" + id);
+
       for (int i = 0; i < 4; i++) {
         m_rectangles[i].setFillColor(sf::Color::Red);
       }
     }
-
-    m_bang_sound.setBuffer(ins.resourceManager.GetSoundBuffer("effects/bolt_shot_reload.wav"));
-    m_sub_bang_sound.setBuffer(ins.resourceManager.GetSoundBuffer("effects/smg_shot.wav"));
-    m_bang_sound.setRelativeToListener(controllable);
-
-    const auto id = std::string(data["id"].GetString());
-    const std::vector<std::string> listeners = {
-      "updateMovement:" + id,
-      "damage:" + id,
-      "respawn:" + id,
-    };
-
-    for (auto& i : listeners) {
-      listen(i);
+    else {
+      listen("updateMovement:" + id);
+      listen("shoot:" + id);
     }
+
+    listen("damage:" + id);
+    listen("respawn:" + id);
+
+    m_bang_sound.setRelativeToListener(controllable);
 
     setRadius(data["radius"].GetFloat());
     setOrigin(getRadius(), getRadius());
 
     m_recyle[0] = 20;
     m_recyle[1] = 3;
-    m_reloadTime[0] = 1.5;
-    m_reloadTime[1] = 0.05;
+    m_reloadTime[0] = 1.5f;
+    m_reloadTime[1] = 0.05f;
     m_reloadCounter[0] = 0;
     m_reloadCounter[1] = 0;
     m_recyleRecovery[0] = 10;
@@ -95,20 +100,16 @@ namespace jam
 
   void Player::shoot()
   {
-    float recyle_max = 35;
+    const float recyle_max = 35;
     if (m_recyle_counter[m_currentWeapon] < recyle_max) {
       m_recyle_counter[m_currentWeapon] += 5;
     }
     m_reloadCounter[m_currentWeapon] += m_reloadTime[m_currentWeapon];
-    switch (m_currentWeapon){
-    case 0:
-      m_bang_sound.play();
-      break;
-    case 1:
-      m_sub_bang_sound.play();
-      break;
-    }
+
+    m_bang_sound.setBuffer(m_instance.resourceManager.GetSoundBuffer(ns_weaponSounds[m_currentWeapon]));
+    m_bang_sound.play();
   }
+
   bool Player::getTriggerReady() {
     return m_reloadCounter[m_currentWeapon] == 0 ? true : false;
   }
@@ -123,7 +124,6 @@ namespace jam
       using sf::Keyboard;
       auto sfMousePos = m_instance.window.mapPixelToCoords( sf::Mouse::getPosition(m_instance.window), m_view);
       glm::vec2 mousePos = glm::vec2(sfMousePos.x, sfMousePos.y);
-
 
       bool input = false;
       for (auto& itr:m_recyle_counter) {
@@ -146,25 +146,25 @@ namespace jam
 
       float recyle = m_recyle[m_currentWeapon] * m_recyle_counter[m_currentWeapon];
       const float speed = 750.f * m_instance.config.float_("INTERPOLATION_TICK_LENGTH");
-      glm::vec2 currentPos = getCurrentPos();
-      glm::vec2 m_lookDir = glm::normalize(mousePos - currentPos);
+      const glm::vec2 currentPos = getCurrentPos();
+      const glm::vec2 lookDir = glm::normalize(mousePos - currentPos);
 
-      setRotation(360/(2*glm::pi<float>())*std::atan2(m_lookDir.y, m_lookDir.x));
+      setRotation(360 / (2 * glm::pi<float>()) * std::atan2(lookDir.y, lookDir.x));
       m_accelVec = glm::vec2(0.f);
       if (sf::Keyboard::isKeyPressed(Keyboard::W)) {
-        m_accelVec += m_accelFloat * m_lookDir;
+        m_accelVec += m_accelFloat * lookDir;
         input = true;
       }
       if (sf::Keyboard::isKeyPressed(Keyboard::S)) {
-        m_accelVec += m_accelFloat * glm::vec2(-m_lookDir.x, -m_lookDir.y);
+        m_accelVec += m_accelFloat * glm::vec2(-lookDir.x, -lookDir.y);
         input = true;
       }
       if (sf::Keyboard::isKeyPressed(Keyboard::A)) {
-        m_accelVec += m_accelFloat * glm::vec2(m_lookDir.y, -m_lookDir.x);
+        m_accelVec += m_accelFloat * glm::vec2(lookDir.y, -lookDir.x);
         input = true;
       }
       if (sf::Keyboard::isKeyPressed(Keyboard::D)) {
-        m_accelVec += m_accelFloat * glm::vec2(-m_lookDir.y, m_lookDir.x);
+        m_accelVec += m_accelFloat * glm::vec2(-lookDir.y, lookDir.x);
         input = true;
       }
       if (sf::Keyboard::isKeyPressed(Keyboard::Key::Num1)) {
@@ -214,6 +214,11 @@ namespace jam
       m_rectangles[3].setSize(sf::Vector2f(rectThickness, rectSize));
       m_rectangles[3].setPosition(sf::Vector2f(mousePos.x - rectThickness / 2, mousePos.y - inAccuracy - rectGap / 2 - rectSize));
 
+      // Audio listener
+      sf::Listener::setUpVector(0, 0, 1.f);
+      sf::Listener::setPosition(currentPos.x, currentPos.y, 0.f);
+      sf::Listener::setDirection(lookDir.x, lookDir.y, 0.f);
+
       if (glm::length(m_targetDirection) > 0) {
         const auto pos = getCurrentPos();
         rapidjson::Document doc(rapidjson::kObjectType);
@@ -231,11 +236,16 @@ namespace jam
 
     const auto currentPos = getCurrentPos();
     setPosition(sf::Vector2f(currentPos.x, currentPos.y));
+
+    if (!m_controllable) {
+      m_bang_sound.setPosition(getPosition().x, getPosition().y, 0.f);
+    }
   }
 
   void Player::draw(sf::RenderTarget& target)
   {
     target.draw(*this);
+
     if (m_controllable) {
       for (int i = 0; i < 4; i++) {
         target.draw(m_rectangles[i]);
@@ -259,7 +269,11 @@ namespace jam
       ), force);
     };
 
-    if (strstr(message, "forcePosition:")) {
+    if (strstr(message, "shoot:")) {
+      m_currentWeapon = data["weabponType"].GetInt();
+      shoot();
+    }
+    else if (strstr(message, "forcePosition:")) {
       posUpdate(true);
     }
     else if (strstr(message, "respawn:")) {
