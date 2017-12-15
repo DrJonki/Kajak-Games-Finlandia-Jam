@@ -270,7 +270,7 @@ namespace jam
     };
 
     if (strstr(message, "shoot:")) {
-      m_currentWeapon = data["weabponType"].GetInt();
+      m_currentWeapon = data["weaponType"].GetInt();
       shoot();
     }
     else if (strstr(message, "forcePosition:")) {
