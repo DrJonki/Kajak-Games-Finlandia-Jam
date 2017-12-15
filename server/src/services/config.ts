@@ -11,7 +11,7 @@ export default Object.freeze({
     max: 50,
     min: 30,
   },
-  mapRadius: viewSize.x * 2,
+  mapRadius: viewSize.x,
   objectRadiusMult: 1.0,
   viewSize,
 });

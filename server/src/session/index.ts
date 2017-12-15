@@ -105,10 +105,11 @@ export default class Session {
     const player = this.mPlayers[socket.id];
 
     if (player) {
-      const pos = player.shootPosition(new Vec(data.position));
+      const pos = player.shootPosition(new Vec(data.crosshairPosition));
 
       this.broadcast(`shoot:${player.id}`, {
         position: pos,
+        weaponType: data.weaponType,
       }, false, player);
 
       eachAsync(this.mPlayers, (value) => {
@@ -117,7 +118,7 @@ export default class Session {
 
         if (dist < Player.radius) {
           this.broadcast(`damage:${value.id}`, {
-            health: player.damage(headshot ? 100 : 50),
+            health: player.damage(headshot ? 100 : 50) * data.weaponType === 0 ? 1.0 : 0.2,
             headshot,
             respawnTime: player.respawnTime,
           }, true);
