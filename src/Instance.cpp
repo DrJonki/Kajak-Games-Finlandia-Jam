@@ -52,7 +52,7 @@ namespace jam
 
     connectTcp();
 
-    if (udpSocket().bind(tcpSocket().getLocalPort()) != sf::Socket::Status::Done) {
+    if (udpSocket().bind(tcpSocket().getLocalPort() + 1) != sf::Socket::Status::Done) {
       throw "Failed to bind UDP port";
     }
 
