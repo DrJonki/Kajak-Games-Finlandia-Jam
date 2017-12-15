@@ -76,6 +76,8 @@ namespace jam
     m_recyleRecovery[1] = 25;
     m_inacuracy[0] = 100;
     m_inacuracy[1] = 15;
+    m_minInacuracy[0] = 0.f;
+    m_minInacuracy[1] = 20.f;
     if (m_faction == Faction::Simo) {
       setTexture(&ins.resourceManager.GetTexture("white.png"));
     }

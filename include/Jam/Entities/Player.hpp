@@ -72,6 +72,7 @@ namespace jam
     float m_reloadTime[2];
     float m_recyleRecovery[2];
     float m_inacuracy[2];
+    float m_minInacuracy[2];
     Randomizer m_rand;
   };
 }
