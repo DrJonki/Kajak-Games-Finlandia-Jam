@@ -52,7 +52,7 @@ namespace jam
 
     connectTcp();
 
-    if (udpSocket().bind(tcpSocket().getLocalPort() + 1) != sf::Socket::Status::Done) {
+    if (udpSocket().bind(tcpSocket().getLocalPort()) != sf::Socket::Status::Done) {
       throw "Failed to bind UDP port";
     }
 
@@ -76,7 +76,7 @@ namespace jam
 
         auto pack = doc["package"].GetString();
         if (strcmp(pack, "ping") == 0) {
-          sendMessage("pong", false);
+          std::cout << sendMessage("pong", false) << std::endl;
         }
         else if (strcmp(pack, "pong") == 0) {
           m_lastPingTime = m_pingTimer.restart();
@@ -250,7 +250,20 @@ namespace jam
       }
     }
 
-    return udpSocket().send(buffer.GetString(), buffer.GetSize(), address, port) == sf::Socket::Done;
+    while (true) {
+      const auto status = udpSocket().send(buffer.GetString(), buffer.GetSize(), address, port);
+
+      switch (status) {
+        case sf::Socket::Done:
+          return true;
+
+        case sf::Socket::NotReady:
+          continue;
+
+        default:
+          return false;
+      }
+    }
   }
 
   sf::Time Instance::getLastPingTime() const

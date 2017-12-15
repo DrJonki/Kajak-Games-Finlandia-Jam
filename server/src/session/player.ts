@@ -24,8 +24,6 @@ export default class Player {
   private readonly mSession: Session;
   private readonly mOnDisconnect: TOnDisconnectFunc;
   private mHealth: number;
-  private mPinger: NodeJS.Timer;
-  private mTimeout: NodeJS.Timer;
   private mPosition = new Vec(0, 0);
   private mAngle = 0;
 
@@ -35,33 +33,7 @@ export default class Player {
     this.socket = socket;
     this.mOnDisconnect = onDisconnect;
     this.mSession = session;
-
     this.mHealth = Config.initialHealth[faction];
-
-    this.mPinger = setInterval(() => {
-      console.log('ping', this.name);
-      this.socket.send('ping', undefined, false);
-    }, 5000);
-    this.pong();
-  }
-
-  public pong() {
-    console.log('pong', this.name);
-
-    if (this.mTimeout) {
-      clearTimeout(this.mTimeout);
-      this.mTimeout = undefined;
-    }
-    this.mTimeout = setTimeout(() => {
-      this.mOnDisconnect(1);
-    }, 15000);
-  }
-
-  public destroy() {
-    clearInterval(this.mPinger);
-    if (this.mTimeout) {
-      clearTimeout(this.mTimeout);
-    }
   }
 
   public shootPosition(vec: Vec) {
