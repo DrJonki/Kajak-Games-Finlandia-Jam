@@ -1,6 +1,7 @@
 import { each as eachAsync } from 'async';
 import * as uuid from 'uuid/v4';
 import Player, { Faction } from './player';
+import Config from '@/services/config';
 import Socket from '@/util/socket';
 import Vec from '@/util/vec';
 import Level from './level';
@@ -30,6 +31,7 @@ export default class Session {
       radius: Player.radius,
       health: player.health,
       level: this.mLevel.level,
+      view: [ Config.viewSize.x, Config.viewSize.y ],
       players: map(this.mPlayers, (value) => {
         return {
           id: value.id,

@@ -1,6 +1,10 @@
+import Config from '@/services/config';
+import Randomizer from '@/util/randomizer';
+
 const enum PropType {
   RockCircular,
   HouseRectangular,
+  Last,
 }
 
 interface IProp {
@@ -15,20 +19,46 @@ interface IProp {
 }
 
 export default class Level {
-  private readonly mLevel: any = {};
+  private readonly mLevel = {
+    props: [] as IProp[],
+  };
   private mIdCounter = 0;
 
   public constructor() {
-    // TODO:Generate
-    this.mLevel.props = [
-      {
-        id: '0',
-        radius: 50,
-        position: [0, 0],
-        type: 0,
-        angle: 0,
-      },
-    ];
+    const numProps = Math.floor(Randomizer.range(Config.mapObjects.min, Config.mapObjects.max));
+
+    for (let i = 0; i < numProps; ++i) {
+      const type = Math.floor(Math.random() * (PropType.Last - 0.01));
+      let attribs: any;
+
+      switch (type) {
+        case PropType.RockCircular: {
+          attribs = {
+            radius: Randomizer.range(8 * Config.objectRadiusMult, 25 * Config.objectRadiusMult),
+          };
+          break;
+        }
+        case PropType.HouseRectangular: {
+          attribs = {
+            size: [
+              Randomizer.range(25 * Config.objectRadiusMult, 50 * Config.objectRadiusMult),
+              Randomizer.range(25 * Config.objectRadiusMult, 50 * Config.objectRadiusMult),
+            ],
+          };
+          break;
+        }
+        default: {
+          throw new Error('Invalid prop generated');
+        }
+      }
+
+      this.mLevel.props.push(Object.assign(attribs, {
+        id: String(this.mIdCounter++),
+        type,
+        position: Randomizer.insideCircle(Config.mapRadius).array,
+        angle: Math.random() * 359,
+      }));
+    }
   }
 
   public get level() {

@@ -19,7 +19,7 @@ namespace jam
       m_uiLayers(),
       m_uiState(UIState::None),
       m_crossHair(sf::Vector2f(20, 20)),
-      m_gameView(sf::Vector2f(), sf::Vector2f(ins.config.float_("VIEW_X"), ins.config.float_("VIEW_Y"))),
+      m_gameView(sf::Vector2f(), sf::Vector2f(data["view"][0u].GetFloat(), data["view"][1].GetFloat())),
       m_uiView(sf::Vector2f(0.5f, 0.5f), sf::Vector2f(1.f, 1.f)),
       m_player(m_characterLayer.insert<Player>(data["id"].GetString(), ins, *this, true, data, m_gameView)),
       m_music()

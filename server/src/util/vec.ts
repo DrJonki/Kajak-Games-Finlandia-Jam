@@ -20,6 +20,15 @@ export default class Vec {
     return Math.sqrt(this.x * this.x + this.y * this.y);
   }
 
+  public get normalized() {
+    const len = this.length;
+    return new Vec(this.x / len, this.y / len);
+  }
+
+  public get array() {
+    return [this.x, this.y];
+  }
+
   public minus(vec: Vec) {
     return new Vec(this.x - vec.x, this.y - vec.y);
   }

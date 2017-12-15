@@ -1,5 +1,6 @@
 import Vec from '@/util/vec';
 import Socket from '@/util/socket';
+import Config from '@/services/config';
 import Session from '@/session';
 import * as uuid from 'uuid/v4';
 import { size } from 'lodash';
@@ -12,13 +13,8 @@ export const enum Faction {
   Russian,
 }
 
-const initialHealth = [
-  /* Simo */    1000,
-  /* Russian */ 100,
-];
-
 export default class Player {
-  public static readonly radius = 30.0;
+  public static readonly radius = 30 * Config.objectRadiusMult;
 
   public readonly socket: Socket;
   public readonly id = uuid();
@@ -38,7 +34,7 @@ export default class Player {
     this.mOnDisconnect = onDisconnect;
     this.mSession = session;
 
-    this.mHealth = initialHealth[faction];
+    this.mHealth = Config.initialHealth[faction];
 
     this.mPinger = setInterval(() => {
       this.socket.send('ping', undefined, false);
@@ -72,7 +68,7 @@ export default class Player {
     this.mHealth -= amount;
 
     setTimeout(() => {
-      this.mHealth = initialHealth[this.faction];
+      this.mHealth = Config.initialHealth[this.faction];
 
       this.mSession.broadcast(`respawn:${this.id}`, {
         health: this.health,
