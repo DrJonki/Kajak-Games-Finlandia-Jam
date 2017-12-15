@@ -108,8 +108,8 @@ namespace jam
     getInstance().sendMessage("disconnect", true);
   }
 
-  bool LevelScene::bulletGotToTarget(glm::vec2 from) {
-    bool nohit = true;
+  glm::vec2 LevelScene::bulletGotToTarget(glm::vec2 from) {
+    glm::vec2  hit = from;
     glm::vec2 to = m_player.getCurrentPos();
     for (auto& itr : m_propLayer.getAll()) {
       auto& shape = static_cast<Obstacle&>(*itr);
@@ -119,15 +119,14 @@ namespace jam
         glm::vec2 line = to - from;
         glm::vec2 helpVec = from - point;
         glm::vec2 ansVec = helpVec - glm::dot(helpVec, line)*line;
+        float dist = glm::length(ansVec);
 
-        
-
-        if (glm::length(ansVec) < static_cast<const sf::CircleShape&> (shape.getShape()).getRadius()) {
-          nohit = false;
+        if (dist < static_cast<const sf::CircleShape&> (shape.getShape()).getRadius()) {
+          hit = glm::vec2(shape.getShape().getPosition().x, shape.getShape().getPosition().y);
         }
       }
     }
-    return nohit;
+    return hit;
   }
 
   void LevelScene::update(const float dt)
@@ -136,7 +135,9 @@ namespace jam
     if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)  && !m_player.isDead() && m_player.getTriggerReady()) {
       m_player.shoot();
 
-      const auto world = getInstance().window.mapPixelToCoords(sf::Mouse::getPosition(getInstance().window), m_gameView) + m_player.getInAccuracy();
+      auto world = getInstance().window.mapPixelToCoords(sf::Mouse::getPosition(getInstance().window), m_gameView) + m_player.getInAccuracy();
+      auto asd = bulletGotToTarget(glm::vec2(world.x, world.y));
+      world = sf::Vector2f(asd.x, asd.y);
       spawnBulletHole(world);
 
       rapidjson::Document data(rapidjson::kObjectType);
