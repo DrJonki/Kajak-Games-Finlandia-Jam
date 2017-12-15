@@ -1,6 +1,7 @@
 import Vec from '@/util/vec';
 import Socket from '@/util/socket';
 import Config from '@/services/config';
+import * as randName from 'node-random-name';
 import Session from '@/session';
 import * as uuid from 'uuid/v4';
 import { size } from 'lodash';
@@ -26,10 +27,11 @@ export default class Player {
   private mPinger: NodeJS.Timer;
   private mTimeout: NodeJS.Timer;
   private mPosition = new Vec(0, 0);
+  private mAngle = 0;
 
   constructor(faction: Faction, data: any, socket: Socket, session: Session, onDisconnect: TOnDisconnectFunc) {
     this.faction = faction;
-    this.name = data.name;
+    this.name = randName();
     this.socket = socket;
     this.mOnDisconnect = onDisconnect;
     this.mSession = session;
@@ -88,6 +90,14 @@ export default class Player {
 
   public get position() {
     return this.mPosition;
+  }
+
+  public set angle(angle: number) {
+    this.mAngle = angle;
+  }
+
+  public get angle() {
+    return this.mAngle;
   }
 
   public get health() {

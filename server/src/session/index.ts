@@ -31,12 +31,14 @@ export default class Session {
       faction: player.faction,
       radius: Player.radius,
       health: player.health,
+      name: player.name,
       level: this.mLevel.level,
       view: [ Config.viewSize.x, Config.viewSize.y ],
       players: map(this.mPlayers, (value) => {
         return {
           id: value.id,
           health: value.id,
+          name: value.name,
           faction: value.faction,
         };
       }),
@@ -45,6 +47,7 @@ export default class Session {
     this.broadcast('join', {
       id: player.id,
       health: player.health,
+      name: player.name,
       faction: player.faction,
       radius: Player.radius,
     }, true);
@@ -108,9 +111,11 @@ export default class Session {
 
     if (player) {
       player.position = new Vec(data.position);
+      player.angle = data.angle;
 
       this.broadcast(`updateMovement:${player.id}`, {
         position: player.position,
+        angle: player.angle,
       }, false, player);
     }
   }

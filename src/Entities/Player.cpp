@@ -11,6 +11,7 @@
 //#include <glm/gtx/vector_angle.hpp>
 #include <SFML/Window/Mouse.hpp>
 #include <iostream>
+#include <algorithm>
 
 namespace
 {
@@ -43,7 +44,8 @@ namespace jam
       m_playerRotatio(0.f),
       m_recyle(),
       m_recyle_counter(),
-      m_currentWeapon(0)
+      m_currentWeapon(0),
+      m_nameText()
   {
     const auto id = std::string(data["id"].GetString());
     if (controllable) {
@@ -62,6 +64,16 @@ namespace jam
     listen("respawn:" + id);
 
     m_bang_sound.setRelativeToListener(controllable);
+
+    {
+      m_nameText.setFont(ins.resourceManager.GetFont("BEBAS.ttf"));
+      m_nameText.setFillColor(sf::Color::Black);
+      m_nameText.setCharacterSize(64);
+      m_nameText.setString(data["name"].GetString());
+      const auto bounds = m_nameText.getLocalBounds();
+      m_nameText.setOrigin(bounds.width / 2, bounds.height);
+      m_nameText.setScale(0.4f, 0.4f);
+    }
 
     setRadius(data["radius"].GetFloat());
     setOrigin(getRadius(), getRadius());
@@ -228,7 +240,10 @@ namespace jam
         positionVector.PushBack(pos.x, doc.GetAllocator());
         positionVector.PushBack(pos.y, doc.GetAllocator());
 
+        rapidjson::Value angle(getRotation());
+
         doc.AddMember("position", positionVector, doc.GetAllocator());
+        doc.AddMember("angle", angle, doc.GetAllocator());
 
         sendMessage("updateMovement", doc, false);
       }
@@ -239,6 +254,8 @@ namespace jam
     const auto currentPos = getCurrentPos();
     setPosition(sf::Vector2f(currentPos.x, currentPos.y));
 
+    m_nameText.setPosition(getPosition().x, getPosition().y - 60.f);
+
     if (!m_controllable) {
       m_bang_sound.setPosition(getPosition().x, getPosition().y, 0.f);
     }
@@ -247,6 +264,7 @@ namespace jam
   void Player::draw(sf::RenderTarget& target)
   {
     target.draw(*this);
+    target.draw(m_nameText);
 
     if (m_controllable) {
       for (int i = 0; i < 4; i++) {
@@ -291,6 +309,7 @@ namespace jam
 
     if (strstr(message, "updateMovement:")) {
       posUpdate(data);
+      setRotation(data["angle"].GetFloat());
     }
   }
 }

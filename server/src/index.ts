@@ -47,6 +47,8 @@ const tcpServer = net.createServer((sock) => {
   }).on('close', () => {
     handleMessage(new Buffer(JSON.stringify({ package: 'disconnect' })), sockInstance);
     delete socketContainer[url];
+
+    console.log('TCP disconnected', url);
   });
 }).on('listening', () => {
   console.log('TCP Server listening on', `${tcpServer.address().address}:${tcpServer.address().port}`);

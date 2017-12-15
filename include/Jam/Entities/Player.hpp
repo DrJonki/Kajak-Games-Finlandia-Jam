@@ -6,6 +6,7 @@
 #include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Audio/Sound.hpp>
+#include <SFML/Graphics/Text.hpp>
 #include <array>
 #include <Jam/Randomizer.hpp>
 
@@ -74,5 +75,7 @@ namespace jam
     float m_inacuracy[2];
     float m_minInacuracy[2];
     Randomizer m_rand;
+
+    sf::Text m_nameText;
   };
 }
