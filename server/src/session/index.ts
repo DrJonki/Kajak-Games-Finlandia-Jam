@@ -101,6 +101,8 @@ export default class Session {
     const player = this.mPlayers[socket.id];
 
     if (player) {
+      // TODO: Check if movement is withing acceptable speed.
+
       player.position = new Vec(data.position);
       player.angle = data.angle;
 
@@ -116,6 +118,9 @@ export default class Session {
 
     if (player) {
       const pos = player.shootPosition(new Vec(data.crosshairPosition));
+
+      // TODO: Check if shot position is withing acceptable range (likely inside viewport)
+      // Also check if the reload time has passed.
 
       this.broadcast(`shoot:${player.id}`, {
         position: pos.array,

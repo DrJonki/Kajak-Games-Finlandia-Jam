@@ -126,7 +126,7 @@ namespace jam
 
     // UDP packets
     {
-      static std::string buffer(sf::UdpSocket::MaxDatagramSize, '\0'); // Bigger buffer for TCP messages
+      static std::string buffer(sf::UdpSocket::MaxDatagramSize, '\0');
       sf::IpAddress addr;
       unsigned short port = 0;
       std::size_t received = 0;
